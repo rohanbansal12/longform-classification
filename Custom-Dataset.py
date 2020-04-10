@@ -8,11 +8,12 @@ import collections
 import numpy as np
 from torchtext.data import Iterator, BucketIterator
 import json
-import torch.nn as nn
-import tqdm.notebook as tqdm
+import time
+import tqdm
 
 #output all items, not just last one
 from IPython.core.interactiveshell import InteractiveShell
+
 InteractiveShell.ast_node_interactivity = "all"
 
 #set device
@@ -24,7 +25,6 @@ class Articles(torch.utils.data.Dataset):
         with open(json_file, "r") as data_file:
             self.examples = json.loads(data_file.read())
         self.tokenize()
-        print(self.examples[0])
     
     def __getitem__(self, idx):
         return self.examples[idx]
@@ -48,6 +48,53 @@ class Articles(torch.utils.data.Dataset):
                 prob[idx] = (negative/(len(self)))
         return torch.utils.data.WeightedRandomSampler(weights=prob, num_samples=len(self), replacement=True)
     
+    def create_dictionaries(self):
+        counter = collections.Counter()
+        url_counter = collections.Counter()
+        urls = []
+
+        for example in self.examples:
+            counter.update(example['text'])
+            counter.update(example['title'])
+            urls.append(example['url'])
+
+        url_counter.update(urls)
+        word_to_id = {word: id for id, word in enumerate(counter.keys())}
+        article_to_id = {word: id for id, word in enumerate(url_counter.keys())}
+        return word_to_id, article_to_id
+    
+    def map_items(self, word_to_id, url_to_id):
+        words = []
+        articles = []
+        labels = []
+        for idx, example in enumerate(self.examples):
+            self.examples[idx]['text'] = [word_to_id.get(word) for word in example['text']]
+            self.examples[idx]['title'] = [word_to_id.get(word) for word in example['title']]
+            self.examples[idx]['url'] = url_to_id.get(example['url'])
+            
+def create_merged_dictionaries(train, test, val):
+    train_word_id, train_url_id = train.create_dictionaries()
+    test_word_id, test_url_id = test.create_dictionaries()
+    val_word_id, val_url_id = val.create_dictionaries()
+    test_word_id.update(train_word_id)
+    test_url_id.update(train_url_id)
+    val_word_id.update(test_word_id)
+    val_url_id.update(test_url_id)
+    return val_word_id, val_url_id
+
+train_data = Articles("changed-data/train.json")
+test_data = Articles("changed-data/test.json")
+val_data = Articles("changed-data/validate.json")
+
+# train_data = Articles("changed-data/debugdata/train_basic.json")
+# test_data = Articles("changed-data/debugdata/test_basic.json")
+# val_data = Articles("changed-data/debugdata/val_basic.json")
+
+final_word_ids,final_url_ids= create_merged_dictionaries(train_data, test_data, val_data)
+
+for dataset in [train_data, test_data, val_data]:
+    dataset.map_items(final_word_ids, final_url_ids);
+    
 def collate_fn(examples):
     words = []
     articles = []
@@ -58,24 +105,14 @@ def collate_fn(examples):
         labels.append(example['longform'])
     num_words = [len(x) for x in words]
     words = np.concatenate(words, axis=0)
-    word_attributes = [word_to_id.get(word) for word in words]
-    word_attributes = torch.tensor(word_attributes, dtype=torch.long)
-    articles = [article_to_id.get(article) for article in articles]
+    word_attributes = torch.tensor(words, dtype=torch.long)
     articles = torch.tensor(articles, dtype=torch.long)
     num_words.insert(0,0)
     num_words.pop(-1)
     attribute_offsets = torch.tensor(np.cumsum(num_words), dtype=torch.long)
     publications = torch.tensor([0])
-    labels = torch.tensor(labels, dtype=torch.long)
+    labels = torch.tensor(labels, dtype=torch.float)
     return publications, articles, word_attributes, attribute_offsets, labels
-    
-train = Articles("changed-data/debugdata/train_basic.json")
-weight_sampler = train.create_weighted_sampler()
-batch_sampler = torch.utils.data.BatchSampler(weight_sampler, 10, drop_last=True)
-
-word_to_id, article_to_id = train.map_items()
-loader = torch.utils.data.DataLoader(train.examples, batch_sampler=batch_sampler, collate_fn=collate_fn)
-next(iter(loader))
 
 class InnerProduct(nn.Module):
     def __init__(self, n_publications, n_articles, n_attributes, emb_size, sparse, use_article_emb):
@@ -135,10 +172,17 @@ class InnerProduct(nn.Module):
             return logits, publication_emb, attribute_emb
         else:
             return logits
-        
+
+train_weight_sampler = train_data.create_weighted_sampler()
+train_batch_sampler = torch.utils.data.BatchSampler(train_weight_sampler, 10, drop_last=True)
+
+train_loader = torch.utils.data.DataLoader(train_data, batch_sampler=train_batch_sampler, collate_fn=collate_fn)
+
+val_loader = torch.utils.data.DataLoader(val_data, batch_size=len(val_data), collate_fn=collate_fn)
+
 kwargs = dict(n_publications=1, 
-              n_articles=len(article_to_id), 
-              n_attributes=len(word_to_id), 
+              n_articles=len(final_url_ids), 
+              n_attributes=len(final_word_ids), 
               emb_size=100, sparse=False, 
               use_article_emb=True)
 model = InnerProduct(**kwargs)
@@ -151,20 +195,30 @@ def cycle(iterable):
 
 loss = torch.nn.BCEWithLogitsLoss()
 optimizer = torch.optim.RMSprop(model.parameters(), lr=1e-4,momentum=0.9)
-epochs = 2
+epochs = 4
 
-for epoch in range(1, epochs + 1):
-    running_loss = 0.0
-    running_corrects = 0
-    model.train() # turn on training mode
-    for step, batch in enumerate(tqdm(loader)):
+val_publications, val_articles, val_word_attributes, val_attribute_offsets, val_labels = next(iter(val_loader))
+model.train() # turn on training mode
+
+while True: 
+    for step,batch in enumerate(iter(cycle(train_loader))):
         optimizer.zero_grad()
         publications, articles, word_attributes, attribute_offsets, labels = batch
         logits = model(publications, articles, word_attributes, attribute_offsets)
         L = loss(logits, labels)
         L.backward()
         optimizer.step()
-        running_loss += L.data * len(articles)
-
-    epoch_loss = running_loss / len(train)
-    print("Epoch loss: ", epoch_loss)
+        if step % 50 == 0:
+            model.eval()
+            preds = model(val_publications, val_articles, val_word_attributes, val_attribute_offsets)
+            sorted_preds, indices = torch.sort(preds)
+            correct_10=0
+            correct_100=0
+            for i in range(0,10):
+                if val_labels[indices[i]] == 1:
+                    correct_10 += 1
+            for i in range(0, 90):
+                if val_labels[indices[i]] == 1:
+                    correct_100 += 1
+            print("Top 10: ", correct_10, " /10 or ", (correct_10*10), "%")
+            print("Top 100: ", correct_100, " /100 or ", correct_100, "%")
