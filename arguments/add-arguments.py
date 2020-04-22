@@ -1,0 +1,82 @@
+import os
+import argparse
+import pathlib
+
+def expand_path(string):
+    return pathlib.Path(os.path.expandvars(string))
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+def add_data(parser):
+    parser.add_argument('--train_path',
+                        type=expand_path,
+                        required=True,
+                        help='Path to train set')
+    parser.add_argument('--test_path',
+                        type=expand_path,
+                        required=True,
+                        help='Path to test set')
+    parser.add_argument('--eval_path',
+                        type=expand_path,
+                        required=True,
+                        help='Path to evaluation set')
+    parser.add_argument('--create_dicts',
+                        type=str2bool,
+                        default=True,
+                        help="Create dictionaries for articles, publications, and words.")
+    parser.add_argument('--dict_dir',
+                        type=expand_path,
+                        help="Path where dictionaries are located. Required if --create_dict is False.")
+    parser.add_argument('--map_items',
+                        type=str2bool,
+                        default=True,
+                        help="True if data must be mapped to ids, else False")
+    parser.add_argument('--tokenize',
+                        type=str2bool,
+                        default=True,
+                        help="Tokenize and split data fields.")
+    parser.add_argument('--target_publication',
+                        type=int,
+                        default=0,
+                        help="Designate target publication.")
+    
+    
+def add_training(parser):
+    parser.add_argument('--batch_size',
+                        type=int,
+                        default=64,
+                        help="Batch size for training")
+    parser.add_argument('--use_gpu',
+                        type=str2bool,
+                        default=True,
+                        help="Use GPU for training and evaluation")
+    
+def add_model(parser):
+    parser.add_argument('--emb_size',
+                        type=int,
+                        default=100,
+                        help="Set word and publication embedding size")
+    parser.add_argument('--use_sparse',
+                        type=str2bool,
+                        default=False,
+                        help="Use sparse in model")
+    parser.add_argument('--use_article_emb',
+                        type=str2bool,
+                        default=False,
+                        help="Use article embeddings in model")
+    
+def add_optimization(parser):
+    parser.add_argument('--learning-rate',
+                        type=float,
+                        default=1e-4,
+                        help="Set optimizer learning rate")
+    parser.add_argument('--momentum',
+                        type=float,
+                        default=0.9,
+                        help="Set optimizer momentum.")
