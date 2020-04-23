@@ -26,6 +26,9 @@ args = parser.parse_args()
 
 if not args.create_dicts and args.dict_dir is None:
     parser.error("If --create_dicts is false, --dict_dir must be specified.")
+
+if not args.train_model and args.model_path is None:
+    parser.error("If --train_model is false, --model_path must be specified")
     
 #set device
 if torch.cuda.is_available() and args.use_gpu:
@@ -75,8 +78,8 @@ class Articles(torch.utils.data.Dataset):
             self.examples[idx]['text'] = [word for word in example['text'] if word != len(word_to_id)]
             self.examples[idx]['title'] = [word_to_id.get(word, len(word_to_id)) for word in example['title']]
             self.examples[idx]['title'] = [word for word in example['title'] if word != len(word_to_id)]
-            self.examples[idx]['url'] = url_to_id.get(example['url'], len(url_to_id))
-            self.examples[idx]['model_publication'] = publication_to_id.get(example['model_publication'], len(publication_to_id))
+            self.examples[idx]['url'] = url_to_id.get(example['url'], url_to_id.get("miscellaneous"))
+            self.examples[idx]['model_publication'] = publication_to_id.get(example['model_publication'], publication_to_id.get("miscellaneous"))
 
 #function to create dictionaries for words and urls for all datasets at once
 def create_merged_dictionaries(all_examples):
@@ -97,6 +100,9 @@ def create_merged_dictionaries(all_examples):
     word_to_id = {word: id for id, word in enumerate(counter.keys())}
     article_to_id = {word: id for id, word in enumerate(url_counter.keys())}
     publication_to_id = {publication: id for id, publication in enumerate(publication_counter.keys())}
+    word_to_id.update({"miscallaneous":len(word_to_id)})
+    article_to_id.update({"miscallaneous":len(article_to_id)})
+    publication_to_id.update({"miscallaneous":len(publication_to_id)})
     return word_to_id, article_to_id, publication_to_id
     
 #load datasets
@@ -110,7 +116,7 @@ eval_data = Articles(eval_path)
 print("Data Loaded")
 
 #Check if items need to be tokenized
-if args.tokenize:
+if args.map_items and args.tokenize:
     train_data.tokenize()
     test_data.tokenize()
     eval_data.tokenize()
@@ -313,19 +319,6 @@ train_loader = torch.utils.data.DataLoader(train_data, batch_sampler=train_batch
 
 eval_loader = torch.utils.data.DataLoader(eval_data, batch_size=len(eval_data), collate_fn=collate_fn, pin_memory=pin_mem)
 
-#initialize model, loss, and optimizer
-kwargs = dict(n_publications=len(final_publication_ids), 
-              n_articles=len(final_url_ids), 
-              n_attributes=len(final_word_ids), 
-              emb_size=args.emb_size, sparse=args.use_sparse, 
-              use_article_emb=args.use_article_emb)
-model = InnerProduct(**kwargs)
-model.reset_parameters()
-model.to(device)
-
-loss = torch.nn.BCEWithLogitsLoss()
-optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
-
 #function that allows for infinite iteration over training batches
 def cycle(iterable):
     while True:
@@ -340,77 +333,147 @@ eval_word_attributes = eval_word_attributes.to(device)
 eval_attribute_offsets = eval_attribute_offsets.to(device)
 eval_real_labels = eval_real_labels.to(device)
 
-model.train(); # turn on training mode
-check=True
+if args.train_model: 
+    
+    #initialize model, loss, and optimizer
+    kwargs = dict(n_publications=len(final_publication_ids), 
+                  n_articles=len(final_url_ids), 
+                  n_attributes=len(final_word_ids), 
+                  emb_size=args.emb_size, sparse=args.use_sparse, 
+                  use_article_emb=args.use_article_emb)
+    model = InnerProduct(**kwargs)
+    model.reset_parameters()
+    model.to(device)
 
-print("Beginning Training")
-print("--------------------")
-#training loop with validation checks every 50 steps and final validation recall calculated after 400 steps
-while check: 
-    for step,batch in enumerate(tqdm(cycle(train_loader))):
-        optimizer.zero_grad();
-        publications, articles, word_attributes, attribute_offsets, real_labels = batch
-        publications = publications.to(device)
-        articles = articles.to(device)
-        word_attributes = word_attributes.to(device)
-        attribute_offsets = attribute_offsets.to(device)
-        labels = torch.Tensor((np.arange(len(articles)) < len(articles) // 2).astype(np.float32)) #create fake labels with first half as positive(1) and second half as negative(0)
-        labels = labels.to(device) 
-        logits = model(publications, articles, word_attributes, attribute_offsets)
-        L = loss(logits, labels)
-        L.backward();
-        optimizer.step();
-        
-        if step % 100 == 0 and step % 800 != 0:
-            print("Step: ", step, "Temporary Training Loss: ", L.detach().mean().cpu().numpy())
-            model.eval();
-            publication_set = [args.target_publication]*len(eval_data)
-            publication_set = torch.tensor(publication_set, dtype=torch.long)
-            publication_set = publication_set.to(device)
-            preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
-            sorted_preds, indices = torch.sort(preds, descending=True)
-            correct_10=0
-            correct_100=0
-            for i in range(0, 100):
-                if eval_real_labels[indices[i]] == args.target_publication:
-                    if i < 10: 
-                        correct_10 += 1
-                    correct_100 += 1
-            print("Evaluation Performance:")
-            print("Top 10: ", correct_10, "/10 or ", (correct_10*10), "%")
-            print("Top 100: ", correct_100, "/100 or", correct_100, "%")
-            print("--------------------")
-            model.train();
+    loss = torch.nn.BCEWithLogitsLoss()
+    optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
+    
+    model.train(); # turn on training mode
+    check=True
 
-        if step != 0 and step % 800 == 0:
-            print("Getting Final Evaluation Results")
-            print("--------------------")
-            model.eval();
-            publication_set = [args.target_publication]*len(eval_data)
-            publication_set = torch.tensor(publication_set, dtype=torch.long)
-            publication_set = publication_set.to(device)
-            preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
-            sorted_preds, indices = torch.sort(preds, descending=True)
-            df = pd.DataFrame(columns=['title', 'url', 'text','publication', 'target_prediction'])
-            links = list(final_url_ids.keys())
-            for i in range(0, 1500):
-                example = eval_data[indices[i]]
-                prediction = sorted_preds[i].item()
-                text = []
-                for x in example['title']:
-                    text.append(next((word for word, numero in final_word_ids.items() if numero == x), None))
-                    title = ""
-                for word in text:
-                    title += word
-                    title += " "
-                unique_text = list(set(example['text']))
-                url = links[example['url']]
-                publication = example['publication']
-                df.loc[i] = [title, url, unique_text, publication, prediction]
-            if not os.path.exists('results'):
-                os.mkdir("results")
-            if not os.path.exists('results/evaluation'):
-                os.mkdir("results/evaluation")
-            df.to_csv("results/evaluation/top-1500.csv", index=False)
-            check=False
-            break
+    print("Beginning Training")
+    print("--------------------")
+    #training loop with validation checks every 50 steps and final validation recall calculated after 400 steps
+    while check: 
+        for step,batch in enumerate(cycle(train_loader)):
+            optimizer.zero_grad();
+            publications, articles, word_attributes, attribute_offsets, real_labels = batch
+            publications = publications.to(device)
+            articles = articles.to(device)
+            word_attributes = word_attributes.to(device)
+            attribute_offsets = attribute_offsets.to(device)
+            labels = torch.Tensor((np.arange(len(articles)) < len(articles) // 2).astype(np.float32)) #create fake labels with first half as positive(1) and second half as negative(0)
+            labels = labels.to(device) 
+            logits = model(publications, articles, word_attributes, attribute_offsets)
+            L = loss(logits, labels)
+            L.backward();
+            optimizer.step();
+
+            if step % 100 == 0 and step % 800 != 0:
+                print("Step: ", step, " | Temporary Training Loss: ", L.detach().mean().cpu().numpy())
+                model.eval();
+                publication_set = [args.target_publication]*len(eval_data)
+                publication_set = torch.tensor(publication_set, dtype=torch.long)
+                publication_set = publication_set.to(device)
+                preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
+                sorted_preds, indices = torch.sort(preds, descending=True)
+                correct_10=0
+                correct_100=0
+                for i in range(0, 100):
+                    if eval_real_labels[indices[i]] == args.target_publication:
+                        if i < 10: 
+                            correct_10 += 1
+                        correct_100 += 1
+                print("Evaluation Performance:")
+                print("Top 10: ", correct_10, "/10 or ", (correct_10*10), "%")
+                print("Top 100: ", correct_100, "/100 or", correct_100, "%")
+                print("--------------------")
+                model.train();
+
+            if step != 0 and step % 800 == 0:
+                print("Getting Final Evaluation Results")
+                print("--------------------")
+                model.eval();
+                publication_set = [args.target_publication]*len(eval_data)
+                publication_set = torch.tensor(publication_set, dtype=torch.long)
+                publication_set = publication_set.to(device)
+                preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
+                sorted_preds, indices = torch.sort(preds, descending=True)
+                df = pd.DataFrame(columns=['title', 'url', 'text','publication', 'target_prediction'])
+                links = list(final_url_ids.keys())
+                for i in range(0, 1500):
+                    example = eval_data[indices[i]]
+                    prediction = sorted_preds[i].item()
+                    text = []
+                    for x in example['title']:
+                        text.append(next((word for word, numero in final_word_ids.items() if numero == x), None))
+                        title = ""
+                    for word in text:
+                        title += word
+                        title += " "
+                    unique_text = list(set(example['text']))
+                    url = links[example['url']]
+                    publication = example['publication']
+                    df.loc[i] = [title, url, unique_text, publication, prediction]
+                if not os.path.exists('results'):
+                    os.mkdir("results")
+                if not os.path.exists('results/evaluation'):
+                    os.mkdir("results/evaluation")
+                df.to_csv("results/evaluation/top-1500.csv", index=False)
+                check=False
+                break
+    if not os.path.exists('model'):
+        os.mkdir("model")
+    torch.save(model.state_dict(), "model/inner-product-model.pt")
+            
+else:
+    abs_model_path = Path(args.model_path).resolve()
+    kwargs = dict(n_publications=len(final_publication_ids), 
+              n_articles=len(final_url_ids), 
+              n_attributes=len(final_word_ids), 
+              emb_size=args.emb_size, sparse=args.use_sparse, 
+              use_article_emb=args.use_article_emb)
+    model = InnerProduct(**kwargs)
+    model.load_state_dict(torch.load(abs_model_path))
+    print("Model Successfully Loaded")
+    model.to(device)
+    print("Getting Final Evaluation Results")
+    print("--------------------")
+    model.eval();
+    publication_set = [args.target_publication]*len(eval_data)
+    publication_set = torch.tensor(publication_set, dtype=torch.long)
+    publication_set = publication_set.to(device)
+    preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
+    sorted_preds, indices = torch.sort(preds, descending=True)
+    correct_10=0
+    correct_100=0
+    for i in range(0, 100):
+        if eval_real_labels[indices[i]] == args.target_publication:
+            if i < 10: 
+                correct_10 += 1
+            correct_100 += 1
+    print("Evaluation Performance:")
+    print("Top 10: ", correct_10, "/10 or ", (correct_10*10), "%")
+    print("Top 100: ", correct_100, "/100 or", correct_100, "%")
+    print("--------------------")
+    df = pd.DataFrame(columns=['title', 'url', 'text','publication', 'target_prediction'])
+    links = list(final_url_ids.keys())
+    for i in range(0, 1500):
+        example = eval_data[indices[i]]
+        prediction = sorted_preds[i].item()
+        text = []
+        for x in example['title']:
+            text.append(next((word for word, numero in final_word_ids.items() if numero == x), None))
+            title = ""
+        for word in text:
+            title += word
+            title += " " 
+        unique_text = list(set(example['text']))
+        url = links[example['url']]
+        publication = example['publication']
+        df.loc[i] = [title, url, unique_text, publication, prediction]
+    if not os.path.exists('results'):
+        os.mkdir("results")
+    if not os.path.exists('results/evaluation'):
+        os.mkdir("results/evaluation")
+    df.to_csv("results/evaluation/top-1500.csv", index=False)
