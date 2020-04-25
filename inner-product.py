@@ -181,13 +181,13 @@ if args.map_items:
 
 #define model which uses a simple dot product with publication and word embeddings to calculate logits
 class InnerProduct(nn.Module):
-    def __init__(self, n_publications, n_articles, n_attributes, emb_size, sparse, use_article_emb):
+    def __init__(self, n_publications, n_articles, n_attributes, emb_size, sparse, use_article_emb, mode):
         super().__init__()
         self.emb_size = emb_size
         self.publication_embeddings = nn.Embedding(n_publications, emb_size, sparse=sparse)
         self.publication_bias = nn.Embedding(n_publications, 1, sparse=sparse)
-        self.attribute_emb_sum = nn.EmbeddingBag(n_attributes, emb_size, mode='mean', sparse=sparse)
-        self.attribute_bias_sum = nn.EmbeddingBag(n_attributes, 1, mode='sum', sparse=sparse)
+        self.attribute_emb_sum = nn.EmbeddingBag(n_attributes, emb_size, mode=mode, sparse=sparse)
+        self.attribute_bias_sum = nn.EmbeddingBag(n_attributes, 1, mode=mode, sparse=sparse)
         self.use_article_emb = use_article_emb
         if use_article_emb:
             self.article_embeddings = nn.Embedding(n_articles, emb_size, sparse=sparse)
@@ -279,7 +279,13 @@ def collate_fn(examples):
     labels = []
     publications = []
     for example in examples:
-        words.append(list(set(example['text'])))
+        if args.use_all_words:
+            words.append(list(set(example['text'])))
+        else:
+            if len(example['text']) > args.words_to_use:
+                words.append(list(set(example['text'][:args.words_to_use])))
+            else:
+                words.append(list(set(example['text'])))
         articles.append(example['url'])
         publications.append(example['model_publication'])
         labels.append(example['model_publication'])
@@ -340,15 +346,16 @@ if args.train_model:
                   n_articles=len(final_url_ids), 
                   n_attributes=len(final_word_ids), 
                   emb_size=args.emb_size, sparse=args.use_sparse, 
-                  use_article_emb=args.use_article_emb)
+                  use_article_emb=args.use_article_emb,
+                  mode=args.word_embedding_type)
     model = InnerProduct(**kwargs)
     model.reset_parameters()
     model.to(device)
 
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
-    
-    model.train(); # turn on training mode
+    print(model)
+    model.train() # turn on training mode
     check=True
 
     print("Beginning Training")
@@ -419,12 +426,18 @@ if args.train_model:
                     os.mkdir("results")
                 if not os.path.exists('results/evaluation'):
                     os.mkdir("results/evaluation")
-                df.to_csv("results/evaluation/top-1500.csv", index=False)
+                eval_folder_path = Path("results/evaluation").resolve()
+                result_path = args.word_embedding_type + "-top-1500.csv"
+                eval_folder_path = eval_folder_path / result_path
+                df.to_csv(eval_folder_path, index=False)
                 check=False
                 break
     if not os.path.exists('model'):
         os.mkdir("model")
-    torch.save(model.state_dict(), "model/inner-product-model.pt")
+    model_string = args.word_embedding_type + "-inner-product-model.pt"
+    model_string_path = Path("model").resolve()
+    model_string_path = model_string_path / model_string
+    torch.save(model.state_dict(), model_string_path)
             
 else:
     abs_model_path = Path(args.model_path).resolve()
@@ -432,9 +445,11 @@ else:
               n_articles=len(final_url_ids), 
               n_attributes=len(final_word_ids), 
               emb_size=args.emb_size, sparse=args.use_sparse, 
-              use_article_emb=args.use_article_emb)
+              use_article_emb=args.use_article_emb,
+              mode=args.word_embedding_type)
     model = InnerProduct(**kwargs)
     model.load_state_dict(torch.load(abs_model_path))
+    print(model)
     print("Model Successfully Loaded")
     model.to(device)
     print("Getting Final Evaluation Results")
