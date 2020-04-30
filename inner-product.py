@@ -20,9 +20,9 @@ import matplotlib.pyplot as plt
 #set and get arguments
 parser = argparse.ArgumentParser(description='Train model on article data and test evaluation')
 arguments.add_data(parser)
-arguments.add_training(parser) 
-arguments.add_model(parser) 
-arguments.add_optimization(parser) 
+arguments.add_training(parser)
+arguments.add_model(parser)
+arguments.add_optimization(parser)
 args = parser.parse_args()
 
 if not args.create_dicts and args.dict_dir is None:
@@ -30,15 +30,15 @@ if not args.create_dicts and args.dict_dir is None:
 
 if not args.train_model and args.model_path is None:
     parser.error("If --train_model is false, --model_path must be specified")
-    
+
 #set device
 if torch.cuda.is_available() and args.use_gpu:
     device= "cuda"
 elif not args.use_gpu:
-    device = "cpu"  
+    device = "cpu"
 else:
     print("Cannot use GPU. Using CPU instead.")
-    device = "cpu" 
+    device = "cpu"
 print("Device: ", device)
 
 #Tensboard log and graph output folder declaration
@@ -53,32 +53,32 @@ class Articles(torch.utils.data.Dataset):
         super().__init__()
         with open(json_file, "r") as data_file:
             self.examples = json.loads(data_file.read())
-    
+
     def __getitem__(self, idx):
         return self.examples[idx]
-    
+
     def __len__(self):
         return len(self.examples)
-    
+
     def tokenize(self):
         for idx, example in enumerate(self.examples):
             self.examples[idx]['text'] = re.findall('[\w]+', self.examples[idx]['text'].lower())
             self.examples[idx]['title'] = re.findall('[\w]+', self.examples[idx]['title'].lower())
-    
+
     def create_positive_sampler(self):
         prob = np.zeros(len(self))
         for idx, example in enumerate(self.examples):
             if example['model_publication'] == args.target_publication:
                 prob[idx] = 1
         return torch.utils.data.WeightedRandomSampler(weights=prob, num_samples=len(self), replacement=True)
-    
+
     def create_negative_sampler(self):
         prob = np.zeros(len(self))
         for idx, example in enumerate(self.examples):
             if example['model_publication'] != args.target_publication:
                 prob[idx] = 1
         return torch.utils.data.WeightedRandomSampler(weights=prob, num_samples=len(self), replacement=True)
-    
+
     def map_items(self, word_to_id, url_to_id, publication_to_id):
         for idx, example in enumerate(self.examples):
             self.examples[idx]['text'] = [word_to_id.get(word, len(word_to_id)) for word in example['text']]
@@ -111,7 +111,7 @@ def create_merged_dictionaries(all_examples):
     article_to_id.update({"miscellaneous":len(article_to_id)})
     publication_to_id.update({"miscellaneous":len(publication_to_id)})
     return word_to_id, article_to_id, publication_to_id
-    
+
 #load datasets
 train_path = Path(args.train_path).resolve()
 test_path = Path(args.test_path).resolve()
@@ -128,33 +128,33 @@ if args.map_items and args.tokenize:
     test_data.tokenize()
     eval_data.tokenize()
     print("Items tokenized")
-    
+
 #Create and save or load dictionaries based on arguments
 if args.create_dicts:
     all_examples = train_data.examples+test_data.examples+eval_data.examples
     final_word_ids,final_url_ids, final_publication_ids = create_merged_dictionaries(all_examples)
     print("Dictionaries Created")
-    
+
     if not os.path.exists('dictionaries'):
         os.mkdir("dictionaries")
-        
+
     #save dictionary files for future use and ease of access
     with open("dictionaries/word_dictionary.json", "w") as file:
         json.dump(final_word_ids, file)
 
     with open("dictionaries/article_dictionary.json", "w") as file:
         json.dump(final_url_ids, file)
-        
+
     with open("dictionaries/publication_dictionary.json", "w") as file:
-        json.dump(final_publication_ids, file)    
+        json.dump(final_publication_ids, file)
     print("Dictionaries saved to /dictionary folder.")
-    
+
 else:
     abs_dictionary_dir = Path(args.dict_dir).resolve()
     word_dict_path = abs_dictionary_dir / "word_dictionary.json"
     url_id_path = abs_dictionary_dir / "article_dictionary.json"
     publication_id_path = abs_dictionary_dir / "publication_dictionary.json"
-    
+
     if Path(word_dict_path).is_file() and Path(url_id_path).is_file() and Path(publication_id_path).is_file():
         with open(word_dict_path, "r") as file:
             final_word_ids = json.load(file)
@@ -174,10 +174,10 @@ if args.map_items:
     for dataset in [train_data, test_data, eval_data]:
         dataset.map_items(final_word_ids, final_url_ids, final_publication_ids)
     print("Items mapped")
-    
+
     if not os.path.exists('mapped-data'):
         os.mkdir("mapped-data")
-        
+
     with open("mapped-data/train.json", "w") as file:
         json.dump(train_data.examples, file)
     with open("mapped-data/test.json", "w") as file:
@@ -235,7 +235,7 @@ class InnerProduct(nn.Module):
         else:
               # for every publication, only compute inner product with corresponding minibatch element
               # (batch_size, 1, emb_size) x (batch_size, emb_size, 1) -> (batch_size, 1)
-              # logits = torch.bmm(publication_emb.view(-1, 1, self.emb_size), 
+              # logits = torch.bmm(publication_emb.view(-1, 1, self.emb_size),
               #                    (article_and_attr_emb).view(-1, self.emb_size, 1)).squeeze()
             inner_prod = (publication_emb * article_and_attr_emb).sum(-1)
             logits = inner_prod + attr_bias.squeeze() + publication_bias.squeeze()
@@ -245,7 +245,7 @@ class InnerProduct(nn.Module):
             return logits, publication_emb, attribute_emb
         else:
             return logits
-        
+
 
 #Create batches with positive samples in first half and negative examples in second half
 class BatchSamplerWithNegativeSamples(torch.utils.data.Sampler):
@@ -255,7 +255,7 @@ class BatchSamplerWithNegativeSamples(torch.utils.data.Sampler):
         self._items = items
         assert batch_size % 2 == 0, 'Batch size must be divisible by two for negative samples.'
         self._batch_size = batch_size
-        
+
     def __iter__(self):
         batch, neg_batch = [], []
         neg_sampler = iter(self._neg_sampler)
@@ -323,11 +323,11 @@ train_batch_sampler = BatchSamplerWithNegativeSamples(
     items=train_data.examples, batch_size=args.batch_size)
 
 #create dataloaders for iterable data when training and testing recall
-if device=="cuda": 
+if device=="cuda":
     pin_mem = True
 else:
     pin_mem = False
-    
+
 train_loader = torch.utils.data.DataLoader(train_data, batch_sampler=train_batch_sampler, collate_fn=collate_with_neg_fn, pin_memory=pin_mem)
 
 eval_loader = torch.utils.data.DataLoader(eval_data, batch_size=len(eval_data), collate_fn=collate_fn, pin_memory=pin_mem)
@@ -346,13 +346,13 @@ eval_word_attributes = eval_word_attributes.to(device)
 eval_attribute_offsets = eval_attribute_offsets.to(device)
 eval_real_labels = eval_real_labels.to(device)
 
-if args.train_model: 
-    
+if args.train_model:
+
     #initialize model, loss, and optimizer
-    kwargs = dict(n_publications=len(final_publication_ids), 
-                  n_articles=len(final_url_ids), 
-                  n_attributes=len(final_word_ids), 
-                  emb_size=args.emb_size, sparse=args.use_sparse, 
+    kwargs = dict(n_publications=len(final_publication_ids),
+                  n_articles=len(final_url_ids),
+                  n_attributes=len(final_word_ids),
+                  emb_size=args.emb_size, sparse=args.use_sparse,
                   use_article_emb=args.use_article_emb,
                   mode=args.word_embedding_type)
     model = InnerProduct(**kwargs)
@@ -364,16 +364,15 @@ if args.train_model:
         optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
     else:
         optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
-        
+
     print(model)
-    print(optimizer)
     model.train() # turn on training mode
     check=True
     running_loss = 0
     print("Beginning Training")
     print("--------------------")
     #training loop with validation checks every 50 steps and final validation recall calculated after 400 steps
-    while check: 
+    while check:
         for step,batch in enumerate(cycle(train_loader)):
             optimizer.zero_grad();
             publications, articles, word_attributes, attribute_offsets, real_labels = batch
@@ -382,7 +381,7 @@ if args.train_model:
             word_attributes = word_attributes.to(device)
             attribute_offsets = attribute_offsets.to(device)
             labels = torch.Tensor((np.arange(len(articles)) < len(articles) // 2).astype(np.float32)) #create fake labels with first half as positive(1) and second half as negative(0)
-            labels = labels.to(device) 
+            labels = labels.to(device)
             logits = model(publications, articles, word_attributes, attribute_offsets)
             L = loss(logits, labels)
             L.backward();
@@ -401,7 +400,7 @@ if args.train_model:
                 correct_100=0
                 for i in range(0, 100):
                     if eval_real_labels[indices[i]] == args.target_publication:
-                        if i < 10: 
+                        if i < 10:
                             correct_10 += 1
                         correct_100 += 1
                 print(f"Evaluation Performance: Step - {step}")
@@ -427,7 +426,7 @@ if args.train_model:
                 correct_100=0
                 for i in range(0, 100):
                     if eval_real_labels[indices[i]] == args.target_publication:
-                        if i < 10: 
+                        if i < 10:
                             correct_10 += 1
                         correct_100 += 1
                 print(f"Evaluation Performance: Step - {step}")
@@ -470,13 +469,13 @@ if args.train_model:
     model_string_path = Path("model").resolve()
     model_string_path = model_string_path / model_string
     torch.save(model.state_dict(), model_string_path)
-            
+
 else:
     abs_model_path = Path(args.model_path).resolve()
-    kwargs = dict(n_publications=len(final_publication_ids), 
-              n_articles=len(final_url_ids), 
-              n_attributes=len(final_word_ids), 
-              emb_size=args.emb_size, sparse=args.use_sparse, 
+    kwargs = dict(n_publications=len(final_publication_ids),
+              n_articles=len(final_url_ids),
+              n_attributes=len(final_word_ids),
+              emb_size=args.emb_size, sparse=args.use_sparse,
               use_article_emb=args.use_article_emb,
               mode=args.word_embedding_type)
     model = InnerProduct(**kwargs)
@@ -496,7 +495,7 @@ else:
     correct_100=0
     for i in range(0, 100):
         if eval_real_labels[indices[i]] == args.target_publication:
-            if i < 10: 
+            if i < 10:
                 correct_10 += 1
             correct_100 += 1
     print("Evaluation Performance:")
@@ -514,7 +513,7 @@ else:
             title = ""
         for word in text:
             title += word
-            title += " " 
+            title += " "
         unique_text = list(set(example['text']))
         url = links[example['url']]
         publication = example['publication']
