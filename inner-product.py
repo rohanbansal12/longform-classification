@@ -9,12 +9,13 @@ import collections
 import numpy as np
 import json
 import time
-from tqdm import tqdm
 import torch.nn as nn
 import os
 import argparse
 import arguments.add_arguments as arguments
 from pathlib import Path
+from torch.utils.tensorboard import SummaryWriter
+import matplotlib.pyplot as plt
 
 #set and get arguments
 parser = argparse.ArgumentParser(description='Train model on article data and test evaluation')
@@ -39,7 +40,13 @@ else:
     print("Cannot use GPU. Using CPU instead.")
     device = "cpu" 
 print("Device: ", device)
-                            
+
+#Tensboard log and graph output folder declaration
+
+log_tensorboard_dir = Path("runs")
+log_tensorboard_dir  = log_tensorboard_dir / str(args.word_embedding_type)
+writer = SummaryWriter(log_tensorboard_dir)
+
 #define Articles dataset class for easy sampling, iteration, and weight creating
 class Articles(torch.utils.data.Dataset):
     def __init__(self, json_file):
@@ -100,9 +107,9 @@ def create_merged_dictionaries(all_examples):
     word_to_id = {word: id for id, word in enumerate(counter.keys())}
     article_to_id = {word: id for id, word in enumerate(url_counter.keys())}
     publication_to_id = {publication: id for id, publication in enumerate(publication_counter.keys())}
-    word_to_id.update({"miscallaneous":len(word_to_id)})
-    article_to_id.update({"miscallaneous":len(article_to_id)})
-    publication_to_id.update({"miscallaneous":len(publication_to_id)})
+    word_to_id.update({"miscellaneous":len(word_to_id)})
+    article_to_id.update({"miscellaneous":len(article_to_id)})
+    publication_to_id.update({"miscellaneous":len(publication_to_id)})
     return word_to_id, article_to_id, publication_to_id
     
 #load datasets
@@ -353,11 +360,16 @@ if args.train_model:
     model.to(device)
 
     loss = torch.nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
+    if args.optimizer_type == "RMS"
+        optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
+    else:
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
+        
     print(model)
+    print(optimizer)
     model.train() # turn on training mode
     check=True
-
+    running_loss = 0
     print("Beginning Training")
     print("--------------------")
     #training loop with validation checks every 50 steps and final validation recall calculated after 400 steps
@@ -375,9 +387,10 @@ if args.train_model:
             L = loss(logits, labels)
             L.backward();
             optimizer.step();
-
-            if step % 100 == 0 and step % 800 != 0:
-                print("Step: ", step, " | Temporary Training Loss: ", L.detach().mean().cpu().numpy())
+            running_loss += L.item()
+            if step % 100 == 0 and step % args.training_steps != 0:
+                writer.add_scalar('Loss/train', running_loss/100, step)
+                print(f"Training Loss: {running_loss/100}")
                 model.eval();
                 publication_set = [args.target_publication]*len(eval_data)
                 publication_set = torch.tensor(publication_set, dtype=torch.long)
@@ -391,13 +404,17 @@ if args.train_model:
                         if i < 10: 
                             correct_10 += 1
                         correct_100 += 1
-                print("Evaluation Performance:")
-                print("Top 10: ", correct_10, "/10 or ", (correct_10*10), "%")
-                print("Top 100: ", correct_100, "/100 or", correct_100, "%")
+                print(f"Evaluation Performance: Step - {step}")
+                print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
+                print(f"Top 100: {correct_100} / 100 or {correct_100} %")
                 print("--------------------")
+                writer.add_scalar('Eval/Top-10', correct_10, step)
+                writer.add_scalar('Eval/Top-100', correct_100, step)
                 model.train();
-
-            if step != 0 and step % 800 == 0:
+                running_loss = 0.0
+            if step != 0 and step % args.training_steps == 0:
+                writer.add_scalar('Loss/train', running_loss/100, step)
+                print(f"Training Loss: {running_loss/100}")
                 print("Getting Final Evaluation Results")
                 print("--------------------")
                 model.eval();
@@ -406,6 +423,21 @@ if args.train_model:
                 publication_set = publication_set.to(device)
                 preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
                 sorted_preds, indices = torch.sort(preds, descending=True)
+                correct_10=0
+                correct_100=0
+                for i in range(0, 100):
+                    if eval_real_labels[indices[i]] == args.target_publication:
+                        if i < 10: 
+                            correct_10 += 1
+                        correct_100 += 1
+                print(f"Evaluation Performance: Step - {step}")
+                print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
+                print(f"Top 100: {correct_100} / 100 or {correct_100 }%")
+                print("--------------------")
+                writer.add_scalar('Eval/Top-10', correct_10, step)
+                writer.add_scalar('Eval/Top-100', correct_100, step)
+                model.train();
+                writer.close()
                 df = pd.DataFrame(columns=['title', 'url', 'text','publication', 'target_prediction'])
                 links = list(final_url_ids.keys())
                 for i in range(0, 1500):
