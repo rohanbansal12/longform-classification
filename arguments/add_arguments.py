@@ -71,6 +71,10 @@ def add_training(parser):
                         type=str2bool,
                         default=True,
                         help="Use GPU for training and evaluation")
+    parser.add_argument("--training_steps",
+                        type=int,
+                        default=1000,
+                        help="Total Number Of Steps For Training")
     
 def add_model(parser):
     parser.add_argument('--emb_size',
@@ -91,6 +95,9 @@ def add_model(parser):
                         help="Use article embeddings in model")
     
 def add_optimization(parser):
+    parser.add_argument('--optimizer-type',
+                        choice=["RMS", "SGD"],
+                        default="RMS")
     parser.add_argument('--learning-rate',
                         type=float,
                         default=1e-4,
