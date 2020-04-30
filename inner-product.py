@@ -360,12 +360,13 @@ if args.train_model:
     model.to(device)
 
     loss = torch.nn.BCEWithLogitsLoss()
-    if args.optimizer_type == "RMS"
+    if args.optimizer_type == "RMS":
         optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
     else:
         optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
 
     print(model)
+    print(optimizer)
     model.train() # turn on training mode
     check=True
     running_loss = 0
@@ -384,8 +385,8 @@ if args.train_model:
             labels = labels.to(device)
             logits = model(publications, articles, word_attributes, attribute_offsets)
             L = loss(logits, labels)
-            L.backward();
-            optimizer.step();
+            L.backward()
+            optimizer.step()
             running_loss += L.item()
             if step % 100 == 0 and step % args.training_steps != 0:
                 writer.add_scalar('Loss/train', running_loss/100, step)
@@ -522,4 +523,8 @@ else:
         os.mkdir("results")
     if not os.path.exists('results/evaluation'):
         os.mkdir("results/evaluation")
+    eval_folder_path = Path("results/evaluation")
+    result_path = args.word_embedding_type + "-top-1500.csv"
+    eval_folder_path = eval_folder_path / result_path
+    df.to_csv(eval_folder_path, index=False)
     df.to_csv("results/evaluation/top-1500.csv", index=False)
