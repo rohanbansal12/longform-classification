@@ -26,6 +26,10 @@ def add_data(parser):
                         type=expand_path,
                         required=True,
                         help='Path to evaluation set')
+    parser.add_argument('--output_dir',
+                        type=expand_path,
+                        required=True,
+                        help='Directory for storing results')
     parser.add_argument('--create_dicts',
                         type=str2bool,
                         default=True,
@@ -45,8 +49,8 @@ def add_data(parser):
                         type=int,
                         default=0,
                         help="Designate target publication.")
-    
-    
+
+
 def add_training(parser):
     parser.add_argument('--train_model',
                         type=str2bool,
@@ -66,7 +70,7 @@ def add_training(parser):
     parser.add_argument('--words_to_use',
                         type=int,
                         default=400,
-                        help="Number of words to use from article")  
+                        help="Number of words to use from article")
     parser.add_argument('--use_gpu',
                         type=str2bool,
                         default=True,
@@ -75,7 +79,7 @@ def add_training(parser):
                         type=int,
                         default=1000,
                         help="Total Number Of Steps For Training")
-    
+
 def add_model(parser):
     parser.add_argument('--emb_size',
                         type=int,
@@ -93,11 +97,12 @@ def add_model(parser):
                         type=str2bool,
                         default=False,
                         help="Use article embeddings in model")
-    
+
 def add_optimization(parser):
-    parser.add_argument('--optimizer-type',
+    parser.add_argument('--optimizer_type',
                         choice=["RMS", "SGD"],
-                        default="RMS")
+                        default="RMS",
+                        help="Choose optimizer type")
     parser.add_argument('--learning-rate',
                         type=float,
                         default=1e-4,

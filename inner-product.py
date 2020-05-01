@@ -41,10 +41,11 @@ else:
     device = "cpu"
 print("Device: ", device)
 
-#Tensboard log and graph output folder declaration
+#set output directory path
+output_path = Path(args.output_dir)
 
-log_tensorboard_dir = Path("runs")
-log_tensorboard_dir  = log_tensorboard_dir / str(args.word_embedding_type)
+#Tensboard log and graph output folder declaration
+log_tensorboard_dir = output_path / runs
 writer = SummaryWriter(log_tensorboard_dir)
 
 #define Articles dataset class for easy sampling, iteration, and weight creating
@@ -113,9 +114,9 @@ def create_merged_dictionaries(all_examples):
     return word_to_id, article_to_id, publication_to_id
 
 #load datasets
-train_path = Path(args.train_path).resolve()
-test_path = Path(args.test_path).resolve()
-eval_path = Path(args.eval_path).resolve()
+train_path = Path(args.train_path)
+test_path = Path(args.test_path)
+eval_path = Path(args.eval_path)
 
 train_data = Articles(train_path)
 test_data = Articles(test_path)
@@ -361,9 +362,9 @@ if args.train_model:
 
     loss = torch.nn.BCEWithLogitsLoss()
     if args.optimizer_type == "RMS":
-        optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
+        optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
     else:
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate,momentum=args.momentum)
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
 
     print(model)
     print(optimizer)
@@ -454,25 +455,32 @@ if args.train_model:
                     url = links[example['url']]
                     publication = example['publication']
                     df.loc[i] = [title, url, unique_text, publication, prediction]
-                if not os.path.exists('results'):
-                    os.mkdir("results")
-                if not os.path.exists('results/evaluation'):
-                    os.mkdir("results/evaluation")
-                eval_folder_path = Path("results/evaluation").resolve()
+                results_path = output_path / "results"
+                if not results_path.is_dir():
+                    results_path.mkdir()
+                evaluation_results_path = results_path / "evaluation"
+                if not evaluation_results_path.is_dir():
+                    evaluation_results_path.mkdir()
                 result_path = args.word_embedding_type + "-top-1500.csv"
-                eval_folder_path = eval_folder_path / result_path
+                eval_folder_path = evaluation_results_path / result_path
                 df.to_csv(eval_folder_path, index=False)
+                eval_numeric_path = evaluation_results_path / "numeric_results.txt"
+                with eval_numeric_path.open(mode="w+") as file:
+                    file.writelines(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
+                    file.writelines(f"Top 100: {correct_100} / 100 or {correct_100 }%")
                 check=False
                 break
-    if not os.path.exists('model'):
-        os.mkdir("model")
+
+    #save model for easy future reloading
+    model_path = output_path / "model"
+    if not model_path.is_dir():
+        model_path.mkdir()
     model_string = args.word_embedding_type + "-inner-product-model.pt"
-    model_string_path = Path("model").resolve()
-    model_string_path = model_string_path / model_string
-    torch.save(model.state_dict(), model_string_path)
+    model_path = model_path / model_string
+    torch.save(model.state_dict(), model_path)
 
 else:
-    abs_model_path = Path(args.model_path).resolve()
+    abs_model_path = Path(args.model_path)
     kwargs = dict(n_publications=len(final_publication_ids),
               n_articles=len(final_url_ids),
               n_attributes=len(final_word_ids),
@@ -519,12 +527,16 @@ else:
         url = links[example['url']]
         publication = example['publication']
         df.loc[i] = [title, url, unique_text, publication, prediction]
-    if not os.path.exists('results'):
-        os.mkdir("results")
-    if not os.path.exists('results/evaluation'):
-        os.mkdir("results/evaluation")
-    eval_folder_path = Path("results/evaluation")
+    results_path = output_path / "results"
+    if not results_path.is_dir():
+        results_path.mkdir()
+    evaluation_results_path = results_path / "evaluation"
+    if not evaluation_results_path.is_dir():
+        evaluation_results_path.mkdir()
     result_path = args.word_embedding_type + "-top-1500.csv"
-    eval_folder_path = eval_folder_path / result_path
+    eval_folder_path = evaluation_results_path / result_path
     df.to_csv(eval_folder_path, index=False)
-    df.to_csv("results/evaluation/top-1500.csv", index=False)
+    eval_numeric_path = evaluation_results_path / "numeric_results.txt"
+    with eval_numeric_path.open(mode="w+") as file:
+        file.writelines(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
+        file.writelines(f"Top 100: {correct_100} / 100 or {correct_100 }%")

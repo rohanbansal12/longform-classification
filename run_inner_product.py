@@ -4,7 +4,7 @@ import collections
 import pathlib
 import addict
 
-def get_slurm_script_gpu(train_dir, command):
+def get_slurm_script_gpu(output_dir, command):
   """Returns contents of SLURM script for a gpu job."""
   return """#!/bin/bash
 #SBATCH -N 1
@@ -18,7 +18,7 @@ def get_slurm_script_gpu(train_dir, command):
 #module load anaconda3 cudatoolkit/10.0 cudnn/cuda-10.0/7.3.1
 #source activate yumi
 {}
-""".format(train_dir, command)
+""".format(output_dir, command)
 
 
 if __name__ == '__main__':
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(0, "optimizer_type")
     keys_for_dir_name.insert(1, "use_all_words")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_train_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['train_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #RMS with only unique from first 500 words
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(0, "optimizer_type")
     keys_for_dir_name.insert(1, "use_all_words")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_train_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with all words and sum
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(1, "use_all_words")
     keys_for_dir_name.insert(2, "word_embedding_type")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_train_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with all words and mean
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(1, "use_all_words")
     keys_for_dir_name.insert(2, "word_embedding_type")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_train_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with only unique from first 500 words and sum
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(1, "use_all_words")
     keys_for_dir_name.insert(2, "word_embedding_type")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_train_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with only unique from first 500 words and sum
@@ -121,5 +121,5 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(1, "use_all_words")
     keys_for_dir_name.insert(2, "word_embedding_type")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_train_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
