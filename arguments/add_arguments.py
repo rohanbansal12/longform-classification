@@ -26,6 +26,10 @@ def add_data(parser):
                         type=expand_path,
                         required=True,
                         help='Path to evaluation set')
+    parser.add_argument('--data_dir',
+                        type=expand_path,
+                        required=True,
+                        help='Path for data storage and loading')
     parser.add_argument('--output_dir',
                         type=expand_path,
                         required=True,

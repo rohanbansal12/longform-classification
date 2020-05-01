@@ -25,22 +25,22 @@ if __name__ == '__main__':
     commands = ["PYTHONPATH=. python inner-product.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json "]
 
     experiment_name = 'news-inner-product'
-    log_dir = pathlib.Path("log-grid-search") / 'news-classification-inner-product'
+    log_dir = pathlib.Path(pathlib.os.environ['LOG']) / 'news-classification-inner-product'
 
-    grid = addict.Dict()
-    grid.create_dicts = False
-    grid.map_items = False
-    grid.emb_size = 100
-    grid.tokenize = False
-    grid.target_publication = 0
-    grid.batch_size = 2000
-    grid.momentum = 0.9
-    grid.use_sparse = False
-    grid.use_gpu = True
+    base_grid = addict.Dict()
+    base_grid.create_dicts = False
+    base_grid.map_items = False
+    base_grid.emb_size = 100
+    base_grid.tokenize = False
+    base_grid.target_publication = 0
+    base_grid.batch_size = 2000
+    base_grid.momentum = 0.9
+    base_grid.use_sparse = False
+    base_grid.use_gpu = True
     #  grid.inner_product_checkpoint = '/scratch/gpfs/altosaar/log/food_rec/2019-05-22/adagrad_rmsprop_adam_sgd_lr_decay/model=InnerProduct_optim=sgd_learning_rate=3.0_batch_size=1024/best_state_dict'
 
     #RMS with all words
-    grid = copy.deepcopy(grid)
+    grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "RMS"
     grid['use_all_words'] = True
     grid['learning_rate'] = [1e-1, 1e-3, 1e-4, 1e-5]
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #RMS with only unique from first 500 words
-    grid = copy.deepcopy(grid)
+    grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "RMS"
     grid['use_all_words'] = False
     grid['words_to_use'] = 500
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with all words and sum
-    grid = copy.deepcopy(grid)
+    grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = True
     grid['learning_rate'] = [0.1,1,5,10,15]
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with all words and mean
-    grid = copy.deepcopy(grid)
+    grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = True
     grid['learning_rate'] = [60, 600, 3000, 6000, 9000]
@@ -95,7 +95,7 @@ if __name__ == '__main__':
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with only unique from first 500 words and sum
-    grid = copy.deepcopy(grid)
+    grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = False
     grid['words_to_use'] = 500
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #SGD with only unique from first 500 words and sum
-    grid = copy.deepcopy(grid)
+    grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = False
     grid['words_to_use'] = 500

@@ -135,23 +135,26 @@ if args.create_dicts:
     all_examples = train_data.examples+test_data.examples+eval_data.examples
     final_word_ids,final_url_ids, final_publication_ids = create_merged_dictionaries(all_examples)
     print("Dictionaries Created")
-
-    if not os.path.exists('dictionaries'):
-        os.mkdir("dictionaries")
+    dict_path = pathlib(args.data_dir) / "dictionaries"
+    if not dict_path.is_dir():
+        dict_path.mkdir()
 
     #save dictionary files for future use and ease of access
-    with open("dictionaries/word_dictionary.json", "w") as file:
+    word_dict_path = dict_path / "word_dictionary.json"
+    article_dict_path = dict_path / "article_dictionary.json"
+    publication_dict_path = dict_path / "publication_dictionary.json"
+    with open(word_dict_path, "w") as file:
         json.dump(final_word_ids, file)
 
-    with open("dictionaries/article_dictionary.json", "w") as file:
+    with open(article_dict_path, "w") as file:
         json.dump(final_url_ids, file)
 
-    with open("dictionaries/publication_dictionary.json", "w") as file:
+    with open(publication_dict_path, "w") as file:
         json.dump(final_publication_ids, file)
     print("Dictionaries saved to /dictionary folder.")
 
 else:
-    abs_dictionary_dir = Path(args.dict_dir).resolve()
+    abs_dictionary_dir = Path(args.dict_dir)
     word_dict_path = abs_dictionary_dir / "word_dictionary.json"
     url_id_path = abs_dictionary_dir / "article_dictionary.json"
     publication_id_path = abs_dictionary_dir / "publication_dictionary.json"
@@ -175,15 +178,18 @@ if args.map_items:
     for dataset in [train_data, test_data, eval_data]:
         dataset.map_items(final_word_ids, final_url_ids, final_publication_ids)
     print("Items mapped")
+    mapped_data_path = Path(args.data_dir) / "mapped-data"
+    if not mapped_data_path.is_dir():
+        mapped_data.mkdir()
 
-    if not os.path.exists('mapped-data'):
-        os.mkdir("mapped-data")
-
-    with open("mapped-data/train.json", "w") as file:
+    train_mapped_path = mapped_data / "train.json"
+    test_mapped_path = mapped_data / "test.json"
+    eval_mapped_path = mapped_data / "evaluation.json"
+    with open(train_mapped_path, "w") as file:
         json.dump(train_data.examples, file)
-    with open("mapped-data/test.json", "w") as file:
+    with open(test_mapped_path, "w") as file:
         json.dump(test_data.examples, file)
-    with open("mapped-data/evaluation.json", "w") as file:
+    with open(eval_mapped_path, "w") as file:
         json.dump(eval_data.examples, file)
     print("Mapped Data saved to /mapped-data folder")
 
