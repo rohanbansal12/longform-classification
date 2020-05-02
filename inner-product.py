@@ -45,7 +45,7 @@ print("Device: ", device)
 output_path = Path(args.output_dir)
 
 #Tensboard log and graph output folder declaration
-log_tensorboard_dir = output_path / runs
+log_tensorboard_dir = output_path / "runs"
 writer = SummaryWriter(log_tensorboard_dir)
 
 #define Articles dataset class for easy sampling, iteration, and weight creating
@@ -135,7 +135,7 @@ if args.create_dicts:
     all_examples = train_data.examples+test_data.examples+eval_data.examples
     final_word_ids,final_url_ids, final_publication_ids = create_merged_dictionaries(all_examples)
     print("Dictionaries Created")
-    dict_path = pathlib(args.data_dir) / "dictionaries"
+    dict_path = Path(args.data_dir) / "dictionaries"
     if not dict_path.is_dir():
         dict_path.mkdir()
 
@@ -180,11 +180,11 @@ if args.map_items:
     print("Items mapped")
     mapped_data_path = Path(args.data_dir) / "mapped-data"
     if not mapped_data_path.is_dir():
-        mapped_data.mkdir()
+        mapped_data_path.mkdir()
 
-    train_mapped_path = mapped_data / "train.json"
-    test_mapped_path = mapped_data / "test.json"
-    eval_mapped_path = mapped_data / "evaluation.json"
+    train_mapped_path = mapped_data_path / "train.json"
+    test_mapped_path = mapped_data_path / "test.json"
+    eval_mapped_path = mapped_data_path / "evaluation.json"
     with open(train_mapped_path, "w") as file:
         json.dump(train_data.examples, file)
     with open(test_mapped_path, "w") as file:

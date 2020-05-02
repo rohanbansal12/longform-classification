@@ -104,7 +104,7 @@ def add_model(parser):
 
 def add_optimization(parser):
     parser.add_argument('--optimizer_type',
-                        choice=["RMS", "SGD"],
+                        choices=["RMS", "SGD"],
                         default="RMS",
                         help="Choose optimizer type")
     parser.add_argument('--learning-rate',
