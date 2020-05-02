@@ -26,7 +26,7 @@ if __name__ == '__main__':
     commands = ["PYTHONPATH=. python inner-product.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json "]
 
     experiment_name = 'news-inner-product'
-    log_dir = pathlib.Path("/users/rohan") / 'news-classification-inner-product'
+    log_dir =  pathlib.Path(pathlib.os.environ['LOG'])  / 'news-classification-inner-product'
 
     base_grid = addict.Dict()
     base_grid.create_dicts = False
