@@ -45,7 +45,7 @@ print("Device: ", device)
 output_path = Path(args.output_dir)
 
 #Tensboard log and graph output folder declaration
-log_tensorboard_dir = output_path / "runs"
+log_tensorboard_dir = output_path / "runs" / args.word_embedding_type
 writer = SummaryWriter(log_tensorboard_dir)
 
 #define Articles dataset class for easy sampling, iteration, and weight creating
@@ -544,5 +544,5 @@ else:
     df.to_csv(eval_folder_path, index=False)
     eval_numeric_path = evaluation_results_path / "numeric_results.txt"
     with eval_numeric_path.open(mode="w+") as file:
-        file.writelines(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
-        file.writelines(f"Top 100: {correct_100} / 100 or {correct_100 }%")
+        file.write(f"Top 10: {correct_10} / 10 or {correct_10*10} %\n")
+        file.write(f"Top 100: {correct_100} / 100 or {correct_100 }%")
