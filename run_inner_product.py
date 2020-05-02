@@ -37,6 +37,11 @@ if __name__ == '__main__':
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
+    base_grid.train_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/train.json")
+    base_grid.test_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/test.json")
+    base_grid.eval_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json")
+    base_grid.dict_dir = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/dictionaries")
+
     #  grid.inner_product_checkpoint = '/scratch/gpfs/altosaar/log/food_rec/2019-05-22/adagrad_rmsprop_adam_sgd_lr_decay/model=InnerProduct_optim=sgd_learning_rate=3.0_batch_size=1024/best_state_dict'
 
     #RMS with all words
@@ -49,7 +54,7 @@ if __name__ == '__main__':
     keys_for_dir_name.insert(0, "optimizer_type")
     keys_for_dir_name.insert(1, "use_all_words")
     for cfg in jobs.param_grid(grid):
-        cfg['train_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
+        cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
     #RMS with only unique from first 500 words

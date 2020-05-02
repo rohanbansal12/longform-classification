@@ -39,7 +39,7 @@ elif not args.use_gpu:
 else:
     print("Cannot use GPU. Using CPU instead.")
     device = "cpu"
-print("Device: ", device)
+print(f"Device: {device}")
 
 #set output directory path
 output_path = Path(args.output_dir)
@@ -191,7 +191,7 @@ if args.map_items:
         json.dump(test_data.examples, file)
     with open(eval_mapped_path, "w") as file:
         json.dump(eval_data.examples, file)
-    print("Mapped Data saved to /mapped-data folder")
+    print(f"Mapped Data saved to {mapped_data_path} directory")
 
 #define model which uses a simple dot product with publication and word embeddings to calculate logits
 class InnerProduct(nn.Module):
@@ -472,7 +472,7 @@ if args.train_model:
                 df.to_csv(eval_folder_path, index=False)
                 eval_numeric_path = evaluation_results_path / "numeric_results.txt"
                 with eval_numeric_path.open(mode="w+") as file:
-                    file.writelines(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
+                    file.writelines(f"Top 10: {correct_10} / 10 or {correct_10*10} %" + os.linesep)
                     file.writelines(f"Top 100: {correct_100} / 100 or {correct_100 }%")
                 check=False
                 break
@@ -544,5 +544,5 @@ else:
     df.to_csv(eval_folder_path, index=False)
     eval_numeric_path = evaluation_results_path / "numeric_results.txt"
     with eval_numeric_path.open(mode="w+") as file:
-        file.write(f"Top 10: {correct_10} / 10 or {correct_10*10} %\n")
-        file.write(f"Top 100: {correct_100} / 100 or {correct_100 }%")
+        file.writelines(f"Top 10: {correct_10} / 10 or {correct_10*10} %" + os.linesep)
+        file.writelines(f"Top 100: {correct_100} / 100 or {correct_100 }%")
