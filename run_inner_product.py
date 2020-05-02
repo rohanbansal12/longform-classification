@@ -4,9 +4,10 @@ import collections
 import pathlib
 import addict
 
+
 def get_slurm_script_gpu(output_dir, command):
-  """Returns contents of SLURM script for a gpu job."""
-  return """#!/bin/bash
+    """Returns contents of SLURM script for a gpu job."""
+    return """#!/bin/bash
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
@@ -25,7 +26,7 @@ if __name__ == '__main__':
     commands = ["PYTHONPATH=. python inner-product.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json "]
 
     experiment_name = 'news-inner-product'
-    log_dir = pathlib.Path(pathlib.os.environ['LOG']) / 'news-classification-inner-product'
+    log_dir = pathlib.Path("/users/rohan") / 'news-classification-inner-product'
 
     base_grid = addict.Dict()
     base_grid.create_dicts = False
@@ -41,8 +42,6 @@ if __name__ == '__main__':
     base_grid.test_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/test.json")
     base_grid.eval_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json")
     base_grid.dict_dir = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/dictionaries")
-
-    #  grid.inner_product_checkpoint = '/scratch/gpfs/altosaar/log/food_rec/2019-05-22/adagrad_rmsprop_adam_sgd_lr_decay/model=InnerProduct_optim=sgd_learning_rate=3.0_batch_size=1024/best_state_dict'
 
     #RMS with all words
     grid = copy.deepcopy(base_grid)
