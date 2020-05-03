@@ -1,6 +1,5 @@
 import copy
 import jobs
-import collections
 import pathlib
 import addict
 
@@ -43,7 +42,7 @@ if __name__ == '__main__':
     base_grid.eval_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json")
     base_grid.dict_dir = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/dictionaries")
 
-    #RMS with all words
+    # RMS with all words
     grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "RMS"
     grid['use_all_words'] = True
@@ -56,7 +55,7 @@ if __name__ == '__main__':
         cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
-    #RMS with only unique from first 500 words
+    # RMS with only unique from first 500 words
     grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "RMS"
     grid['use_all_words'] = False
@@ -70,11 +69,11 @@ if __name__ == '__main__':
         cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
-    #SGD with all words and sum
+    # SGD with all words and sum
     grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = True
-    grid['learning_rate'] = [0.1,1,5,10,15]
+    grid['learning_rate'] = [0.1, 1, 5, 10, 15]
     grid['word_embedding_type'] = 'sum'
     keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
     keys_for_dir_name.insert(0, "optimizer_type")
@@ -84,7 +83,7 @@ if __name__ == '__main__':
         cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
-    #SGD with all words and mean
+    # SGD with all words and mean
     grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = True
@@ -98,12 +97,12 @@ if __name__ == '__main__':
         cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
-    #SGD with only unique from first 500 words and sum
+    # SGD with only unique from first 500 words and sum
     grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = False
     grid['words_to_use'] = 500
-    grid['learning_rate'] = [0.1,1,5,10,15]
+    grid['learning_rate'] = [0.1, 1, 5, 10, 15]
     grid['word_embedding_type'] = 'mean'
     keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
     keys_for_dir_name.insert(0, "optimizer_type")
@@ -113,12 +112,12 @@ if __name__ == '__main__':
         cfg['output_dir'] = jobs.make_output_dir(log_dir, experiment_name, cfg, keys_for_dir_name)
         jobs.submit(commands, cfg, get_slurm_script_gpu)
 
-    #SGD with only unique from first 500 words and sum
+    # SGD with only unique from first 500 words and sum
     grid = copy.deepcopy(base_grid)
     grid['optimizer_type'] = "SGD"
     grid['use_all_words'] = False
     grid['words_to_use'] = 500
-    grid['learning_rate'] = [30,300,1500,3000, 4500]
+    grid['learning_rate'] = [30, 300, 1500, 3000, 4500]
     grid['word_embedding_type'] = 'mean'
     keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
     keys_for_dir_name.insert(0, "optimizer_type")

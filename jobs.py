@@ -1,10 +1,7 @@
 import os
-import copy
 import time
 import itertools
 import subprocess
-import collections
-import pathlib
 
 
 def get_keys_for_dir_name(grid):
@@ -45,7 +42,7 @@ def submit(command_list, cfg, get_slurm_script):
     """
     param_tuples = list(cfg.items())
     args = ' '.join(['--%s=%s' % tup for tup in param_tuples])
-    command = '\n'.join([' '.join([command, args]) for command in command_list])
+    command = '\n'.join([' '.join([command, args])for command in command_list])
     file_contents = get_slurm_script(cfg['output_dir'], command)
     print(file_contents)
     fname = cfg['output_dir'] / 'job.cmd'
