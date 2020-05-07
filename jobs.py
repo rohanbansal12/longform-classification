@@ -32,7 +32,7 @@ def param_grid(grid):
             all_combos.append([(key, grid[key])])
     for params_tuples in itertools.product(*all_combos):
         cfg = dict(params_tuples)
-    yield cfg
+        yield cfg
 
 
 def submit(command_list, cfg, get_slurm_script):

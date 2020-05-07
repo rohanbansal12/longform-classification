@@ -37,8 +37,8 @@ if torch.cuda.is_available() and args.use_gpu:
 elif not args.use_gpu:
     device = "cpu"
 else:
-    print("Cannot use GPU. Using CPU instead.")
     device = "cpu"
+    print("Cannot use GPU. Using CPU instead.")
 print(f"Device: {device}")
 
 # set output directory path
@@ -386,6 +386,10 @@ if args.train_model:
     model.train()  # turn on training mode
     check = True
     running_loss = 0
+
+    labels = torch.Tensor((np.arange(args.batch_size) < args.batch_size // 2).astype(np.float32))
+    labels = labels.to(device)
+
     print("Beginning Training")
     print("--------------------")
     # training loop with validation checks every 50 steps and final validation recall calculated after 400 steps
@@ -398,7 +402,6 @@ if args.train_model:
             word_attributes = word_attributes.to(device)
             attribute_offsets = attribute_offsets.to(device)
             # create fake labels with first half as positive(1) and second half as negative(0)
-            labels = torch.Tensor((np.arange(len(articles)) < len(articles) // 2).astype(np.float32))
             logits = model(publications, articles, word_attributes, attribute_offsets)
             L = loss(logits, labels)
             L.backward()
