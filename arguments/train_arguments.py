@@ -56,10 +56,6 @@ def add_data(parser):
 
 
 def add_training(parser):
-    parser.add_argument('--train_model',
-                        type=str2bool,
-                        default=True,
-                        help="Train Model")
     parser.add_argument('--model_path',
                         type=expand_path,
                         help="If --train_model is false, this is required to load model.")
@@ -107,7 +103,7 @@ def add_optimization(parser):
                         choices=["RMS", "SGD"],
                         default="RMS",
                         help="Choose optimizer type")
-    parser.add_argument('--learning-rate',
+    parser.add_argument('--learning_rate',
                         type=float,
                         default=1e-4,
                         help="Set optimizer learning rate")
