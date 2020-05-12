@@ -17,10 +17,11 @@ from data_processing.articles import Articles
 from models.models import InnerProduct
 import data_processing.dictionaries as dictionary
 import sampling.sampler_util as sampler_util
-import training.train_util as train_util
+import training.eval_util as eval_util
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # set and get arguments
 parser = argparse.ArgumentParser(description='Train model on article data and test evaluation')
@@ -54,6 +55,13 @@ writer = SummaryWriter(log_tensorboard_dir)
 train_path = Path(args.train_path)
 test_path = Path(args.test_path)
 eval_path = Path(args.eval_path)
+for path_to_data in [train_path, test_path, eval_path]:
+    temp_df = pd.read_json(path_to_data)
+    if "link" not in temp_df.columns:
+        temp_df['link'] = temp_df['url']
+    if "orig_title" not in temp_df.columns:
+        temp_df['orig_title'] = temp_df['title']
+    temp_df.to_json(path_to_data, orient="records")
 
 train_data = Articles(train_path)
 test_data = Articles(test_path)
@@ -68,24 +76,24 @@ if args.map_items and args.tokenize:
     eval_data.tokenize()
     print("Items tokenized")
 
-    
+
 # create and save or load dictionaries based on arguments
 if args.create_dicts:
     all_examples = train_data.examples+test_data.examples+eval_data.examples
     final_word_ids,final_url_ids, final_publication_ids = dictionary.create_merged_dictionaries(all_examples, "target")
     print("Dictionaries Created")
-    
+
     dict_path = Path(args.data_dir) / "dictionaries"
     if not dict_path.is_dir():
         dict_path.mkdir()
-        
+
     dictionary.save_dictionaries(final_word_ids,final_url_ids, final_publication_ids, dict_path)
 
 else:
     dictionary_dir = Path(args.dict_dir)
     final_word_ids,final_url_ids, final_publication_ids = dictionary.load_dictionaries(dictionary_dir)
+    print("Dictionaries loaded.")
 
-    
 # map items in dataset using dictionary keys (convert words and urls to numbers for the model)
 if args.map_items:
     for dataset in [train_data, test_data, eval_data]:
@@ -168,6 +176,7 @@ def cycle(iterable):
         for x in iterable:
             yield x
 
+
 # initialize model, loss, and optimizer
 kwargs = dict(n_publications=len(final_publication_ids),
               n_articles=len(final_url_ids),
@@ -181,9 +190,13 @@ model.to(device)
 
 loss = torch.nn.BCEWithLogitsLoss()
 if args.optimizer_type == "RMS":
-    optimizer = torch.optim.RMSprop(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
+    optimizer = torch.optim.RMSprop(model.parameters(),
+                                    lr=args.learning_rate,
+                                    momentum=args.momentum)
 else:
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum)
+    optimizer = torch.optim.SGD(model.parameters(),
+                                lr=args.learning_rate,
+                                momentum=args.momentum)
 
 print(model)
 print(optimizer)
@@ -196,36 +209,49 @@ labels = labels.to(device)
 
 print("Beginning Training")
 print("--------------------")
-# training loop with validation checks every 50 steps and final validation recall calculated after 400 steps
-while check:
-    for step,batch in enumerate(cycle(train_loader)):
-        optimizer.zero_grad();
-        publications, articles, word_attributes, attribute_offsets, real_labels = batch
-        publications = publications.to(device)
-        articles = articles.to(device)
-        word_attributes = word_attributes.to(device)
-        attribute_offsets = attribute_offsets.to(device)
-        logits = model(publications, articles, word_attributes, attribute_offsets)
-        L = loss(logits, labels)
-        L.backward()
-        optimizer.step()
-        running_loss += L.item()
-        if step % 100 == 0 and step % args.training_steps != 0:
-            writer.add_scalar('Loss/train', running_loss/100, step)
-            print(f"Training Loss: {running_loss/100}")
-            train_util.calculate_eval_performance(eval_loader, model, device, args.target_publication, step, writer)
-            model.train()
-            running_loss = 0.0
-        if step != 0 and step % args.training_steps == 0:
-            writer.add_scalar('Loss/train', running_loss/100, step)
-            print(f"Training Loss: {running_loss/100}")
-            print("Getting Final Evaluation Results")
-            print("--------------------")
-            train_util.calculate_eval_performance(eval_loader, model, device, args.target_publication, step, writer, final=True)
-            writer.close()
-            train_util.save_eval_ranked_results(final_word_ids, final_url_ids, output_path, args.word_embedding_type)
-            check = False
-            break
+# training loop with validation checks every 100 steps and final validation recall calcualation
+for step, batch in enumerate(cycle(train_loader)):
+    optimizer.zero_grad()
+    publications, articles, word_attributes, attribute_offsets, real_labels = batch
+    publications = publications.to(device)
+    articles = articles.to(device)
+    word_attributes = word_attributes.to(device)
+    attribute_offsets = attribute_offsets.to(device)
+    logits = model(publications, articles, word_attributes, attribute_offsets)
+    L = loss(logits, labels)
+    L.backward()
+    optimizer.step()
+    running_loss += L.item()
+    if step % 100 == 0 and step % args.training_steps != 0:
+        writer.add_scalar('Loss/train', running_loss/100, step)
+        print(f"Training Loss: {running_loss/100}")
+        sorted_preds, indices = eval_util.calculate_predictions(eval_loader,
+                                                                model, device,
+                                                                args.target_publication,
+                                                                step=step, writer=writer,
+                                                                check_recall=True)
+        model.train()
+        running_loss = 0.0
+    if step != 0 and step % args.training_steps == 0:
+        writer.add_scalar('Loss/train', running_loss/100, step)
+        print(f"Training Loss: {running_loss/100}")
+        print("Getting Final Evaluation Results")
+        print("--------------------")
+        sorted_preds, indices = eval_util.calculate_predictions(eval_loader, model, device,
+                                                                args.target_publication,
+                                                                step=step, writer=writer,
+                                                                check_recall=True)
+        writer.close()
+        ranked_df = eval_util.create_ranked_eval_list(final_word_ids,
+                                                      args.word_embedding_type,
+                                                      sorted_preds, indices,
+                                                      eval_data)
+        eval_util.save_ranked_df(output_path,
+                                 ranked_df,
+                                 args.word_embedding_type)
+        print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'}!")
+        check = False
+        break
 
 # save model for easy future reloading
 model_path = output_path / "model"

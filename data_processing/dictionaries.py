@@ -35,7 +35,7 @@ def save_dictionaries(final_word_ids, final_url_ids, final_publication_ids, dict
     word_dict_path = dict_path / "word_dictionary.json"
     article_dict_path = dict_path / "article_dictionary.json"
     publication_dict_path = dict_path / "publication_dictionary.json"
-    
+
     with open(word_dict_path, "w") as file:
         json.dump(final_word_ids, file)
 
@@ -44,16 +44,16 @@ def save_dictionaries(final_word_ids, final_url_ids, final_publication_ids, dict
 
     with open(publication_dict_path, "w") as file:
         json.dump(final_publication_ids, file)
-    
+
     print("Dictionaries saved to /dictionary folder.")
-    
-    
-def load_dictionaries(dictionary_dir):
+
+
+def load_dictionaries(abs_dictionary_dir):
     word_dict_path = abs_dictionary_dir / "word_dictionary.json"
     url_id_path = abs_dictionary_dir / "article_dictionary.json"
     publication_id_path = abs_dictionary_dir / "publication_dictionary.json"
 
-    if Path(word_dict_path).is_file() and Path(url_id_path).is_file() and Path(publication_id_path).is_file():
+    if word_dict_path.is_file() and url_id_path.is_file() and publication_id_path.is_file():
         with open(word_dict_path, "r") as file:
             final_word_ids = json.load(file)
 
