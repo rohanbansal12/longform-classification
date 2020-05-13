@@ -37,6 +37,10 @@ def add_data(parser):
                         type=str2bool,
                         default=True,
                         help="Tokenize and split data fields.")
+    parser.add_argument('--min_article_length',
+                        type=int,
+                        default=100,
+                        help="Minimum article length to generate predictions for.")
 
 
 def add_model(parser):

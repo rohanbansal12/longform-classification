@@ -62,8 +62,6 @@ def load_dictionaries(abs_dictionary_dir):
 
         with open(publication_id_path, "r") as file:
             final_publication_ids = json.load(file)
-
-        print("Dictionaries Loaded")
     else:
         raise FileNotFoundError
     return final_word_ids, final_url_ids, final_publication_ids

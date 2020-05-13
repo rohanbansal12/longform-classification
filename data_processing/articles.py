@@ -20,7 +20,6 @@ class Articles(torch.utils.data.Dataset):
     def tokenize(self):
         for idx, example in enumerate(self.examples):
             self.examples[idx]['text'] = re.findall('[\w]+', self.examples[idx]['text'].lower())
-            self.examples[idx]['title'] = re.findall('[\w]+', self.examples[idx]['title'].lower())
 
     def create_positive_sampler(self, target_publication):
         prob = np.zeros(len(self))
@@ -36,11 +35,13 @@ class Articles(torch.utils.data.Dataset):
                 prob[idx] = 1
         return torch.utils.data.WeightedRandomSampler(weights=prob, num_samples=len(self), replacement=True)
 
-    def map_items(self, word_to_id, url_to_id, publication_to_id):
+    def map_items(self, word_to_id, url_to_id, publication_to_id, min_length):
+        min_length_articles = []
         for idx, example in enumerate(self.examples):
             self.examples[idx]['text'] = [word_to_id.get(word, len(word_to_id)) for word in example['text']]
             self.examples[idx]['text'] = [word for word in example['text'] if word != len(word_to_id)]
-            self.examples[idx]['title'] = [word_to_id.get(word, len(word_to_id)) for word in example['title']]
-            self.examples[idx]['title'] = [word for word in example['title'] if word != len(word_to_id)]
+            if len(self.examples[idx]['text']) > min_length and "episode" not in example['title'].lower() and "podcast" not in example['title'].lower():
+                min_length_articles.append(self.examples[idx])
             self.examples[idx]['url'] = url_to_id.get(example['url'], url_to_id.get("miscellaneous"))
             self.examples[idx]['model_publication'] = publication_to_id.get(example['model_publication'], publication_to_id.get("miscellaneous"))
+        return min_length_articles

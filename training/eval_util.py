@@ -48,7 +48,7 @@ def create_ranked_eval_list(final_word_ids, word_embedding_type, sorted_preds, i
     for i in range(0, 1500):
         example = eval_data[indices[i]]
         prediction = sorted_preds[i].item()
-        title = example['orig_title']
+        title = example['title']
         unique_text = list(set(example['text']))
         url = example['link']
         publication = example['publication']

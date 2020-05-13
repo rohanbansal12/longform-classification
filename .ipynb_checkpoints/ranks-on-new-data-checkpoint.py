@@ -22,7 +22,7 @@ from pathlib import Path
 import pandas as pd
 
 
-parser = argparse.ArgumentParser(description='Get Ranked Predictions on New Dataset.')
+parser = argparse.ArgumentParser(description='Get Ranked Predictions on Data Set.')
 arguments.add_data(parser)
 arguments.add_model(parser)
 args = parser.parse_args()
@@ -35,44 +35,39 @@ else:
     device = "cpu"
     print("Cannot use GPU. Using CPU instead.")
 print(f"Device: {device}")
-print("-------------------")
 
 # set output directory path
 output_path = Path(args.output_dir)
 
-# load in dataset
+# load in dataset, add easily returnable link, then create PyTorch Dataset
 raw_data_path = Path(args.dataset_path)
+temp_df = pd.read_json(raw_data_path)
+if "link" not in temp_df.columns:
+    temp_df['link'] = temp_df['url']
+if "orig_title" not in temp_df.columns:
+    temp_df['orig_title'] = temp_df['title']
+temp_df.to_json(args.dataset_path, orient="records")
+
+
 raw_data = Articles(raw_data_path)
 print("Data Loaded")
-print("-------------------")
 
 # load dictionaries from path
 dictionary_dir = Path(args.dict_dir)
 final_word_ids, final_url_ids, final_publication_ids = dictionary.load_dictionaries(dictionary_dir)
-print("Dictionaries Loaded")
-print("-------------------")
 
 # map items to their dictionary values
 if args.map_items:
-    # tokenize data and split into words
-    raw_data.tokenize()
-    # map items to their ids in dictionaries and filter articles
-    proper_data = raw_data.map_items(final_word_ids,
-                                     final_url_ids,
-                                     final_publication_ids,
-                                     args.min_article_length)
-    print("Mapped and Filtered Data!")
+    raw_data.map_items(final_word_ids, final_url_ids, final_publication_ids)
     mapped_data_path = Path(args.data_dir) / "mapped-data"
-    print("Initial: ", len(raw_data))
+    print("Mapped Data!")
     if not mapped_data_path.is_dir():
         mapped_data_path.mkdir()
+
     train_mapped_path = mapped_data_path / "mapped_dataset.json"
     with open(train_mapped_path, "w") as file:
-        json.dump(proper_data, file)
-    print(f"Filtered, Mapped Data saved to {mapped_data_path} directory")
-    print("-------------------")
-    raw_data = Articles(train_mapped_path)
-
+        json.dump(raw_data.examples, file)
+    print(f"Mapped Data saved to {mapped_data_path} directory")
 
 def collate_fn(examples):
     words = []
@@ -114,7 +109,6 @@ if device == "cuda":
 else:
     pin_mem = False
 
-# Generates a dataloader on the dataset that outputs entire set as a batch for one time predictions
 raw_loader = torch.utils.data.DataLoader(raw_data, batch_size=len(raw_data), collate_fn=collate_fn, pin_memory=pin_mem)
 
 abs_model_path = Path(args.model_path)
@@ -128,9 +122,7 @@ kwargs = dict(n_publications=len(final_publication_ids),
 model = InnerProduct(**kwargs)
 model.load_state_dict(torch.load(abs_model_path))
 model.to(device)
-print("Model Loaded")
 print(model)
-print("-------------------")
 sorted_preds, indices = eval_util.calculate_predictions(raw_loader, model, device,
                                                         args.target_publication)
 ranked_df = eval_util.create_ranked_eval_list(final_word_ids,
@@ -140,5 +132,4 @@ ranked_df = eval_util.create_ranked_eval_list(final_word_ids,
 eval_util.save_ranked_df(output_path,
                          ranked_df,
                          args.word_embedding_type)
-print("Predictions Made")
 print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'} directory!")
