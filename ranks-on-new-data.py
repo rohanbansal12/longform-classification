@@ -70,10 +70,10 @@ if args.map_items:
     train_mapped_path = mapped_data_path / "mapped_dataset.json"
     with open(train_mapped_path, "w") as file:
         json.dump(proper_data, file)
+    raw_data = Articles(train_mapped_path)
+    print("Final: ", len(raw_data))
     print(f"Filtered, Mapped Data saved to {mapped_data_path} directory")
     print("-------------------")
-    raw_data = Articles(train_mapped_path)
-
 
 def collate_fn(examples):
     words = []

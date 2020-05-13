@@ -55,13 +55,6 @@ writer = SummaryWriter(log_tensorboard_dir)
 train_path = Path(args.train_path)
 test_path = Path(args.test_path)
 eval_path = Path(args.eval_path)
-for path_to_data in [train_path, test_path, eval_path]:
-    temp_df = pd.read_json(path_to_data)
-    if "link" not in temp_df.columns:
-        temp_df['link'] = temp_df['url']
-    if "orig_title" not in temp_df.columns:
-        temp_df['orig_title'] = temp_df['title']
-    temp_df.to_json(path_to_data, orient="records")
 
 train_data = Articles(train_path)
 test_data = Articles(test_path)
@@ -79,15 +72,14 @@ if args.map_items and args.tokenize:
 
 # create and save or load dictionaries based on arguments
 if args.create_dicts:
-    all_examples = train_data.examples+test_data.examples+eval_data.examples
-    final_word_ids, final_url_ids, final_publication_ids = dictionary.create_merged_dictionaries(all_examples, "target")
+    final_word_ids, final_url_ids, final_publication_ids = dictionary.create_merged_dictionaries(train_data.examples, "target")
     print("Dictionaries Created")
 
     dict_path = Path(args.data_dir) / "dictionaries"
     if not dict_path.is_dir():
         dict_path.mkdir()
 
-    dictionary.save_dictionaries(final_word_ids,final_url_ids, final_publication_ids, dict_path)
+    dictionary.save_dictionaries(final_word_ids, final_url_ids, final_publication_ids, dict_path)
 
 else:
     dictionary_dir = Path(args.dict_dir)

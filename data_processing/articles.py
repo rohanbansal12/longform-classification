@@ -41,7 +41,7 @@ class Articles(torch.utils.data.Dataset):
             self.examples[idx]['text'] = [word_to_id.get(word, len(word_to_id)) for word in example['text']]
             self.examples[idx]['text'] = [word for word in example['text'] if word != len(word_to_id)]
             if filter:
-                if len(self.examples[idx]['text']) > min_length and "episode" not in example['title'].lower() and "podcast" not in example['title'].lower():
+                if len(self.examples[idx]['text']) > min_length:
                     min_length_articles.append(self.examples[idx])
             self.examples[idx]['url'] = url_to_id.get(example['url'], url_to_id.get("miscellaneous"))
             self.examples[idx]['model_publication'] = publication_to_id.get(example['model_publication'], publication_to_id.get("miscellaneous"))
