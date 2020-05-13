@@ -80,7 +80,7 @@ if args.map_items and args.tokenize:
 # create and save or load dictionaries based on arguments
 if args.create_dicts:
     all_examples = train_data.examples+test_data.examples+eval_data.examples
-    final_word_ids,final_url_ids, final_publication_ids = dictionary.create_merged_dictionaries(all_examples, "target")
+    final_word_ids, final_url_ids, final_publication_ids = dictionary.create_merged_dictionaries(all_examples, "target")
     print("Dictionaries Created")
 
     dict_path = Path(args.data_dir) / "dictionaries"
@@ -97,7 +97,10 @@ else:
 # map items in dataset using dictionary keys (convert words and urls to numbers for the model)
 if args.map_items:
     for dataset in [train_data, test_data, eval_data]:
-        dataset.map_items(final_word_ids, final_url_ids, final_publication_ids)
+        dataset.map_items(final_word_ids,
+                          final_url_ids,
+                          final_publication_ids,
+                          filter=False)
     print("Items mapped")
     mapped_data_path = Path(args.data_dir) / "mapped-data"
     if not mapped_data_path.is_dir():

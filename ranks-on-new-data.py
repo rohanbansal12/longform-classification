@@ -60,7 +60,8 @@ if args.map_items:
     proper_data = raw_data.map_items(final_word_ids,
                                      final_url_ids,
                                      final_publication_ids,
-                                     args.min_article_length)
+                                     filter=True,
+                                     min_length=args.min_article_length)
     print("Mapped and Filtered Data!")
     mapped_data_path = Path(args.data_dir) / "mapped-data"
     print("Initial: ", len(raw_data))
