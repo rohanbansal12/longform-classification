@@ -29,14 +29,14 @@ def calculate_predictions(eval_loader, model, device, target_publication, step=0
     if check_recall:
         correct_10 = 0
         correct_100 = 0
-        for i in range(0, 100):
+        for i in range(0, 150):
             if eval_real_labels[indices[i]] == target_publication:
                 if i < 10 :
                     correct_10 += 1
-                correct_100 += 1
+                correct_150 += 1
         print(f"Evaluation Performance: Step - {step}")
         print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
-        print(f"Top 100: {correct_100} / 100 or {correct_100} %")
+        print(f"Top 150: {correct_150} / 100 or {(correct_150*100)/150} %")
         print("--------------------")
         if writer is not None:
             writer.add_scalar('Eval/Top-10', correct_10, step)
