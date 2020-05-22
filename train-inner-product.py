@@ -21,7 +21,6 @@ import training.eval_util as eval_util
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
-import pandas as pd
 
 # set and get arguments
 parser = argparse.ArgumentParser(description='Train model on article data and test evaluation')

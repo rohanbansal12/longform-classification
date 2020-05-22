@@ -1,0 +1,74 @@
+% !TEX program = xetex
+\PassOptionsToPackage{usenames,dvipsnames}{xcolor}
+\PassOptionsToPackage{colorlinks,linktoc=all}{hyperref}
+% \documentclass[sigconf, anonymous, review]{acmart} % for review
+\documentclass[sigconf]{acmart} % for arxiv
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain} % removes running headers
+\makeatletter
+\renewcommand\@formatdoi[1]{\ignorespaces}
+\makeatother
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08emT\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Web conference formatting
+%\setcopyright{acmcopyright}
+%\acmDOI{10.475/123_4}
+%\acmISBN{123-4567-24-567/08/06}
+\acmConference[KDD 2019]{}{August 4-8, 2019}{Anchorage, Alaska, USA}
+%\acmYear{2019}
+%\copyrightyear{2019}
+%\acmArticle{4}
+%\acmPrice{15.00}
+
+\input{preamble/preamble}
+\input{preamble/preamble_math}
+\input{preamble/preamble_acronyms}
+\input{preamble/preamble_tikz}
+
+% \title{Ranking from sets}
+\title{\textsc{draft: do not cite or redistribute}\\
+Recommending items with attributes}
+%\title{Recommending items using their sets of attributes}
+% keywords:
+% deep learning
+% collaborative filtering
+% negative sampling
+% content-based recommendation
+% food recommender systems
+% \begin{framed}
+% \centering
+% \textsc{do not cite or redistribute.}
+% \end{framed}
+
+\author{Jaan Altosaar}
+\orcid{0000-0003-1294-4159}
+\affiliation{\institution{Princeton University}}
+\email{altosaar@princeton.edu}
+
+\author{Rajesh Ranganath}
+\affiliation{\institution{New York University}}
+\email{rajeshr@cims.nyu.edu}
+
+\author{Wesley Tansey}
+\affiliation{\institution{Columbia University}}
+\email{wesley.tansey@columbia.edu}
+\begin{document}
+\input{sec_abstract}
+\maketitle % for amsart need this after the \begin{abstract} command
+\input{sec_intro}
+\input{sec_background}
+\input{sec_method}
+\input{sec_experiments}
+\input{sec_discussion}
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bib}
+\input{sec_appendix}
+%\clearpage
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "set_recommendation"
+%%% End:

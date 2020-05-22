@@ -3,6 +3,8 @@ from torch.utils.tensorboard import SummaryWriter
 import pandas as pd
 import pathlib as Path
 import os
+import time
+from  datetime import datetime
 
 
 #create a full batch and send to device
@@ -56,13 +58,23 @@ def create_ranked_eval_list(final_word_ids, word_embedding_type, sorted_preds, i
     return df
 
 
-def save_ranked_df(output_path, df, word_embedding_type):
+def save_ranked_df(output_path, df, word_embedding_type, word_count=0):
+    if not output_path.is_dir():
+        output_path.mkdir()
+    dateTimeObj = datetime.now()
+    timestampStr = dateTimeObj.strftime("%Y-%m-%d")
     results_path = output_path / "results"
     if not results_path.is_dir():
         results_path.mkdir()
-    evaluation_results_path = results_path / "evaluation"
+    results_date_path = results_path / timestampStr
+    if not results_date_path.is_dir():
+        results_date_path.mkdir()
+    evaluation_results_path = results_date_path / "evaluation"
     if not evaluation_results_path.is_dir():
         evaluation_results_path.mkdir()
-    result_path = word_embedding_type + "-top-1500.csv"
+    if word_count != 0:
+        result_path = "min-" + str(word_count) + "-" + word_embedding_type + "-top-1500.csv"
+    else:
+        result_path = word_embedding_type + "-top-1500.csv"
     eval_folder_path = evaluation_results_path / result_path
     df.to_csv(eval_folder_path, index=False)

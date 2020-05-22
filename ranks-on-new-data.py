@@ -63,7 +63,10 @@ if args.map_items:
                                      filter=True,
                                      min_length=args.min_article_length)
     print("Mapped and Filtered Data!")
-    mapped_data_path = Path(args.data_dir) / "mapped-data"
+    data_path = Path(args.data_dir)
+    if not data_path.is_dir():
+        data_path.mkdir()
+    mapped_data_path = data_path / "mapped-data"
     print("Initial: ", len(raw_data))
     if not mapped_data_path.is_dir():
         mapped_data_path.mkdir()
@@ -140,6 +143,7 @@ ranked_df = eval_util.create_ranked_eval_list(final_word_ids,
                                               raw_data)
 eval_util.save_ranked_df(output_path,
                          ranked_df,
-                         args.word_embedding_type)
+                         args.word_embedding_type,
+                         word_count=args.min_article_length)
 print("Predictions Made")
 print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'} directory!")
