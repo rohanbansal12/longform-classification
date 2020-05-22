@@ -28,7 +28,7 @@ def calculate_predictions(eval_loader, model, device, target_publication, step=0
     sorted_preds, indices = torch.sort(preds, descending=True)
     if check_recall:
         correct_10 = 0
-        correct_100 = 0
+        correct_150 = 0
         for i in range(0, 150):
             if eval_real_labels[indices[i]] == target_publication:
                 if i < 10 :
