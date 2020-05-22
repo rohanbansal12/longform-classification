@@ -30,7 +30,7 @@ if __name__ == '__main__':
     base_grid = addict.Dict()
     base_grid.create_dicts = False
     base_grid.map_items = False
-    base_grid.emb_size = 100
+    base_grid.emb_size = [100, 200, 300, 400]
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = 2000
