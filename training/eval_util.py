@@ -4,7 +4,7 @@ import pandas as pd
 import pathlib as Path
 import os
 import time
-from  datetime import datetime
+from datetime import datetime
 
 
 #create a full batch and send to device
@@ -31,16 +31,16 @@ def calculate_predictions(eval_loader, model, device, target_publication, step=0
         correct_150 = 0
         for i in range(0, 150):
             if eval_real_labels[indices[i]] == target_publication:
-                if i < 10 :
+                if i < 10:
                     correct_10 += 1
                 correct_150 += 1
         print(f"Evaluation Performance: Step - {step}")
         print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
-        print(f"Top 150: {correct_150} / 100 or {(correct_150*100)/150} %")
+        print(f"Top 150: {correct_150} / 100 or {(correct_150*2)/3} %")
         print("--------------------")
         if writer is not None:
             writer.add_scalar('Eval/Top-10', correct_10, step)
-            writer.add_scalar('Eval/Top-100', correct_100, step)
+            writer.add_scalar('Eval/Top-150', correct_150, step)
     return sorted_preds, indices
 
 
