@@ -34,6 +34,7 @@ ENTRY
     institution
     journal
     key
+    location
     month
     note
     number
@@ -425,6 +426,44 @@ FUNCTION { output.coden }       % UTAH
   if$
 }
 
+%
+% Sometimes articleno starts with the word 'Article' or 'Paper.
+% (this is a bug of acmdl, sigh)
+% We strip them.  We assume eid or articleno is already on stack
+%
+
+FUNCTION { strip.articleno.or.eid }
+{
+  't :=
+  t #1 #7 substring$ "Article" = 
+    {t #8 t text.length$ substring$ 't :=}
+    { }
+  if$
+  t #1 #7 substring$ "article" = 
+    {t #8 t text.length$ substring$ 't :=}
+    { }
+  if$
+  t #1 #5 substring$ "Paper" = 
+    {t #6 t text.length$ substring$ 't :=}
+    { }
+  if$
+  t #1 #5 substring$ "paper" = 
+    {t #6 t text.length$ substring$ 't :=}
+    { }
+  if$
+  % Strip any left trailing space or ~
+  t #1 #1 substring$ " " =
+    {t #2 t text.length$ substring$ 't :=}
+    { }
+  if$ 
+  t #1 #1 substring$ "~" =
+    {t #2 t text.length$ substring$ 't :=}
+    { }
+  if$
+  t 
+}
+
+
 FUNCTION { format.articleno }
 {
   articleno empty.or.unknown not eid empty.or.unknown not and
@@ -440,20 +479,20 @@ FUNCTION { format.articleno }
           { }
         if$
         eid empty.or.unknown
-          { "Article \bibinfo{articleno}{" articleno * "}" * }
-          { "Article \bibinfo{articleno}{" eid * "}" * }
+          { "Article \bibinfo{articleno}{" articleno strip.articleno.or.eid * "}" * }
+          { "Article \bibinfo{articleno}{" eid strip.articleno.or.eid * "}" * }
         if$
      }
   if$
 }
 
 FUNCTION { format.year }
-{ % push year string or "[n. d.]" onto output stack
+{ % push year string or "[n.\,d.]" onto output stack
   %% Because year is a mandatory field, we always force SOMETHING
   %% to be output
   "\bibinfo{year}{"
   year empty.or.unknown
-    { "[n. d.]" }
+    { "[n.\,d.]" }
     { year }
   if$
   *  "}" *
@@ -678,16 +717,15 @@ FUNCTION { output.eprint } %
            }
            { "[" archiveprefix "l" change.case$ "]" * * * }
          if$
-         "{" *
+	 "{" eprint "}" * * *
          primaryclass empty.or.unknown
            { eprintclass empty.or.unknown
              { }
-             { eprintclass "/" * * }
+             { "~[" eprintclass "]" * * * }
              if$
            }
-           { primaryclass "/" * * }
+           { "~[" primaryclass "]" * * * }
          if$
-         eprint "}" * *
          writeln
     }
   if$
@@ -732,7 +770,7 @@ FUNCTION { output.year.check }
   year empty.or.unknown
      { "empty year in " cite$ * warning$
        write$
-       " \bibinfo{year}{[n. d.]}"
+       " \bibinfo{year}{[n.d.]}"
        "\natexlab{" extra.label * "}" * *
        mid.sentence 'output.state :=
      }
@@ -1232,31 +1270,43 @@ FUNCTION { format.btitle }
 FUNCTION { format.emphasize.booktitle }
 { booktitle format.a.title.with.edition }
 
+
+
 FUNCTION { format.city }
 {
   % jtb: if the preceding string (the title of the conference) is non-empty,
   % jtb: append the location, otherwise leave empty (so as to trigger the
   % jtb: error message in output.check
 
-%  duplicate$ empty.or.unknown
-%    { }
-%    {
-%      city empty.or.unknown
-%        {
-%          date empty.or.unknown
-%            { }
-%            { " (" * date * ")" * }
-%         if$
-%%        }
-%%        {
-%%          date empty.or.unknown
-%%            { " (" * city * ")" * }
-%%            { " (" * city * ", " * date * ")" * }
-%%          if$
-%%        }
-%%      if$
-%%    }
-%  if$
+  duplicate$ empty.or.unknown
+    { }
+    {
+      city empty.or.unknown location empty.or.unknown and
+        {
+          date empty.or.unknown
+            { }
+            { " (" * date * ")" * }
+          if$
+        }
+        {
+          location empty.or.unknown
+            {
+              date empty.or.unknown
+                { " (" * city * ")" * }
+                { " (" * city * ", " * date * ")" * }
+              if$
+            }
+            {
+              date empty.or.unknown
+                { " (" * location * ")" * }
+                { " (" * location * ", " * date * ")" * }
+              if$
+            }
+          if$
+        }
+      if$
+    }
+  if$
 }
 
 FUNCTION { tie.or.space.connect }
@@ -1308,7 +1358,19 @@ FUNCTION { format.series }
 {
   series empty.or.unknown
     {""}
-    {" \emph{(\bibinfo{series}{" * series "})}" *}
+    {" \emph{(\bibinfo{series}{" * series "}" *
+     volume empty.or.unknown
+       {
+         number empty.or.unknown
+            {")}" *}
+            {", \bibinfo{number}{" number "})}" * * *}
+          if$
+       }
+       {", Vol.~\bibinfo{volume}{" volume "})}" * * *
+        "volume and number" number either.or.check
+       }
+     if$
+    }
   if$
 }
 
@@ -1645,10 +1707,10 @@ FUNCTION { format.journal.volume.number.day.month.year }
   % Sometimes proceedings are published in journals
   % In this case we do not want to put year, day and month here
 
-%  type$ "inproceedings" =
-%    { }
-%    {format.day.month.year * }
-%  if$
+  type$ "inproceedings" =
+    { }
+    {format.day.month.year * }
+  if$
 }
 
 FUNCTION { format.chapter.pages }
@@ -1922,7 +1984,7 @@ FUNCTION { calc.basic.label }
   if$
   duplicate$
   year empty.or.unknown
-    { "[n. d.]" }
+    { "[n.d.]" }
     { year field.or.null purify$ #-1 #4 substring$}
   if$
   *
@@ -1970,7 +2032,7 @@ FUNCTION { calc.label }
   % save the year for sort processing afterwards (adding a, b, c, etc.)
   %
   year empty.or.unknown
-    { "[n. d.]" }
+    { "[n.d.]" }
     { year field.or.null purify$ #-1 #4 substring$}
   if$
   'label.year :=
@@ -2016,14 +2078,14 @@ FUNCTION { output.issue.doi.coden.isxn.lccn.url.eprint }
   "\newblock" writeln
   after.block 'output.state :=
 
-%  output.issue
-%  output.isbn
-%  output.coden  % CODEN is functionally like ISSN, so output them sequentially
-%  output.issn
-%  output.lccn
-%  output.doi    % DOI is ALWAYS last according to CrossRef DOI documentation
+  output.issue
+  output.isbn
+  output.coden  % CODEN is functionally like ISSN, so output them sequentially
+  output.issn
+  output.lccn
+  output.doi    % DOI is ALWAYS last according to CrossRef DOI documentation
   output.eprint
-%  output.url    % but ACM wants URL last
+  output.url    % but ACM wants URL last
 }
 
 FUNCTION { output.issue.doi.coden.isxn.lccn.url.eprint.note }
@@ -2237,11 +2299,13 @@ FUNCTION { inproceedings }
   crossref missing$
     {
       journal missing$          % jtb: proceedings appearing in journals
-        { %format.in.emphasize.booktitle format.city "booktitle"  output.check.dot.space
-	  format.in.emphasize.booktitle "booktitle"  output.check.dot.space
+        { format.in.emphasize.booktitle format.city "booktitle"  output.check.dot.space
           format.series output.removenospace
-          %format.editors.fml output % BV 2011/09/27 Moved dot to comma
-          format.bvolume.noseries output
+          format.editors.fml output % BV 2011/09/27 Moved dot to comma
+          series empty.or.unknown
+              { format.bvolume.noseries output }
+              {}
+          if$
           new.sentence
           organization output
           publisher "publisher" bibinfo.output.check % jtb: require publisher (?)
@@ -2249,9 +2313,8 @@ FUNCTION { inproceedings }
           format.bookpages output
         }
         {
-           %format.in.booktitle format.city "booktitle" output.check
-	   format.in.booktitle "booktitle" output.check
-           % format.editors.fml output
+           format.in.booktitle format.city "booktitle" output.check
+           format.editors.fml output
            new.sentence
            format.journal.volume.number.day.month.year output
         }
@@ -2340,10 +2403,17 @@ FUNCTION { misc }
   fin.entry
 }
 
-FUNCTION { online } { misc }
+FUNCTION { online } { manual }
 
-FUNCTION { game } { misc }
+FUNCTION { game } { manual }
 
+FUNCTION { artifactsoftware } { manual }
+
+FUNCTION { artifactdataset } { manual }
+
+FUNCTION { software } { manual }
+
+FUNCTION { dataset } { manual }
 
 FUNCTION { phdthesis }
 {
@@ -2444,8 +2514,7 @@ FUNCTION { proceedings }
   %                                        editor or organization
   output.year.check                    % added (newapa)
   new.block
-  %format.btitle format.city "title" output.check        % jtb: added city
-  format.btitle "title" output.check        % jtb: added city
+  format.btitle format.city "title" output.check        % jtb: added city
   new.sentence
   format.bvolume output
   format.number.series output
