@@ -37,9 +37,6 @@ if __name__ == '__main__':
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
-    base_grid.train_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/train.json")
-    base_grid.test_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/test.json")
-    base_grid.eval_path = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/mapped-data/evaluation.json")
     base_grid.dict_dir = pathlib.Path("/scratch/gpfs/altosaar/dat/longform-data/dictionaries")
 
     # RMS with all words
