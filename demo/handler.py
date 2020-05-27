@@ -6,9 +6,9 @@ import boto3
 def getData():
     BUCKET = 'personal-bucket-news-ranking'
     FILE_TO_READ = 'pub_emb+bias.json'
-    client = boto3.client('s3',
-                           aws_access_key_id='AKIAJLFOBBVIRW4TTHZA',
-                           aws_secret_access_key='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'
+   client = boto3.client('s3',
+                           aws_access_key_id='xxxxxxxxxxxxxxxxxxxx'
+                           aws_secret_access_key='xxxxxxxxxxxxxxxxxxx'
                          )
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
     publications = json.loads(result["Body"].read().decode())
