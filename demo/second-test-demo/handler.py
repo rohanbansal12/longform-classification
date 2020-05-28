@@ -2,16 +2,21 @@ import json
 import numpy as np
 import boto3
 import scipy
+import scipy.sparse
 from io import BytesIO
+import os
+
+ACCESS_KEY = os.environ['ACCESS_KEY']
+SECRET_ACCESS_KEY = os.environ['SECRET_ACCESS_KEY']
 
 
 def getData():
     BUCKET = 'personal-bucket-news-ranking'
     client = boto3.client('s3',
-                          aws_access_key_id='xxxxxxxxxxxxxxxxxxxx',
-                          aws_secret_access_key='xxxxxxxxxxxxxxxxxxx'
+                          aws_access_key_id=ACCESS_KEY,
+                          aws_secret_access_key=SECRET_ACCESS_KEY
                           )
-    FILE_TO_READ = 'word_articles.npz'
+    FILE_TO_READ = 'csr_articles.npz'
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
     word_articles = scipy.sparse.load_npz(BytesIO(result["Body"].read()))
 
@@ -27,7 +32,7 @@ def getData():
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
     id_to_word = json.loads(result["Body"].read().decode())
 
-    FILE_TO_READ = 'mapped-data.json'
+    FILE_TO_READ = 'mapped_dataset.json'
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
     real_data = json.loads(result["Body"].read().decode())
 
@@ -35,6 +40,7 @@ def getData():
 
 
 def lambda_handler(event, context):
+    print(ACCESS_KEY)
     publication_emb = np.asarray([1.0440499, 1.0030843, 1.0340449, 0.992087, 1.0509816,
                                   1.0315005, -1.0493797, -1.0198538, 0.9712321, -1.026394,
                                  -0.9687971, 1.0592866, -1.0200703, -1.0423145, 0.9929519,
