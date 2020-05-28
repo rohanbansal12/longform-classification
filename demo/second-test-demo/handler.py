@@ -23,7 +23,15 @@ def getData():
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
     word_bias = np.load(BytesIO(result["Body"].read()))
 
-    return word_articles, word_emb, word_bias
+    FILE_TO_READ = 'reversed_word_ids.json'
+    result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
+    id_to_word = json.loads(result["Body"].read().decode())
+
+    FILE_TO_READ = 'mapped-data.json'
+    result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
+    real_data = json.loads(result["Body"].read().decode())
+
+    return word_articles, word_emb, word_bias, id_to_word, real_data
 
 
 def lambda_handler(event, context):
@@ -57,17 +65,64 @@ def lambda_handler(event, context):
     publication_emb[67] = event['e']
     print(publication_emb)
 
-    word_articles, word_emb, word_bias = getData()
-    article_embeddings = (csr_matrix(word_articles) * csr_matrix(word_emb)).toarray()
+    word_articles, word_emb, word_bias, id_to_word, real_data = getData()
+    print("Data loaded successfully!")
+
+    article_embeddings = np.dot(word_articles, word_emb)
+
     emb_times_publication = np.dot(article_embeddings, publication_emb.reshape(100,1))
+
     article_bias = np.dot(word_articles, word_bias)
+
     product_with_bias = emb_times_publication + article_bias
+
     word_counts = word_articles.sum(axis=1).reshape(word_articles.shape[0], 1)
+
     final_logits = np.divide(product_with_bias, word_counts) + float(publication_bias)
 
+    indices = final_logits.argsort(axis=0)[-75:].reshape(75)
+
+    word_logits = np.dot(word_emb, publication_emb.reshape(100,1)) + word_bias
+
+    top_articles = word_articles[indices].squeeze()
+
+    broadcasted_words_per_article = top_articles * word_logits.T
+
+    sorted_word_indices = broadcasted_words_per_article.argsort(axis=1)
+
+    return_articles = []
+
+    i = 0
+    for idx in indices:
+        current_article = real_data[int(idx)]
+        current_article['logit'] = float(final_logits[int(idx)])
+        current_sorted_words = sorted_word_indices[i]
+        top_words = []
+        least_words = []
+        for top_word in current_sorted_words[-10:]:
+            word = id_to_word[str(top_word)]
+            top_words.append(word)
+        for least_word in current_sorted_words[:10]:
+            word = id_to_word[str(least_word)]
+            least_words.append(word)
+        current_article['top_words'] = top_words
+        current_article['least_words'] = least_words
+        return_articles.append(current_article)
+        i += 1
+    ordered_return_articles = return_articles[::-1]
     response = {
         "statusCode": 200,
-        "body": final_logits
+        "body": json.dumps(ordered_return_articles)
     }
-
     return response
+
+
+if __name__ == "__main__":
+    test_event = {
+        'a': 5,
+        'b': 6,
+        'c': 100,
+        'd': 12,
+        'e': -123
+    }
+    print(lambda_handler(test_event, ''))
