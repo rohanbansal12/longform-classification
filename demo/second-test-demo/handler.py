@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import boto3
-from scipy.sparse import csr_matrix
+import scipy
 from io import BytesIO
 
 
@@ -11,9 +11,9 @@ def getData():
                           aws_access_key_id='xxxxxxxxxxxxxxxxxxxx',
                           aws_secret_access_key='xxxxxxxxxxxxxxxxxxx'
                           )
-    FILE_TO_READ = 'word_articles.npy'
+    FILE_TO_READ = 'word_articles.npz'
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
-    word_articles = np.load(BytesIO(result["Body"].read()))
+    word_articles = scipy.sparse.load_npz(BytesIO(result["Body"].read()))
 
     FILE_TO_READ = 'word_emb.npy'
     result = client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
@@ -68,11 +68,11 @@ def lambda_handler(event, context):
     word_articles, word_emb, word_bias, id_to_word, real_data = getData()
     print("Data loaded successfully!")
 
-    article_embeddings = np.dot(word_articles, word_emb)
+    article_embeddings = word_articles.dot(word_emb)
 
     emb_times_publication = np.dot(article_embeddings, publication_emb.reshape(100,1))
 
-    article_bias = np.dot(word_articles, word_bias)
+    article_bias = word_articles.dot(word_bias)
 
     product_with_bias = emb_times_publication + article_bias
 
@@ -84,16 +84,16 @@ def lambda_handler(event, context):
 
     word_logits = np.dot(word_emb, publication_emb.reshape(100,1)) + word_bias
 
-    top_articles = word_articles[indices].squeeze()
+    top_articles = word_articles[indices.tolist()[0]]
 
-    broadcasted_words_per_article = top_articles * word_logits.T
+    broadcasted_words_per_article = top_articles.toarray() * word_logits.T
 
     sorted_word_indices = broadcasted_words_per_article.argsort(axis=1)
 
     return_articles = []
 
     i = 0
-    for idx in indices:
+    for idx in indices.tolist()[0]:
         current_article = real_data[int(idx)]
         current_article['logit'] = float(final_logits[int(idx)])
         current_sorted_words = sorted_word_indices[i]

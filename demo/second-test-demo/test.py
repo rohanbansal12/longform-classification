@@ -2,6 +2,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import time
 import json
+import scipy
 
 publication_emb = np.asarray([1.0440499, 1.0030843, 1.0340449, 0.992087, 1.0509816, 1.0315005, -1.0493797, -1.0198538, 0.9712321, -1.026394, 
             -0.9687971, 1.0592866, -1.0200703, -1.0423145, 0.9929519, 1.0220934, 1.021279, -1.0265925, 0.9601833, 0.9763889, 
@@ -15,9 +16,9 @@ publication_emb = np.asarray([1.0440499, 1.0030843, 1.0340449, 0.992087, 1.05098
             0.9786834, 1.0199072, 0.98080486, 0.9698635, -0.99322844, -0.95841753, -0.99150276, 0.97394156, 0.9976019, -1.0375009], dtype=np.float32)
 
 publication_bias = 0.99557
-word_articles = np.load('../word_articles.npy')
-word_emb = np.load('../word_emb.npy')
-word_bias = np.load('../word_bias.npy')
+word_articles = scipy.sparse.load_npz('/users/rohan/news-classification/Data/demo-data/csr_articles.npz')
+word_emb = np.load('/users/rohan/news-classification/Data/demo-data/word_emb.npy')
+word_bias = np.load('/users/rohan/news-classification/Data/demo-data/word_bias.npy')
 
 with open("/users/rohan/news-classification/Data/feed_ranks/data/mapped-data/mapped_dataset.json",'r') as file:
     real_data = json.load(file)
@@ -27,11 +28,11 @@ with open('/users/rohan/news-classification/data/dictionaries/reversed_word_ids.
 print("Data Loaded Successfully!")
 
 time1 = time.time()
-article_embeddings = np.dot(word_articles, word_emb)
+article_embeddings = word_articles.dot(word_emb)
 
 emb_times_publication = np.dot(article_embeddings, publication_emb.reshape(100,1))
 
-article_bias = np.dot(word_articles, word_bias)
+article_bias = word_articles.dot(word_bias)
 
 product_with_bias = emb_times_publication + article_bias
 
@@ -43,16 +44,17 @@ indices = final_logits.argsort(axis=0)[-75:].reshape(75)
 
 word_logits = np.dot(word_emb, publication_emb.reshape(100,1)) + word_bias
 
-top_articles = word_articles[indices].squeeze()
+top_articles = word_articles[indices.tolist()[0]]
 
-broadcasted_words_per_article = top_articles * word_logits.T
+broadcasted_words_per_article = top_articles.toarray() * word_logits.T
 
 sorted_word_indices = broadcasted_words_per_article.argsort(axis=1)
 
 return_articles = []
 
 i=0
-for idx in indices:
+for idx in indices.tolist()[0]:
+    print(idx)
     current_article = real_data[int(idx)]
     current_article['logit'] = float(final_logits[int(idx)])
     current_sorted_words = sorted_word_indices[i]
