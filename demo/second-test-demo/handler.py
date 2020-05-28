@@ -50,6 +50,13 @@ def lambda_handler(event, context):
                                  dtype=np.float32)
 
     publication_bias = 0.99557
+    publication_emb[1] = event['a']
+    publication_emb[5] = event['b']
+    publication_emb[17] = event['c']
+    publication_emb[34] = event['d']
+    publication_emb[67] = event['e']
+    print(publication_emb)
+
     word_articles, word_emb, word_bias = getData()
     article_embeddings = (csr_matrix(word_articles) * csr_matrix(word_emb)).toarray()
     emb_times_publication = np.dot(article_embeddings, publication_emb.reshape(100,1))
