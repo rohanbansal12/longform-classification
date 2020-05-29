@@ -65,3 +65,12 @@ th {
   margin-left: auto;
   margin-right: auto;
 }
+
+.description {
+  width:70%;
+  margin: auto;
+  text-align:center;
+  color: black !important;
+  font-weight: bold !important;
+  font-size: 20px !important;
+}
