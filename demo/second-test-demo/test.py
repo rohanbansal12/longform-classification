@@ -73,5 +73,4 @@ for idx in indices.tolist()[0]:
     
 time2 = time.time()
 
-print(return_articles[74])
 print(time2-time1)
