@@ -54,6 +54,12 @@ p {
   font-weight: bold !important;
 }
 
+.publication {
+  text-align: left !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
 th {
   color: black !important;
   font-weight: bold !important;
@@ -73,4 +79,29 @@ th {
   color: black !important;
   font-weight: bold !important;
   font-size: 20px !important;
+}
+
+.rank_results {
+  width:90%; 
+  margin-left:5%; 
+  margin-right:5%;
+}
+
+.description {
+  padding-top: 10px;
+}
+
+.mdl-layout__header-row {
+  text-align: center;
+  margin: auto;
+  margin-bottom: 50px;
+  margin-top: 20px;
+}
+
+.mdl-layout__title, .mdl-layout-title {
+  font-size: 50px;
+}
+
+table {
+  margin: 0 auto;
 }

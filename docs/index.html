@@ -1,733 +1,1909 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>News Recommendation</title>
-    <script src="https://kit.fontawesome.com/044c0d86f3.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
-    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-  </head>
-  <body>
-    <h1 class="main_header">Ranking Feature Writing</h1>
-    <p class="description">
-      This is a basic demonstration of our feature writing ranking app. You can alter the publication embeddings with the sliders provided, then click the button to get updated article lists!
-    </p>
-    <div class="input_div" style="display: flex;align-items: center;width:70%;margin: auto;">
-    <div style="width:85%; text-align: center;">
-    <p class="embedding_slider_holder">
-      <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="s1" min="-50" max="50" value="5" step="5">
-    </p>
-    <p class="embedding_slider_holder">
-      <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s2" min="-50" max="50" value="5" step="5">
-    </p>
-    <p class="embedding_slider_holder">
-      <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s3" min="-50" max="50" value="5" step="5">
-    </p>
-    <p class="embedding_slider_holder">
-      <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s4" min="-50" max="50" value="5" step="5">
-    </p>
-    <p class="embedding_slider_holder">
-      <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s5" min="-50" max="50" value="5" step="5">
-    </p>
+
+<head>
+  <meta charset="utf-8">
+  <title>News Recommendation</title>
+  <script src="https://kit.fontawesome.com/044c0d86f3.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+</head>
+
+<body>
+  <!-- Simple header with fixed tabs. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+            mdl-layout--fixed-tabs">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <!-- Title -->
+        <span id="main-heading" class="mdl-layout-title">Ranking Feature Writing</span>
+      </div>
+      <!-- Tabs -->
+      <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+        <a href="#fixed-tab-browser" class="mdl-layout__tab is-active">Browser-Esque</a>
+        <a href="#fixed-tab-corona" class="mdl-layout__tab">Coronavirus</a>
+      </div>
+    </header>
+    <main class="mdl-layout__content">
+      <!-- Your content goes here -->
+      <p class="description">
+        This is a basic demonstration of our feature writing ranking app. You can alter the publication embeddings with
+        the
+        sliders provided, then click the button to get updated article lists!
+      </p>
+      <div class="input_div" style="display: flex;align-items: center;width:70%;margin: auto;">
+        <div style="width:85%; text-align: center;">
+          <p class="embedding_slider_holder">
+            <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="s1" min="-50" max="50"
+              value="5" step="5">
+          </p>
+          <p class="embedding_slider_holder">
+            <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s2" min="-50" max="50"
+              value="5" step="5">
+          </p>
+          <p class="embedding_slider_holder">
+            <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s3" min="-50" max="50"
+              value="5" step="5">
+          </p>
+          <p class="embedding_slider_holder">
+            <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s4" min="-50" max="50"
+              value="5" step="5">
+          </p>
+          <p class="embedding_slider_holder">
+            <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s5" min="-50" max="50"
+              value="5" step="5">
+          </p>
+        </div>
+        <div style="width:15%; text-align: center">
+          <button style="display: inline-block"
+            class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">forward</i>
+          </button>
+        </div>
+      </div>
+      <div id="spinner" class="mdl-spinner mdl-js-spinner is-active" style="display:none;"></div>
+      <section class="mdl-layout__tab-panel is-active" id="fixed-tab-browser">
+        <div class="page-content">
+          <!-- Your content goes here -->
+          <div id="table-wrapper-browser">
+            <table id="rank_results" class="mdl-data-table mdl-js-data-table">
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">Articles</th>
+                  <th class="mdl-data-table__cell--non-numeric">Publication</th>
+                  <th class="mdl-data-table__cell--non-numeric">Prediction</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://www.colinmcginn.net/mind-dependence/">Mind-Dependence</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">finite, thus, neurons, notion, hence, indeed, attractive, suppose, moreover</p>
+                    <p class="least_words">isn, says, stemming, including, also, appearance, arguing</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">7.9061784744262695</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.simonsfoundation.org/2020/05/06/finding-prime-locations-the-continuing-challenge-to-prove-the-riemann-hypothesis/">Finding
+                      Prime Locations: The Continuing Challenge to Prove the Riemann Hypothesis</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">hypothesis, consisting, conjecture, behavior, graph, whereas, wikimedia,
+                      domain, credit</p>
+                    <p class="least_words">above, key, gives, series, makes, suggests, than, friedrich, 1700s</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">7.137406826019287</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://thedabbler.co.uk/2017/01/review-manly-manners-for-the-impeccable-gent-by-guy-egmont/">Review:
+                      Manly Manners for the Impeccable Gent – by Guy Egmont</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">silent, club, money, arranged, wives, etc, reader, talk, harvard, secretaries
+                    </p>
+                    <p class="least_words">season, exec, workplace, says, deal, titled, emboldened, also, women</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">6.296250343322754</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://justice-everywhere.org/general/should-economics-be-pluralist/">Should Economics be
+                      Pluralist?</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">analogy, economics, behavior, statistical, suppose, behavioral, pdf</p>
+                    <p class="least_words">while, according, argued, delves, finding, currently, also, sweden, actually
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">6.169751167297363</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://cognitionandculture.net/blogs/helena-miton/ubiquitous-yet-nowhere-to-be-found-on-the-invisible-hands-success/">Ubiquitous
+                      yet nowhere to be found: on the Invisible Hand’s success</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">behavioral, credit</p>
+                    <p class="least_words">explaining, shows, essentially, while, watch, journal, includes, offering,
+                      inquiry, finding</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">6.115911960601807</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/issue-35/fiction-drama/the-creature/">The Creature</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">ever, account, whenever, the, knew, friend, names, handsome, inbox, drive</p>
+                    <p class="least_words">wrote, winds, bit, white, really, after, was, stop</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.8149309158325195</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://tante.cc/2018/11/28/experte-zum-thema-blockchain-beim-ausschuss-digitale-agenda-des-bundestages/">Experte
+                      zum Thema Blockchain beim Ausschuss Digitale Agenda des Bundestages</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">governments, the, quasi, den, und, von</p>
+                    <p class="least_words">brexit, digital, deutschland, today, around, was, saying, ganz, blockchain,
+                      für</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.654151916503906</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/nybooks/~3/Q76K1CCLbwA/">Fun for One</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">the, southwest, sound, table, microphone, arms, brown, desk, sitting, onto</p>
+                    <p class="least_words">stone, while, watch, sonia, said, crossing, broadway, lead</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.581697463989258</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://tante.cc/2020/04/21/bluetooth-abstandsmessung-und-algorithmen/">Bluetooth
+                      Abstandsmessung und Algorithmen</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">centimeter, quasi, mich, den, liked, box, und, system, patreon, von</p>
+                    <p class="least_words">2020, apps, also, proxies, was, ganz, via, für</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.57907247543335</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.bayesianspectacles.org/omit-needless-words-an-unapproachable-example-of-conciseness-related-by-the-traveling-chinese-story-teller-kai-lung/">Omit
+                      Needless Words: An Unapproachable Example of Conciseness Related by the Traveling Chinese
+                      Story-teller Kai Lung</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">the, incapable, jan, manner, indeed, mentioned, ten</p>
+                    <p class="least_words">read, added, 2020, said, means, sings, pearson, prevent</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.50782585144043</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/online-only/online-only/pretty-girl-with-bad-hair/">Pretty Girl with
+                      Bad Hair</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">eighteen, jeans, pages, translated, ten, fifty, eighteenth, forty, twenty</p>
+                    <p class="least_words">read, 2014, pretty, watch, journal, saturday, ahead, popular, above</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.4934492111206055</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://blog.jessriedel.com/2019/09/23/the-interpretation-of-free-energy-as-bit-erasure-capacity/">The
+                      interpretation of free energy as bit-erasure capacity</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">system, summary, hence, indeed, obvious, henceforth, 1st, blog</p>
+                    <p class="least_words">isn, specifically, doesn, initially, above, bit</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.482933044433594</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/the-good-soldier">The Good Soldier</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">oil, satisfaction, behavior, suppose, emergence, tea, pages, hundred</p>
+                    <p class="least_words">read, twitter, rolling, changing, stone, added, wrote, code, drama</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.382519245147705</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://www.oneill.io/2020/04/29/why-do-dogs-howl-at-the-moon/">Why do dogs howl at the
+                      moon?</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">please, hung, empty, days, the, liked, television, reader, drive, wondered</p>
+                    <p class="least_words">read, actively, key, also, letting, definitely, found, her, was</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.312851905822754</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://www.colinmcginn.net/phenomenological-knowledge/">Phenomenological Knowledge</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">insist, hence, indeed, etc, exceed, obvious, faculty, suppose, whereas, occupy
+                    </p>
+                    <p class="least_words">pretty, isn, doesn, argued, alleged, deal, totally, twist</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.302178859710693</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://copper-nickel.org/the-missing-are-considered-dead/">The Missing Are Considered
+                      Dead</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">smile, troubled, talk, neighborhood, neighbor, tea, wondered, occupy, thirty
+                    </p>
+                    <p class="least_words">related, hide, isn, serve, while, watch, moments, hopeful, barrier</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.299867153167725</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://blog.jessriedel.com/2020/05/11/a-checkable-lindbladian-condition/">A checkable
+                      Lindbladian condition</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">etc, generated, onto, furthermore, domain, blog, pdf</p>
+                    <p class="least_words">clarity, statement, barrier, above, said, aren, map, totally</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.253383159637451</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/oupblog/~3/OvGDLbdi2s0/">The words of the day</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">fourteenth, sixteenth, meetings, indeed, operative, image, pages, credit, blog
+                    </p>
+                    <p class="least_words">related, snap, statement, while, due, above, favorite, virus</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.237738609313965</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://blog.andymatuschak.org/post/7565332844">Musical tone and perceived dissonance</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">consonant, harmonic, hence, thousand, cell, hair, moreover</p>
+                    <p class="least_words">researchers, while, bunch, includes, rendition, basically, also, means</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.190851211547852</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.nationalaffairs.com//blog/detail/findings-a-daily-roundup/capitalism-and-its-discontents">Capitalism
+                      and its Discontents</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">moreover, pages, translated, thirty, nineteenth, twentieth</p>
+                    <p class="least_words">explaining, related, jennifer, ruth, earnings, journal, reported, focusing,
+                      particularly, families</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.154965400695801</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://medium.com/@Chris_arnade/d-in-the-mcdonalds-a8e11318ec32?source=rss-9e28ee9292dc------2">D
+                      in the McDonald’s</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">anymore, obvious, talk, parking, drug, mentioned, drive, thirty, twenty</p>
+                    <p class="least_words">read, pop, doesn, dedicated, 2013, genius, shocked, says, particularly</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.145820617675781</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/the-directors-cut">The Director’s Cut</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">domain, von, hundred, eighteenth, forty, twenty</p>
+                    <p class="least_words">explaining, read, added, shows, wrote, serve, essentially, argued, follows
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.141969203948975</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://blog.jessriedel.com/2019/08/23/on-computational-aestivation/">On computational
+                      aestivation</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">computer, hypothesis, paradox, generated, incentives</p>
+                    <p class="least_words">read, shows, previously, while, stars, doesn, argued, ahead, jess</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.131683349609375</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.waggish.org/2019/the-100-most-important-words-to-i-a-richards/">The 100 Most
+                      Important Words (to I. A. Richards)</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">functioning, ing, notion, page, summary, reader, operative, hundred</p>
+                    <p class="least_words">read, twitter, adding, unnamed, facebook, health, worthy, held</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.111241817474365</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/online-only/online-only/misery/">Misery</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">cell, tea, hair, afternoon, eighteen, wondered, translated, thirty, twenty</p>
+                    <p class="least_words">pretty, added, serve, while, moments, hopeful, saturday, fuel, holiday</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.103696823120117</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.waggish.org/2019/robert-musil-in-martha-musils-coat/">Robert Musil in Martha
+                      Musil’s Coat</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">kill, indeed, etc, statistical, hair, translated</p>
+                    <p class="least_words">while, watch, according, follows, said, edited, deserves</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.094523906707764</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://cultureandcommunication.org/galloway/a-list-of-qualities">A List of Qualities</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">languages, editors, indeed, whereas, web</p>
+                    <p class="least_words">digital, code, essentially, statement, argued, hardware, hasn, typically,
+                      appeals</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.083495616912842</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.noahbrier.com/archives/2018/10/pareto-principle-aka-80-20-rule/">Pareto
+                      Principle (aka 80/20 Rule) [Framework of the Day]</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">pages, dec, web, pdf, caption</p>
+                    <p class="least_words">2017, chart, https, wrote, percent, journal, follows, popular, explains</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.061043739318848</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://jasoncollins.blog/2019/08/05/david-leiser-and-yhonatan-shemeshs-how-we-misunderstand-economics-and-why-it-matters-the-psychology-of-bias-distortion-and-conspiracy/">David
+                      Leiser and Yhonatan Shemesh’s How We Misunderstand Economics and Why it Matters: The Psychology of
+                      Bias, Distortion and Conspiracy</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">judgments, indeed, exceed, explanations, economics, israel, whereas,
+                      occasional, domain</p>
+                    <p class="least_words">related, confirmed, respondents, broader, items, offering, climate</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.0573906898498535</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/trading-volatility">Trading Volatility</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">indeed, obvious, analogy, behavior, assumed, suppose, whereas, ten</p>
+                    <p class="least_words">shows, percent, previously, essentially, while, according, argued, follows,
+                      investments</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.056610584259033</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/bodyliterature/QVDj/~3/VjIVrzyrK0g/">Bijan Najdi</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">amongst, arms, translations, caspian, sitting, revolution, onto, gray, hair</p>
+                    <p class="least_words">read, watch, doesn, journal, saturday, including, carrying, currently, seeing
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.047688007354736</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/misused-terms-in-linguistics">Misused Terms
+                      in Linguistics</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">behavioral, domain, neighboring, stimulus, ten, twenty</p>
+                    <p class="least_words">read, clarity, highlight, code, essentially, while, specifically, according,
+                      dedicated, argued</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.042849540710449</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/issue-34/fiction-drama/jackpot/">Jackpot</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">seemed, hadn, money, casino, anymore, clapped, arab, talk, telephone</p>
+                    <p class="least_words">wrote, pilot, said, weren, during, told, women</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.023077487945557</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://davidsimon.com/nightcops/">Nightcops</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">afternoon, pages, credit, twelve, ten, fifteen, fifty, thirty, twenty</p>
+                    <p class="least_words">monday, digital, wrote, while, sunday, watch, tweeting, denied, existential,
+                      inappropriate</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.016082763671875</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/craigmod/~3/2YRm7Kfddlw/">[ridgeline] A Review of Beds — Part
+                      1</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">desk, box, notion, anymore, lobby, males, kilometers, hundred</p>
+                    <p class="least_words">rating, reminder, wrote, snap, serve, code, sunday, canada</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.012973308563232</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/the-miracle-of-general-equilibrium">The
+                      Miracle of General Equilibrium</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">economics, emergence, cent, twentieth</p>
+                    <p class="least_words">donald, 2016, changing, 2015, added, serve, statement, argued, extremely</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">5.004232406616211</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://paulkingsnorth.net/2018/08/01/the-circling/">The Circling</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">cloudless, indeed, shit, suburb, explanations, crap, tea, pages, fifteen</p>
+                    <p class="least_words">isn, 2018, essentially, above, says, said, deal, travel</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.981334686279297</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.philosophyofmoney.net/cyclical-sovereignty/">Cyclical sovereignty</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">marginal, failure, bundesbank, obvious, ecb, conferences, fiscal, balance,
+                      stimulus, ten</p>
+                    <p class="least_words">verse, specifically, existential, due, proposal, historic, proves, during</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.966983795166016</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://mavengame.com/2020/02/one-about-words/">one about words</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">books, obscure, catfish, page, reader, balance, avenue, ten, twenty</p>
+                    <p class="least_words">read, netflix, isn, watch, says, deal, week</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.962460994720459</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://cultureandcommunication.org/galloway/uncomputer">Uncomputer</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">realm, computation, thus, computer, biological, rational, paradox, system,
+                      indeed, twentieth</p>
+                    <p class="least_words">digital, wrote, essentially, according, meanwhile, particularly, key, themes,
+                      series, also</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.9133477210998535</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://www.colinmcginn.net/is-biology-a-normative-science/">Is Biology a Normative
+                      Science?</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">system, manner, judgments, naïve, hence, indeed, etc, talk, suppose</p>
+                    <p class="least_words">healthier, isn, while, according, wellbeing, aimed, explains, focusing,
+                      particularly</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.885959625244141</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/the-social-set">The Social Set</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">occasional, evidently, image, pages, von, hundred, fifty, forty, twenty,
+                      twentieth</p>
+                    <p class="least_words">twitter, added, museum, while, survivors, denied, argued, follows, remarks,
+                      diversity</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.861191749572754</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://hedgehogreview.com/blog/thr/posts/against-projection-for-promise">Against
+                      Projection; For Promise</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">indeed, reader, talk, articles, neighborhood, blog, ten, hundred, fifty, forty
+                    </p>
+                    <p class="least_words">twitter, season, digital, wrote, guide, says, swift</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.85318660736084</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://evonomics.com/capitalisms-alone/">Capitalism(s), Alone</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">economics, indispensable, whereas, web, thirty, copyright, nineteenth, twenty,
+                      twentieth</p>
+                    <p class="least_words">2014, percent, while, earnings, argued, 2013, typically, broadly, key, trend
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.852306365966797</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/craigmod/~3/YNfKJT4XvEk/">[essays] Notes on the Other</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">onto, shirt, eighty, tea, hair, fourteen, nineteen, fifty, sixty, twenty</p>
+                    <p class="least_words">marvel, specifically, moments, due, performances, normalize, indigenous,
+                      women</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.833243370056152</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://philosophynow.org/issues/137/Against_Neural_Philosophy_Of_Mind">Against Neural
+                      Philosophy Of Mind</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">view, system, indeed, obvious, analogy, articles, assumed, emergence, nervous
+                    </p>
+                    <p class="least_words">read, related, prof, 2020, while, longstanding, according, argued, follows
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.832546710968018</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/flavorwire-rss/~3/zavZ69VA5XY/book-excerpt-james-thurbers-collected-fables-19625842">Book
+                      Excerpt: James Thurber's 'Collected Fables'</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">reprinted, friend, thus, kill, articles, inc, preface, ten, copyright, twenty
+                    </p>
+                    <p class="least_words">previously, celebrate, said, edited, also, announced, singing</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.814444541931152</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://evonomics.com/keynes-was-really-a-conservative/">Keynes Was Really a
+                      Conservative</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">whilst, inbox, economics, fiscal, deficits, obama, stimulus, ten, hundred</p>
+                    <p class="least_words">trump, added, wrote, while, said, deal, decried, told, also</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.793371200561523</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.nationalaffairs.com//blog/detail/findings-a-daily-roundup/econ-gone-wild">Econ
+                      Gone Wild</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">behavior, liquidity, behavioral, pages</p>
+                    <p class="least_words">explaining, related, previously, while, according, journal, crucially,
+                      escalate, due</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.792867660522461</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://medium.com/@Chris_arnade/hell-this-is-reno-2f35d8875ba1?source=rss-9e28ee9292dc------2">Hell,
+                      this is Reno</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">shit, talk, parking, drug, clients, hair, ten, fifteen</p>
+                    <p class="least_words">explaining, wednesday, shows, doesn, follows, fun, hurt, says, particularly,
+                      deal</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.768763065338135</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://standpointmag.co.uk/issues/april-2020/robert-conquest-garland-for-a-propagandist/">Robert
+                      Conquest: Garland for a Propagandist</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">books, overthrow, boldly, introduction, sir, insist, indeed, balance, ten,
+                      twentieth</p>
+                    <p class="least_words">2015, 2018, verse, elizabeth, said, edited, twist, told, also</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.763932228088379</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/craigmod/~3/TtqagfV5ByM/">[essays] The Long Road Back to
+                      2000</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">sitting, page, wikipedia, bubble, html, mail, ten, web</p>
+                    <p class="least_words">digital, pretty, released, fun, dovetails, releasing, stalwart, originally
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.742609024047852</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.zocalopublicsquare.org/2020/05/15/where-i-go-rancho-penasquitos-san-diego-apartment-identity/chronicles/where-i-go/">Where
+                      I Go: Penasquitos Gardens</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">begged, talk, neighborhood, neighbor, cell, balance, hair, shotgun</p>
+                    <p class="least_words">holiday, bunch, shooting, said, families, aren, 90s, plans</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.733719825744629</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/online-only/online-only/the-psychiatrist/">The Psychiatrist</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">cell, hair, israel, afternoon, jeans, twelve, ten, forty, twenty</p>
+                    <p class="least_words">read, stone, characters, shows, wrote, ruth, isn, while, pop, thrones</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.73108434677124</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://copper-nickel.org/odd-numbers/">Odd Numbers</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">neighborhood, thousand, tea, hair, drive, afternoon, ten, hundred, thirteen,
+                      twenty</p>
+                    <p class="least_words">explaining, vulture, read, hide, pretty, rudy, snap, while, watch</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.722705841064453</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/nybooks/~3/N-A4AqYm_PU/">Beyond Meaning: Joseph Brodsky’s
+                      Poetry of Exile</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">typed, meters, whereas, seventies, giroux, farrar, straus, nineties, thirty,
+                      nineteenth</p>
+                    <p class="least_words">read, wrote, boris, beloved, previously, verse, while, artifacts,
+                      existential, solidarity</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.7214035987854</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/delanceyplace/rwVN/~3/5KtQl7Jtat0/view-archives.php">the
+                      leadership of deng xiaoping -- 4/28/20</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">northwest, harvard, chairman, eighty, pages, twelve, copyright, twenty</p>
+                    <p class="least_words">sen, ezra, while, dedicated, above, key, secretary, donated, attend</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.7209062576293945</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/online-only/online-only/remainder/">Remainder</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">gray, tea, hair, license, drive, brotherhood, ten, hundred, thirty</p>
+                    <p class="least_words">read, rolling, lightly, pretty, wrote, digs, snap, isn</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.717398166656494</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://neo.life/2019/05/vanilla-memories/">Vanilla Memories</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">graph, drive, cofounder, afternoon, nervous, jeans, wondered, pages,
+                      neighboring</p>
+                    <p class="least_words">read, quarantine, pretty, boost, wrote, video, cdc, code, while</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.7165703773498535</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.berfrois.com/2020/05/emily-ogden-mind-games/">Emily Ogden: Mind Games</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">remembers, faculty, talk, satisfaction, wikimedia, lapham, image, sixty,
+                      illustration</p>
+                    <p class="least_words">guardian, read, monday, wrote, 2018, museum, while, journal, released</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.715446949005127</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/Everywhereist/~3/A8e-cdZRan8/">I Write About Mice But
+                      Actually Anxiety.</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">driveway, sitting, manner, dozen, onto, upper, articles, crap, neighborhood</p>
+                    <p class="least_words">twitter, while, doesn, released, carrie, literally, particularly, deal</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.711244583129883</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://stormbear.com/the-bubba-sudsa/">The Bubba Sudsa</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">insist, drunk, television, indeed, etc, credit</p>
+                    <p class="least_words">rating, smithsonian, read, changing, while, watch, according, debbie, bunch
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.710445404052734</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://ben-kay.com/2020/05/advertising-by-gaslight/">Advertising by Gaslight</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">behave, anymore, shit, crap, clients, hair, occasional</p>
+                    <p class="least_words">fun, initially, behaviour, week, seeing, also, paying, bit</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.708834648132324</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.allendowney.com/blog/2020/04/13/bayesian-hypothesis-testing/">Bayesian
+                      hypothesis testing</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">algorithms, hypothesis, probability, statistician, insist, summary, economics,
+                      statistical, euro</p>
+                    <p class="least_words">guardian, friday, statement, ahead, said, series, means, testing</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.702567100524902</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/a-hot-mess">A Hot Mess</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">statistical, suppose, expectation, whereas, illustration</p>
+                    <p class="least_words">related, researchers, shows, according, released, argued, follows, hardware,
+                      due, proposal</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.702016830444336</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/TheRationalWalkFeed/~3/Qmm8tzy2IqE/">The Song Remains the
+                      Same</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">ten, interviews, hundred, fifty, cent, twenty, twentieth</p>
+                    <p class="least_words">read, tuesday, cnbc, wrote, percent, 2020, doesn, warned, thinks</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.697851657867432</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://inference-review.com/index.php/article/kept-in-mind">Kept in Mind</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">whereas, deficits, concentrate, stimulus, twentieth</p>
+                    <p class="least_words">read, related, percent, previously, while, argued, follows, remarks</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.6826276779174805</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/online-only/online-only/more-or-less/">More or Less</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">desk, fuck, arranged, sitting, parking, gray, lobby, tea</p>
+                    <p class="least_words">isn, while, ahead, says, said, length, chair, week</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.681431293487549</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.scottaaronson.com/blog/?p=4794">Four striking papers</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">mentioned, graph, blog, twenty</p>
+                    <p class="least_words">related, wrote, previously, formally, recommended, favorite, matt, week,
+                      upshot</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.676440238952637</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://medium.com/@tdietterich/reflections-on-innateness-in-machine-learning-4eebefa3e1af?source=rss-d5e56dd33516------2">Reflections
+                      on Innateness in Machine Learning</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">wikipedia, languages, hence, exceed, obvious, behavior, org, web</p>
+                    <p class="least_words">https, researchers, while, according, adding, elizabeth, guide, typically,
+                      particularly</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.675137042999268</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://philosophynow.org/issues/137/Bullshit_Jobs_by_David_Graeber">Bullshit Jobs by David
+                      Graeber</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">multiplied, articles, image, pages, nineteenth, twenty</p>
+                    <p class="least_words">read, researchers, equality, 2020, 2018, essentially, while, follows, due</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.667534828186035</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="http://feedproxy.google.com/~r/delanceyplace/rwVN/~3/YFyNtomxq28/view-archives.php">gutenberg,
+                      failed entrepreneur -- 4/22/20</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">owed, the, books, money, manner, license, pages, fifty, copyright</p>
+                    <p class="least_words">related, 2016, characters, percent, credited, incredible, donated, tackled,
+                      truly</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.6641011238098145</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.lemonde.fr/blog/piketty/2019/07/09/will-money-creation-save-us/">Will money
+                      creation save us?</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">system, ecb, furthermore, balance, whereas, euro</p>
+                    <p class="least_words">2018, above, clarified, particularly, deal, climate, hyper, during, entering
+                    </p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.657807350158691</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://nplusonemag.com/online-only/online-only/in-the-pit/">In the Pit</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">nervous, jeans, translated, ten, fifteen, hundred, thirty, copyright, twenty
+                    </p>
+                    <p class="least_words">2016, previously, serve, while, according, earnings, meanwhile, literally,
+                      dip</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.624243259429932</td>
+                </tr>
+                <tr>
+                  <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                      href="https://www.perell.com/blog/wall-of-heroes">Your Wall of Heroes</a>
+                    <br></br>
+                    <br></br>
+                    <p class="top_words">room, friends, coaches, the, direction, television, explanations, marshall</p>
+                    <p class="least_words">read, lyrics, moments, adding, includes, favorite, aren, heroes</p>
+                  </td>
+                  <td class="publication">browser</td>
+                  <td class="logit">4.613435745239258</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <section class="mdl-layout__tab-panel" id="fixed-tab-corona">
+        <div class="page-content">
+          <!-- Your content goes here -->
+          <div id="table-wrapper-corona">
+            <table id="rank_results" class="mdl-data-table mdl-js-data-table">
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">Articles</th>
+                  <th class="mdl-data-table__cell--non-numeric">Publication</th>
+                  <th class="mdl-data-table__cell--non-numeric">Prediction</th>
+                </tr>
+              </thead>
+              <tbody>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.npr.org/2020/05/29/865685784/a-flight-attendant-shares-her-thoughts-about-returning-to-work?utm_medium=RSS&amp;utm_campaign=allthingsconsidered">A
+                Flight Attendant Shares Her Thoughts About Returning To Work</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">information, the, contractor, sitting, org, inc, pages, copyright</p>
+              <p class="least_words">monday, 2020, ahead, letting, shares, actually, bit, here, dire</p>
+            </td>
+            <td class="publication">All Things Considered : NPR</td>
+            <td class="logit">4.743221282958984</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://newcriterion.com/blogs/dispatch/week-in-review-11574">Week in review</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">books, barry, crisis, manner, protocol, hobbes, nervous, seventy</p>
+              <p class="least_words">rolling, quarantine, reminder, distancing, episode, above, writes, podcasts</p>
+            </td>
+            <td class="publication">The New Criterion Latest Blog</td>
+            <td class="logit">3.9528772830963135</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/FgQKFYPXAcM/">What Kind of Country Do We Want?</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">anomalous, fiscal, expectation, occasional, image, ten, eighteenth, mitt, nineteenth,
+                romney</p>
+              <p class="least_words">read, related, hide, previously, statement, viral, according, earnings, drama</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">3.8671247959136963</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/no-close-encounters-of-any-kind/">No Close
+                Encounters of Any Kind</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">twelve, ten, fifteen, thirteen, forty, thirty, twenty, advertisement</p>
+              <p class="least_words">trump, read, quarantine, confederate, distancing, pretty, 2020, while, stars</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.7215702533721924</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/quarantine-pastoral/">Quarantine Pastoral</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">neighborhood, fourteen, occasional, bush, jeans, obama, fifteen, twenty</p>
+              <p class="least_words">quarantine, stone, reminder, distancing, 2020, alongside, isn, according, visitors
+              </p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.650942087173462</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/billionaires-of-time/">Billionaires of Time</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">gray, tolstoy, hair, afternoon, jeans, fifteen, thirty, sixteen</p>
+              <p class="least_words">read, related, quarantine, pretty, added, shows, isn, museum, while</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.6192212104797363</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.npr.org/2020/05/29/865685805/coronavirus-victims-a-former-high-school-football-player-teddy-nelson?utm_medium=RSS&amp;utm_campaign=allthingsconsidered">Coronavirus
+                Victims: A Former High School Football Player Teddy Nelson</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">the, everybody, knew, friend, contractor, remembers, org, inc, pages, copyright</p>
+              <p class="least_words">2015, 2020, virginia, facebook, safeguard, told, lead</p>
+            </td>
+            <td class="publication">All Things Considered : NPR</td>
+            <td class="logit">3.615570306777954</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://newrepublic.com/article/157786/sounding-teaching-daughter-read-quarantine">Sounding It
+                Out</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">minutes, the, knew, seemed, arithmetic, money, breakfast, crisis, onto, pages</p>
+              <p class="least_words">read, quarantine, upload, video, while, trapped, families, sprint, landing</p>
+            </td>
+            <td class="publication">The New Republic</td>
+            <td class="logit">3.6139395236968994</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://bitcoinmagazine.com/articles/what-is-happening-to-money?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=what-is-happening-to-money">What
+                Is Happening to Money?</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">incentives, balance, inc, drive, whereas, credit, von, stimulus</p>
+              <p class="least_words">digital, previously, code, according, doesn, due, popular, diversity, globally</p>
+            </td>
+            <td class="publication">Bitcoin Magazine</td>
+            <td class="logit">3.5961952209472656</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/precise-and-prescient/">Precise and Prescient</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">avenue, occupy, pages, credit, translated, hundred, twenty</p>
+              <p class="least_words">photograph, trump, read, thursday, donald, 2016, stone, uber, confirmed</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.3921687602996826</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/the-toothache/">The Toothache</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">gray, mentioned, clients, tea, drive, occasional, afternoon, fifteen, twenty</p>
+              <p class="least_words">thursday, monday, clarity, quarantine, friday, recap, wrote, video, whatsapp</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.3692009449005127</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/last-laugh/">Last Laugh</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">upper, attractive, mentioned, occasional, avenue, thirteen, forty, thirty, twenty</p>
+              <p class="least_words">explaining, read, twitter, rolling, changing, reminder, pretty, added, wrote</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.3007161617279053</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://thewalrus.ca/murder-in-old-barns/">Murder in Old Barns</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">fifteen, interviews, fifty, thirty, sixty, sixteen, seventy, twenty</p>
+              <p class="least_words">photograph, explaining, 2017, season, friday, confirmed, pretty, added, shows</p>
+            </td>
+            <td class="publication">The Walrus</td>
+            <td class="logit">3.109334945678711</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/whores-at-the-end-of-the-world/">Whores at the End
+                of the World</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">pages, stimulus, ten, fifteen, hundred, fifty, twenty</p>
+              <p class="least_words">read, twitter, tuesday, hide, quarantine, ezra, friday, recap, distancing, added
+              </p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.031867504119873</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/where-is-patricia-sigl/">Where Is Patricia
+                Sigl?</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">talk, mentioned, neighborhood, tea, fourteen, eighties, sixties, fifty, eighteenth
+              </p>
+              <p class="least_words">brexit, thursday, quarantine, confirmed, distancing, pretty, added, boris, horror
+              </p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">3.0038695335388184</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://newcriterion.com/blogs/dispatch/a-gala-cont">A gala, cont.</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">english, harp, excerpts, himself, ever, the, indeed, forty</p>
+              <p class="least_words">beloved, statement, livestreaming, monologue, wagner, performances, also, spain,
+                held</p>
+            </td>
+            <td class="publication">The New Criterion Latest Blog</td>
+            <td class="logit">2.981576681137085</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://aeon.co/essays/what-is-the-problem-with-ethical-trolley-problems?utm_medium=feed&amp;utm_source=rss-feed">The
+                trolley problem problem</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">reader, obvious, analogy, onto, talk, assumed, domain, moreover, image, cent</p>
+              <p class="least_words">read, clarity, 2015, researchers, wrote, defence, while, watch, doesn</p>
+            </td>
+            <td class="publication">Aeon</td>
+            <td class="logit">2.9584531784057617</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/aRtqeTPuEl4/">A Virus in the Neighborhood</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">download, pages, blond, neighboring, ten, fifteen, hundred, thirteen, twenty</p>
+              <p class="least_words">read, stone, distancing, digital, whatsapp, ebola, serve, museum, while</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">2.934108018875122</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://newcriterion.com/blogs/dispatch/week-in-review-11579">Week in review</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">output, books, iii, crisis, thereby, indeed, etc, chairman</p>
+              <p class="least_words">beloved, alongside, archaeologists, finds, explains, writes, says, latest, taylor,
+                aren</p>
+            </td>
+            <td class="publication">The New Criterion Latest Blog</td>
+            <td class="logit">2.92802095413208</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.commonwealmagazine.org/haves-and-have-nots">The Haves and the Have-Nots</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">friends, business, the, sound, mined, assumptions, view, fourteen, seventy</p>
+              <p class="least_words">wrote, stars, track, writes, scandal, drops, island, health, featured, seemingly
+              </p>
+            </td>
+            <td class="publication">Commonweal Magazine</td>
+            <td class="logit">2.8799922466278076</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.city-journal.org/kipling-the-irish-guards-in-the-great-war">The Other Great War</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">knew, civilization, archive, corpse, enemy, manner, troubled, naïve, headquarters</p>
+              <p class="least_words">wrote, 2020, esque, including, joined, getty, told, also, fire</p>
+            </td>
+            <td class="publication">City Journal</td>
+            <td class="logit">2.8781964778900146</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.smh.com.au/national/the-decline-of-universities-where-students-are-customers-and-academics-itinerant-workers-20200528-p54xbd.html?ref=rss&amp;utm_medium=rss&amp;utm_source=rss_feed">The
+                decline of universities, where students are customers and academics itinerant workers</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">stuff, the, friend, germans, lecture, box, system, economies, revolution, talk</p>
+              <p class="least_words">trump, stone, digital, shows, defence, wellbeing, holiday, meanwhile, says,
+                galloway</p>
+            </td>
+            <td class="publication">Sydney Morning Herald - Latest News</td>
+            <td class="logit">2.8624699115753174</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.nytimes.com/2020/05/29/business/stock-market-today-coronavirus.html">Live Stock Market
+                News During the Coronavirus Pandemic</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">almost, ask, whatever, extent, bear, the, secondly, mentioned</p>
+              <p class="least_words">essentially, focused, tremendous, women, testing, outbreak, really</p>
+            </td>
+            <td class="publication">NYT > Top Stories</td>
+            <td class="logit">2.803107261657715</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.economist.com/books-and-arts/2020/05/16/even-before-lockdowns-confinement-was-part-of-human-life">Even
+                before lockdowns, confinement was part of human life</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">mood, abba, arms, money, cubicle, paradox, notion, obvious, idle, cell</p>
+              <p class="least_words">stone, characters, wrote, metres, while, stars, metre, travelled, pilot, above</p>
+            </td>
+            <td class="publication">Economist Books and arts</td>
+            <td class="logit">2.771440029144287</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/zmeL8gee3h0/">FaceTime, with Lipstick</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">gray, chairman, balance, hair, israel, afternoon, avenue, image, ten, fifteen</p>
+              <p class="least_words">photograph, explaining, reminder, boost, video, horror, previously, boosting,
+                disproportionately</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">2.766542673110962</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.wsj.com/articles/why-the-fed-may-not-duck-inflation-this-time-11590707317">Why the Fed
+                May Not Duck Inflation This Time</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">chairman, liquidity, obama, credit, dec, stimulus</p>
+              <p class="least_words">lawmakers, due, congress, reimpose, finding, during, also, allows</p>
+            </td>
+            <td class="publication">WSJ Opinion</td>
+            <td class="logit">2.758643388748169</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.city-journal.org/paris-lockdown-street-litter">Clean-up Duty</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">cannot, soft, hardly, empty, cigarette, logic, the, behave, hundred</p>
+              <p class="least_words">percent, while, doesn, bravo, gives, during, also</p>
+            </td>
+            <td class="publication">City Journal</td>
+            <td class="logit">2.734053373336792</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.npr.org/2020/05/29/860845135/people-cant-see-it-but-this-grocery-worker-still-wears-lipstick-under-her-mask?utm_medium=RSS&amp;utm_campaign=news">People
+                Can't See It, But This Grocery Worker Still Wears Lipstick Under Her Mask</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">the, meetings, neighbor, image, toggle, enlarge, caption</p>
+              <p class="least_words">read, quarantine, violating, says, said, during, ortiz, told</p>
+            </td>
+            <td class="publication">News : NPR</td>
+            <td class="logit">2.689770460128784</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/hold-your-applause/">Hold Your Applause</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">afternoon, download, twelve, hundred, fifty, thirteen, forty, sixty, twentieth</p>
+              <p class="least_words">trump, read, wednesday, thursday, monday, tuesday, macron, friday, confirmed</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.590306282043457</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.americanbanker.com/opinion/lender-beware-emergency-relief-efforts-are-inherently-risky">Lender
+                beware: Emergency relief efforts are inherently risky</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">bonuses, summary, bankers, statistical, clients, liquidity, balance, credit</p>
+              <p class="least_words">changing, essentially, while, specifically, follows, warned, ahead, diversity,
+                says, aren</p>
+            </td>
+            <td class="publication">American Banker: Feed</td>
+            <td class="logit">2.5690088272094727</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.economist.com/business/2020/05/02/imagine-the-post-pandemic-misery-of-business-travel">Imagine
+                the post-pandemic misery of business travel</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">bottle, buffet, managers, meetings, reader, obvious, clients, cell, afternoon</p>
+              <p class="least_words">distancing, metres, 2020, while, doesn, centre, pilot, beverage, safely</p>
+            </td>
+            <td class="publication">Economist Business</td>
+            <td class="logit">2.5317444801330566</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://spectator.org/how-the-u-s-and-india-can-counteract-china-coronavirus-covid-19/">How the
+                U.S. and India Can Counteract China</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">money, view, sideline, jihad, indeed, politburo, behavior, shiite, pages</p>
+              <p class="least_words">while, tensions, airbase, downplay, focusing, denying, trade, joint, impetus</p>
+            </td>
+            <td class="publication">The American Spectator</td>
+            <td class="logit">2.4929568767547607</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/from-now-on-i-vow-only-to-read-fiction/">From Now
+                On, I Vow Only to Read Fiction</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">assumed, concentrate, wondered, occupy, blog, ten, thirty, twenty, blogs</p>
+              <p class="least_words">trump, read, tweeted, donald, clarity, netflix, quarantine, recap, wrote</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.4878695011138916</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.npr.org/2020/05/29/864721225/friends-remember-george-floyd-as-a-gentle-giant?utm_medium=RSS&amp;utm_campaign=morningedition">Friends
+                Remember George Floyd As A Gentle Giant</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">friend, archived, contractor, smile, anymore, org, inc, pages, copyright</p>
+              <p class="least_words">sparked, video, 2020, literally, hasn, finding, week, puerto</p>
+            </td>
+            <td class="publication">Morning Edition : NPR</td>
+            <td class="logit">2.478846549987793</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://newcriterion.com/blogs/dispatch/may-days">May days</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">page, indeed, startling, talk, eighty, indispensable, thirty, seventy, twenty</p>
+              <p class="least_words">related, 2020, journal, saturday, fdr, ahead, bells, plans</p>
+            </td>
+            <td class="publication">The New Criterion Latest Blog</td>
+            <td class="logit">2.472825527191162</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/the-influence-of-anxiety/">The Influence of
+                Anxiety</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">failure, witted, indeed, talk, conferences, afternoon, nervous, concentrate,
+                advertisement</p>
+              <p class="least_words">photograph, read, twitter, highlight, wrote, while, watch, thinks, lets</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.4024887084960938</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/a-walk-in-the-park/">A Walk in the Park</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">rim, drive, afternoon, eighteen, jeans, avenue, ten, twenty, caption</p>
+              <p class="least_words">photograph, trump, read, quarantine, stone, distancing, shows, tech, lincoln</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.3417439460754395</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.newyorker.com/science/medical-dispatch/the-risks-of-normalizing-the-coronavirus">When
+                COVID-19 Starts to Feel Normal</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">ten, hundred, eighteenth, forty, thirty, cent, sixty, seventy, twenty</p>
+              <p class="least_words">reminder, distancing, isn, while, watch, reported, exclude, particularly</p>
+            </td>
+            <td class="publication">Everything</td>
+            <td class="logit">2.335841178894043</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.project-syndicate.org/commentary/will-covid19-pandemic-change-roles-of-markets-and-state-by-jean-pisani-ferry-2020-05">The
+                Uncertain Pandemic Consensus</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">crisis, view, obvious, globalization, fiscal, whereas, credit, interviews</p>
+              <p class="least_words">trump, donald, reminder, bolsonaro, jair, previously, serve, tensions, argued</p>
+            </td>
+            <td class="publication">Project Syndicate</td>
+            <td class="logit">2.3186607360839844</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/i-must-leave-my-house/">I Must Leave My House</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">neighbor, cell, israel, obama, avenue, occupy, mail, web</p>
+              <p class="least_words">tuesday, lightly, clarity, spokesperson, quarantine, friday, distancing, digital,
+                video</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.304269313812256</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.theglobalist.com/argentina-default-imf-corruption-covid19/">Argentina: Greed, Bonds,
+                COVID and Your Cash</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">default, money, crisis, greedy, argentine, indeed, greed, behavior, incentives,
+                credit</p>
+              <p class="least_words">related, 2018, watch, warned, meanwhile, key, twist, chair, basically</p>
+            </td>
+            <td class="publication">The Globalist</td>
+            <td class="logit">2.2955322265625</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.economist.com/special-report/2020/03/26/africa-is-changing-so-rapidly-it-is-becoming-hard-to-ignore">Africa
+                is changing so rapidly, it is becoming hard to ignore</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">money, crisis, failure, economies, commodity, harvard</p>
+              <p class="least_words">2014, according, centre, says, slavery, climate, radicalisation, trade, entering,
+                also</p>
+            </td>
+            <td class="publication">Economist Special report</td>
+            <td class="logit">2.2743492126464844</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.project-syndicate.org/commentary/bleak-preliminary-history-of-2020s-by-yanis-varoufakis-2020-05">A
+                Chronicle of a Lost Decade Foretold</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">twenties, system, economies, equilibrium, talk, bankers, globalization, thatcher,
+                interviews</p>
+              <p class="least_words">season, tech, analytica, 2020, ahead, condemned, communities, activists, vulnerable
+              </p>
+            </td>
+            <td class="publication">Project Syndicate</td>
+            <td class="logit">2.240781307220459</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.dissentmagazine.org/blog/hot-bothered-has-the-fracking-bubble-finally-burst-with-bethany-mclean">Hot
+                & Bothered: Has the Fracking Bubble Finally Burst? with Bethany McLean</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">crisis, kill, bubble, patreon, oil, talk, economics, ebook</p>
+              <p class="least_words">vox, changing, episode, kate, plumer, fuel, proposal, deal</p>
+            </td>
+            <td class="publication">Dissent Magazine</td>
+            <td class="logit">2.2318055629730225</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/udLHCX1JjBc/">Pandemic Marriage, Ménage, & Me</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">talk, explanations, satisfaction, articles, assumed, neighborhood, balance, hair,
+                occasional, interviews</p>
+              <p class="least_words">trump, read, quarantine, chart, added, isn, while, sunday</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">2.149688959121704</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.newyorker.com/culture/video-dept/the-case-for-eating-crickets">The Case for Eating
+                Crickets</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">box, sitting, oil, telephone, thousand, wondered, hundred, thirteen, cent, twenty</p>
+              <p class="least_words">2016, quarantine, wireless, added, video, alongside, museum, adding, above,
+                explains</p>
+            </td>
+            <td class="publication">Everything</td>
+            <td class="logit">2.1489310264587402</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.technologyreview.com/2020/05/28/1002326/business-workplace-reopening-safely-testing-covid-19/">The
+                CEO’s guide to safely reopening the workplace</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">behave, economies, indeed, economics, neighborhood, suppose, hair, credit</p>
+              <p class="least_words">changing, quarantine, distancing, digital, 2020, previously, presidents, while,
+                sanitizer</p>
+            </td>
+            <td class="publication">Top News - MIT Technology Review</td>
+            <td class="logit">2.144171953201294</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/my-lanyarded-brethren/">My Lanyarded Brethren</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">gray, mentioned, neighborhood, occasional, bureaucrats, translated, forty, thirty</p>
+              <p class="least_words">trump, read, twitter, tuesday, 2016, sanders, bernie, wrote, 2010s</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.1248412132263184</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/stop-making-points/">Stop Making Points</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">thousand, tolstoy, drive, afternoon, ten, kilometers, forty, thirty, twenty</p>
+              <p class="least_words">pic, explaining, monday, quarantine, wrote, whatsapp, gif, while, doesn</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.111539363861084</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.wsj.com/articles/canadas-banks-take-earnings-hit-from-loan-loss-provisions-11590779182">Canada's
+                Banks Take Earnings Hit from Loss Provisions</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">crisis, bubble, economies, fiscal, inc, credit, stimulus, copyright</p>
+              <p class="least_words">2021, 2020, according, earnings, warned, vulnerable, reported, meanwhile, canada,
+                commerce</p>
+            </td>
+            <td class="publication">WSJ.com: Markets</td>
+            <td class="logit">2.104137659072876</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/in-bloom/">In Bloom</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">impersonal, obvious, typed, neighborhood, thousand, neighbor, cell, twelve, hundred
+              </p>
+              <p class="least_words">read, quarantine, added, wrote, horror, newest, while, watch, doesn</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">2.09391188621521</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.telegraph.co.uk/global-health/science-and-disease/economic-terms-covid-19-might-ebola-uk-has-chance-rise-challenge/">In
+                economic terms Covid-19 might as well be Ebola â but the UK has a chance to rise to the challenge</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">whom, daniel, lockdown, the, nevertheless, themselves, cluster, sensible, statistical
+              </p>
+              <p class="least_words">trump, boris, during, virus, health, fire, date, isolating, than</p>
+            </td>
+            <td class="publication">Telegraph</td>
+            <td class="logit">2.001974105834961</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.foreignaffairs.com/articles/united-states/2020-05-29/pandemic-financial-crisis">The
+                Age of Magic Money</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">bush, moreover, pages, stimulus, ten</p>
+              <p class="least_words">2017, 2015, digital, wrote, 2021, percent, 2020, presidents, boosting, affordable
+              </p>
+            </td>
+            <td class="publication">Foreign Affairs Feed</td>
+            <td class="logit">1.9944558143615723</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/vFmUzboYrUk/">Art in Isolation: The Delicate Paintings
+                of Edo Japan</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">urbanization, ninety, harvard, economics, seventeenth, hundred, eighteenth,
+                nineteenth, twenty</p>
+              <p class="least_words">curator, related, boost, 2020, alongside, museum, revealed, due, popular, neil</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">1.9771158695220947</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.economist.com/business/2020/03/21/how-corporate-leaders-should-act-in-a-crisis">How
+                corporate leaders should act in a crisis</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">supply, crisis, failure, invisible, meetings, obvious, clients, suck</p>
+              <p class="least_words">rolling, chart, organisation, pretty, defence, adding, says, latest, deal</p>
+            </td>
+            <td class="publication">Economist Business</td>
+            <td class="logit">1.9665528535842896</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://foreignpolicy.com/2020/05/29/stock-market-rally-coronavirus-pandemic/">Why Are Stocks
+                Soaring in the Middle of a Pandemic?</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">fiscal, liquidity, balance, drive, credit</p>
+              <p class="least_words">distancing, takeaway, percent, while, backstop, doesn, argued, 2013, above</p>
+            </td>
+            <td class="publication">Foreign Policy</td>
+            <td class="logit">1.965714454650879</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.smh.com.au/sport/shifting-the-goalposts-our-new-sporting-life-20200529-p54xng.html?ref=rss&amp;utm_medium=rss&amp;utm_source=rss_feed">Shifting
+                the goalposts: our new sporting life</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">bubble, henceforth, headquarters, chairman, assumed, liquidity, moreover, credit,
+                cent</p>
+              <p class="least_words">changing, highlight, shows, 2020, isn, serve, while, pop, thinks</p>
+            </td>
+            <td class="publication">Sydney Morning Herald - Latest News</td>
+            <td class="logit">1.965591549873352</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/extinction-event/">Extinction Event</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">ten, fifteen, hundred, fifty, forty, thirty, sixty, seventy, twenty</p>
+              <p class="least_words">trump, read, 2017, 2016, distancing, percent, 2020, alongside, presidents</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">1.949511170387268</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://thenewinquiry.com/chaos-orders-us-a-letter-from-paris/">Chaos Orders Us: A Letter From
+                Paris</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">etc, equilibrium, remembers, thousand, hollande, evidently, image, fifty, twenty</p>
+              <p class="least_words">thursday, monday, related, quarantine, macron, 2015, wrote, emmanuel, percent</p>
+            </td>
+            <td class="publication">The New Inquiry</td>
+            <td class="logit">1.9465746879577637</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/7_DhlYEzD7c/">In the Vanguard of Trio Jazz with Micah
+                Thomas</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">mentioned, balance, loft, drive, avenue, fifteen, thirty, sixty, twenty</p>
+              <p class="least_words">tuesday, 2016, jamal, added, wrote, horror, lincoln, isn, 2018</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">1.9141948223114014</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://quillette.com/2020/05/24/do-we-really-want-a-new-cold-war/">Do We Really Want a New Cold
+                War?</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">supply, rational, crisis, system, mutual, belknap, comparative, harvard,
+                libertarians, bureaucrats</p>
+              <p class="least_words">trump, pretty, whatsapp, snap, isn, while, viral, tensions, doesn</p>
+            </td>
+            <td class="publication">Quillette</td>
+            <td class="logit">1.9086610078811646</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://nplusonemag.com/online-only/online-only/aden-dispatch/">Aden Dispatch</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">sitting, system, arab, obvious, attractive, neighborhood, hair, drive</p>
+              <p class="least_words">2015, video, while, dedicated, thinks, hodeidah, clip, shooting, above</p>
+            </td>
+            <td class="publication">n+1</td>
+            <td class="logit">1.8805232048034668</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.foreignaffairs.com/articles/united-states/2020-05-28/spanish-flu-didnt-wreck-global-economy">The
+                Spanish Flu Didn’t Wreck the Global Economy</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">tags, behave, economies, dozen, thirties, faculty, campus, stimulus, hundred</p>
+              <p class="least_words">quarantine, distancing, beloved, percent, according, vulnerable, reported,
+                meanwhile, refugees</p>
+            </td>
+            <td class="publication">Foreign Affairs Feed</td>
+            <td class="logit">1.8761999607086182</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://newcriterion.com/blogs/dispatch/honoring-victimhood">Honoring victimhood</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">headlines, assumed, indispensable, afternoon, pages, homosexuals</p>
+              <p class="least_words">trump, read, monday, ardern, wrote, jacinda, percent, while, adding</p>
+            </td>
+            <td class="publication">The New Criterion Latest Blog</td>
+            <td class="logit">1.852874994277954</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.npr.org/2020/05/29/864699431/alabama-man-serves-homeless-community-by-offering-laundry-service?utm_medium=RSS&amp;utm_campaign=morningedition">Alabama
+                Man Serves Homeless Community By Offering Laundry Service</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">parking, shirt, org, inc, avenue, pages, copyright</p>
+              <p class="least_words">distancing, video, 2020, serve, verse, while, moments, sanitizer, ahead</p>
+            </td>
+            <td class="publication">Morning Edition : NPR</td>
+            <td class="logit">1.8097984790802002</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.project-syndicate.org/commentary/limits-covid19-monetary-policy-by-paola-subacchi-2020-05">The
+                Limits of Extreme COVID Monetary Policy</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">liquidity, balance, drive, whereas, euro, credit, stimulus, interviews</p>
+              <p class="least_words">reportedly, serve, while, doesn, track, ahead, meanwhile, powell</p>
+            </td>
+            <td class="publication">Project Syndicate</td>
+            <td class="logit">1.7895433902740479</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.economist.com/special-report/2020/04/08/south-koreas-transformation-is-still-fragile">South
+                Koreaâs transformation is still fragile</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">sensible, begun, obvious, talk, satisfaction, harvard, fiscal, stimulus</p>
+              <p class="least_words">changing, 2010s, disproportionately, highlighted, says, particularly, said, during,
+                also</p>
+            </td>
+            <td class="publication">Economist Special report</td>
+            <td class="logit">1.765859603881836</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://techcrunch.com/2020/05/29/how-startups-can-leverage-elastic-services-for-cost-optimization/">How
+                startups can leverage elastic services for cost optimization</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">organizations, optimization, business, the, strategic, crisis, operational, obvious
+              </p>
+              <p class="least_words">tech, according, startup, due, retail, startups, providing, has, mature</p>
+            </td>
+            <td class="publication">TechCrunch</td>
+            <td class="logit">1.7581679821014404</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.npr.org/2020/05/29/864699410/s-c-hospital-system-tells-non-covid-19-patients-its-safe-to-return?utm_medium=RSS&amp;utm_campaign=morningedition">S.C.
+                Hospital System Tells Non-COVID-19 Patients It's Safe To Return</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">money, contractor, system, dozen, economics, org, inc, pages, copyright</p>
+              <p class="least_words">2020, bunch, above, says, aren, week, vaccinations</p>
+            </td>
+            <td class="publication">Morning Edition : NPR</td>
+            <td class="logit">1.741795539855957</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/nybooks/~3/MwREaW-ud98/">From Brexit to Covid: A Very British
+                Debacle</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">talk, ninety, preposterous, hair, occasional, image, twelve, nineteenth</p>
+              <p class="least_words">brexit, 2016, season, shows, boris, percent, denies, while</p>
+            </td>
+            <td class="publication">The New York Review of Books</td>
+            <td class="logit">1.7195746898651123</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="http://feedproxy.google.com/~r/theamericanscholar/yaSQ/~3/xMJrIcv3LeM/">Our Posthumous Lives</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">productive, the, occasions, sitting, notion, dozen, etc, reader</p>
+              <p class="least_words">wrote, percent, while, celebrate, moments, vulnerable, segment, favorite,
+                particularly, said</p>
+            </td>
+            <td class="publication">The American Scholar</td>
+            <td class="logit">1.6768460273742676</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.coindesk.com/serious-decentralization-we-need-to-measure-it">To Get Serious About
+                Decentralization, We Need to Measure It</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">distribution, business, the, introduction, economies, protocol, harvard, economics,
+                liquidity</p>
+              <p class="least_words">added, tech, code, while, argued, outcry, popular, reported, stalwart, originally
+              </p>
+            </td>
+            <td class="publication">CoinDesk</td>
+            <td class="logit">1.6756579875946045</td>
+          </tr>
+          <tr>
+            <td class="title mdl-data-table__cell--non-numeric"><a class="article_link"
+                href="https://www.project-syndicate.org/commentary/changes-in-financial-regulation-since-pandemic-by-howard-davies-2020-05">Regulating
+                in a Pandemic</a>
+              <br></br>
+              <br></br>
+              <p class="top_words">mainly, view, explanations, bankers, economics, liquidity, credit, ten, interviews
+              </p>
+              <p class="least_words">confirmed, while, buybacks, argued, ahead, dip, typically</p>
+            </td>
+            <td class="publication">Project Syndicate</td>
+            <td class="logit">1.6397805213928223</td>
+          </tr>
+          ​
+          </tbody>
+          </table>
+        </div>
   </div>
-  <div style="width:15%; text-align: center">
-  <button style="display: inline-block" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-    <i class="material-icons">forward</i>
-  </button>
-</div>
-</div>
-<div id="spinner" class="mdl-spinner mdl-js-spinner is-active" style="display:none;"></div>
-<div id="table-wrapper">
-<table id="rank_results" style="width:90%; margin-left:5%; margin-right:5%;" class="mdl-data-table mdl-js-data-table">
-  <thead>
-    <tr>
-      <th class="mdl-data-table__cell--non-numeric">Articles</th>
-      <th class="mdl-data-table__cell--non-numeric">Prediction</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://www.colinmcginn.net/mind-dependence/">Mind-Dependence</a>
-<br></br>
-<br></br>
-<p class="top_words">finite, thus, neurons, notion, hence, indeed, attractive, suppose, moreover</p>
-<p class="least_words">isn, says, stemming, including, also, appearance, arguing</p>
-</td>
-<td class="logit">7.9061784744262695</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.simonsfoundation.org/2020/05/06/finding-prime-locations-the-continuing-challenge-to-prove-the-riemann-hypothesis/">Finding Prime Locations: The Continuing Challenge to Prove the Riemann Hypothesis</a>
-<br></br>
-<br></br>
-<p class="top_words">hypothesis, consisting, conjecture, behavior, graph, whereas, wikimedia, domain, credit</p>
-<p class="least_words">above, key, gives, series, makes, suggests, than, friedrich, 1700s</p>
-</td>
-<td class="logit">7.137406826019287</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://thedabbler.co.uk/2017/01/review-manly-manners-for-the-impeccable-gent-by-guy-egmont/">Review: Manly Manners for the Impeccable Gent – by Guy Egmont</a>
-<br></br>
-<br></br>
-<p class="top_words">silent, club, money, arranged, wives, etc, reader, talk, harvard, secretaries</p>
-<p class="least_words">season, exec, workplace, says, deal, titled, emboldened, also, women</p>
-</td>
-<td class="logit">6.296250343322754</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://justice-everywhere.org/general/should-economics-be-pluralist/">Should Economics be Pluralist?</a>
-<br></br>
-<br></br>
-<p class="top_words">analogy, economics, behavior, statistical, suppose, behavioral, pdf</p>
-<p class="least_words">while, according, argued, delves, finding, currently, also, sweden, actually</p>
-</td>
-<td class="logit">6.169751167297363</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://cognitionandculture.net/blogs/helena-miton/ubiquitous-yet-nowhere-to-be-found-on-the-invisible-hands-success/">Ubiquitous yet nowhere to be found: on the Invisible Hand’s success</a>
-<br></br>
-<br></br>
-<p class="top_words">behavioral, credit</p>
-<p class="least_words">explaining, shows, essentially, while, watch, journal, includes, offering, inquiry, finding</p>
-</td>
-<td class="logit">6.115911960601807</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/issue-35/fiction-drama/the-creature/">The Creature</a>
-<br></br>
-<br></br>
-<p class="top_words">ever, account, whenever, the, knew, friend, names, handsome, inbox, drive</p>
-<p class="least_words">wrote, winds, bit, white, really, after, was, stop</p>
-</td>
-<td class="logit">5.8149309158325195</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://tante.cc/2018/11/28/experte-zum-thema-blockchain-beim-ausschuss-digitale-agenda-des-bundestages/">Experte zum Thema Blockchain beim Ausschuss Digitale Agenda des Bundestages</a>
-<br></br>
-<br></br>
-<p class="top_words">governments, the, quasi, den, und, von</p>
-<p class="least_words">brexit, digital, deutschland, today, around, was, saying, ganz, blockchain, für</p>
-</td>
-<td class="logit">5.654151916503906</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/nybooks/~3/Q76K1CCLbwA/">Fun for One</a>
-<br></br>
-<br></br>
-<p class="top_words">the, southwest, sound, table, microphone, arms, brown, desk, sitting, onto</p>
-<p class="least_words">stone, while, watch, sonia, said, crossing, broadway, lead</p>
-</td>
-<td class="logit">5.581697463989258</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://tante.cc/2020/04/21/bluetooth-abstandsmessung-und-algorithmen/">Bluetooth Abstandsmessung und Algorithmen</a>
-<br></br>
-<br></br>
-<p class="top_words">centimeter, quasi, mich, den, liked, box, und, system, patreon, von</p>
-<p class="least_words">2020, apps, also, proxies, was, ganz, via, für</p>
-</td>
-<td class="logit">5.57907247543335</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.bayesianspectacles.org/omit-needless-words-an-unapproachable-example-of-conciseness-related-by-the-traveling-chinese-story-teller-kai-lung/">Omit Needless Words: An Unapproachable Example of Conciseness Related by the Traveling Chinese Story-teller Kai Lung</a>
-<br></br>
-<br></br>
-<p class="top_words">the, incapable, jan, manner, indeed, mentioned, ten</p>
-<p class="least_words">read, added, 2020, said, means, sings, pearson, prevent</p>
-</td>
-<td class="logit">5.50782585144043</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/online-only/online-only/pretty-girl-with-bad-hair/">Pretty Girl with Bad Hair</a>
-<br></br>
-<br></br>
-<p class="top_words">eighteen, jeans, pages, translated, ten, fifty, eighteenth, forty, twenty</p>
-<p class="least_words">read, 2014, pretty, watch, journal, saturday, ahead, popular, above</p>
-</td>
-<td class="logit">5.4934492111206055</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://blog.jessriedel.com/2019/09/23/the-interpretation-of-free-energy-as-bit-erasure-capacity/">The interpretation of free energy as bit-erasure capacity</a>
-<br></br>
-<br></br>
-<p class="top_words">system, summary, hence, indeed, obvious, henceforth, 1st, blog</p>
-<p class="least_words">isn, specifically, doesn, initially, above, bit</p>
-</td>
-<td class="logit">5.482933044433594</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/the-good-soldier">The Good Soldier</a>
-<br></br>
-<br></br>
-<p class="top_words">oil, satisfaction, behavior, suppose, emergence, tea, pages, hundred</p>
-<p class="least_words">read, twitter, rolling, changing, stone, added, wrote, code, drama</p>
-</td>
-<td class="logit">5.382519245147705</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://www.oneill.io/2020/04/29/why-do-dogs-howl-at-the-moon/">Why do dogs howl at the moon?</a>
-<br></br>
-<br></br>
-<p class="top_words">please, hung, empty, days, the, liked, television, reader, drive, wondered</p>
-<p class="least_words">read, actively, key, also, letting, definitely, found, her, was</p>
-</td>
-<td class="logit">5.312851905822754</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://www.colinmcginn.net/phenomenological-knowledge/">Phenomenological Knowledge</a>
-<br></br>
-<br></br>
-<p class="top_words">insist, hence, indeed, etc, exceed, obvious, faculty, suppose, whereas, occupy</p>
-<p class="least_words">pretty, isn, doesn, argued, alleged, deal, totally, twist</p>
-</td>
-<td class="logit">5.302178859710693</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://copper-nickel.org/the-missing-are-considered-dead/">The Missing Are Considered Dead</a>
-<br></br>
-<br></br>
-<p class="top_words">smile, troubled, talk, neighborhood, neighbor, tea, wondered, occupy, thirty</p>
-<p class="least_words">related, hide, isn, serve, while, watch, moments, hopeful, barrier</p>
-</td>
-<td class="logit">5.299867153167725</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://blog.jessriedel.com/2020/05/11/a-checkable-lindbladian-condition/">A checkable Lindbladian condition</a>
-<br></br>
-<br></br>
-<p class="top_words">etc, generated, onto, furthermore, domain, blog, pdf</p>
-<p class="least_words">clarity, statement, barrier, above, said, aren, map, totally</p>
-</td>
-<td class="logit">5.253383159637451</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/oupblog/~3/OvGDLbdi2s0/">The words of the day</a>
-<br></br>
-<br></br>
-<p class="top_words">fourteenth, sixteenth, meetings, indeed, operative, image, pages, credit, blog</p>
-<p class="least_words">related, snap, statement, while, due, above, favorite, virus</p>
-</td>
-<td class="logit">5.237738609313965</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://blog.andymatuschak.org/post/7565332844">Musical tone and perceived dissonance</a>
-<br></br>
-<br></br>
-<p class="top_words">consonant, harmonic, hence, thousand, cell, hair, moreover</p>
-<p class="least_words">researchers, while, bunch, includes, rendition, basically, also, means</p>
-</td>
-<td class="logit">5.190851211547852</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.nationalaffairs.com//blog/detail/findings-a-daily-roundup/capitalism-and-its-discontents">Capitalism and its Discontents</a>
-<br></br>
-<br></br>
-<p class="top_words">moreover, pages, translated, thirty, nineteenth, twentieth</p>
-<p class="least_words">explaining, related, jennifer, ruth, earnings, journal, reported, focusing, particularly, families</p>
-</td>
-<td class="logit">5.154965400695801</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://medium.com/@Chris_arnade/d-in-the-mcdonalds-a8e11318ec32?source=rss-9e28ee9292dc------2">D in the McDonald’s</a>
-<br></br>
-<br></br>
-<p class="top_words">anymore, obvious, talk, parking, drug, mentioned, drive, thirty, twenty</p>
-<p class="least_words">read, pop, doesn, dedicated, 2013, genius, shocked, says, particularly</p>
-</td>
-<td class="logit">5.145820617675781</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/the-directors-cut">The Director’s Cut</a>
-<br></br>
-<br></br>
-<p class="top_words">domain, von, hundred, eighteenth, forty, twenty</p>
-<p class="least_words">explaining, read, added, shows, wrote, serve, essentially, argued, follows</p>
-</td>
-<td class="logit">5.141969203948975</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://blog.jessriedel.com/2019/08/23/on-computational-aestivation/">On computational aestivation</a>
-<br></br>
-<br></br>
-<p class="top_words">computer, hypothesis, paradox, generated, incentives</p>
-<p class="least_words">read, shows, previously, while, stars, doesn, argued, ahead, jess</p>
-</td>
-<td class="logit">5.131683349609375</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.waggish.org/2019/the-100-most-important-words-to-i-a-richards/">The 100 Most Important Words (to I. A. Richards)</a>
-<br></br>
-<br></br>
-<p class="top_words">functioning, ing, notion, page, summary, reader, operative, hundred</p>
-<p class="least_words">read, twitter, adding, unnamed, facebook, health, worthy, held</p>
-</td>
-<td class="logit">5.111241817474365</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/online-only/online-only/misery/">Misery</a>
-<br></br>
-<br></br>
-<p class="top_words">cell, tea, hair, afternoon, eighteen, wondered, translated, thirty, twenty</p>
-<p class="least_words">pretty, added, serve, while, moments, hopeful, saturday, fuel, holiday</p>
-</td>
-<td class="logit">5.103696823120117</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.waggish.org/2019/robert-musil-in-martha-musils-coat/">Robert Musil in Martha Musil’s Coat</a>
-<br></br>
-<br></br>
-<p class="top_words">kill, indeed, etc, statistical, hair, translated</p>
-<p class="least_words">while, watch, according, follows, said, edited, deserves</p>
-</td>
-<td class="logit">5.094523906707764</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://cultureandcommunication.org/galloway/a-list-of-qualities">A List of Qualities</a>
-<br></br>
-<br></br>
-<p class="top_words">languages, editors, indeed, whereas, web</p>
-<p class="least_words">digital, code, essentially, statement, argued, hardware, hasn, typically, appeals</p>
-</td>
-<td class="logit">5.083495616912842</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.noahbrier.com/archives/2018/10/pareto-principle-aka-80-20-rule/">Pareto Principle (aka 80/20 Rule) [Framework of the Day]</a>
-<br></br>
-<br></br>
-<p class="top_words">pages, dec, web, pdf, caption</p>
-<p class="least_words">2017, chart, https, wrote, percent, journal, follows, popular, explains</p>
-</td>
-<td class="logit">5.061043739318848</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://jasoncollins.blog/2019/08/05/david-leiser-and-yhonatan-shemeshs-how-we-misunderstand-economics-and-why-it-matters-the-psychology-of-bias-distortion-and-conspiracy/">David Leiser and Yhonatan Shemesh’s How We Misunderstand Economics and Why it Matters: The Psychology of Bias, Distortion and Conspiracy</a>
-<br></br>
-<br></br>
-<p class="top_words">judgments, indeed, exceed, explanations, economics, israel, whereas, occasional, domain</p>
-<p class="least_words">related, confirmed, respondents, broader, items, offering, climate</p>
-</td>
-<td class="logit">5.0573906898498535</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/trading-volatility">Trading Volatility</a>
-<br></br>
-<br></br>
-<p class="top_words">indeed, obvious, analogy, behavior, assumed, suppose, whereas, ten</p>
-<p class="least_words">shows, percent, previously, essentially, while, according, argued, follows, investments</p>
-</td>
-<td class="logit">5.056610584259033</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/bodyliterature/QVDj/~3/VjIVrzyrK0g/">Bijan Najdi</a>
-<br></br>
-<br></br>
-<p class="top_words">amongst, arms, translations, caspian, sitting, revolution, onto, gray, hair</p>
-<p class="least_words">read, watch, doesn, journal, saturday, including, carrying, currently, seeing</p>
-</td>
-<td class="logit">5.047688007354736</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/misused-terms-in-linguistics">Misused Terms in Linguistics</a>
-<br></br>
-<br></br>
-<p class="top_words">behavioral, domain, neighboring, stimulus, ten, twenty</p>
-<p class="least_words">read, clarity, highlight, code, essentially, while, specifically, according, dedicated, argued</p>
-</td>
-<td class="logit">5.042849540710449</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/issue-34/fiction-drama/jackpot/">Jackpot</a>
-<br></br>
-<br></br>
-<p class="top_words">seemed, hadn, money, casino, anymore, clapped, arab, talk, telephone</p>
-<p class="least_words">wrote, pilot, said, weren, during, told, women</p>
-</td>
-<td class="logit">5.023077487945557</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://davidsimon.com/nightcops/">Nightcops</a>
-<br></br>
-<br></br>
-<p class="top_words">afternoon, pages, credit, twelve, ten, fifteen, fifty, thirty, twenty</p>
-<p class="least_words">monday, digital, wrote, while, sunday, watch, tweeting, denied, existential, inappropriate</p>
-</td>
-<td class="logit">5.016082763671875</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/craigmod/~3/2YRm7Kfddlw/">[ridgeline] A Review of Beds — Part 1</a>
-<br></br>
-<br></br>
-<p class="top_words">desk, box, notion, anymore, lobby, males, kilometers, hundred</p>
-<p class="least_words">rating, reminder, wrote, snap, serve, code, sunday, canada</p>
-</td>
-<td class="logit">5.012973308563232</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/the-miracle-of-general-equilibrium">The Miracle of General Equilibrium</a>
-<br></br>
-<br></br>
-<p class="top_words">economics, emergence, cent, twentieth</p>
-<p class="least_words">donald, 2016, changing, 2015, added, serve, statement, argued, extremely</p>
-</td>
-<td class="logit">5.004232406616211</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://paulkingsnorth.net/2018/08/01/the-circling/">The Circling</a>
-<br></br>
-<br></br>
-<p class="top_words">cloudless, indeed, shit, suburb, explanations, crap, tea, pages, fifteen</p>
-<p class="least_words">isn, 2018, essentially, above, says, said, deal, travel</p>
-</td>
-<td class="logit">4.981334686279297</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.philosophyofmoney.net/cyclical-sovereignty/">Cyclical sovereignty</a>
-<br></br>
-<br></br>
-<p class="top_words">marginal, failure, bundesbank, obvious, ecb, conferences, fiscal, balance, stimulus, ten</p>
-<p class="least_words">verse, specifically, existential, due, proposal, historic, proves, during</p>
-</td>
-<td class="logit">4.966983795166016</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://mavengame.com/2020/02/one-about-words/">one about words</a>
-<br></br>
-<br></br>
-<p class="top_words">books, obscure, catfish, page, reader, balance, avenue, ten, twenty</p>
-<p class="least_words">read, netflix, isn, watch, says, deal, week</p>
-</td>
-<td class="logit">4.962460994720459</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://cultureandcommunication.org/galloway/uncomputer">Uncomputer</a>
-<br></br>
-<br></br>
-<p class="top_words">realm, computation, thus, computer, biological, rational, paradox, system, indeed, twentieth</p>
-<p class="least_words">digital, wrote, essentially, according, meanwhile, particularly, key, themes, series, also</p>
-</td>
-<td class="logit">4.9133477210998535</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://www.colinmcginn.net/is-biology-a-normative-science/">Is Biology a Normative Science?</a>
-<br></br>
-<br></br>
-<p class="top_words">system, manner, judgments, naïve, hence, indeed, etc, talk, suppose</p>
-<p class="least_words">healthier, isn, while, according, wellbeing, aimed, explains, focusing, particularly</p>
-</td>
-<td class="logit">4.885959625244141</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/the-social-set">The Social Set</a>
-<br></br>
-<br></br>
-<p class="top_words">occasional, evidently, image, pages, von, hundred, fifty, forty, twenty, twentieth</p>
-<p class="least_words">twitter, added, museum, while, survivors, denied, argued, follows, remarks, diversity</p>
-</td>
-<td class="logit">4.861191749572754</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://hedgehogreview.com/blog/thr/posts/against-projection-for-promise">Against Projection; For Promise</a>
-<br></br>
-<br></br>
-<p class="top_words">indeed, reader, talk, articles, neighborhood, blog, ten, hundred, fifty, forty</p>
-<p class="least_words">twitter, season, digital, wrote, guide, says, swift</p>
-</td>
-<td class="logit">4.85318660736084</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://evonomics.com/capitalisms-alone/">Capitalism(s), Alone</a>
-<br></br>
-<br></br>
-<p class="top_words">economics, indispensable, whereas, web, thirty, copyright, nineteenth, twenty, twentieth</p>
-<p class="least_words">2014, percent, while, earnings, argued, 2013, typically, broadly, key, trend</p>
-</td>
-<td class="logit">4.852306365966797</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/craigmod/~3/YNfKJT4XvEk/">[essays] Notes on the Other</a>
-<br></br>
-<br></br>
-<p class="top_words">onto, shirt, eighty, tea, hair, fourteen, nineteen, fifty, sixty, twenty</p>
-<p class="least_words">marvel, specifically, moments, due, performances, normalize, indigenous, women</p>
-</td>
-<td class="logit">4.833243370056152</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://philosophynow.org/issues/137/Against_Neural_Philosophy_Of_Mind">Against Neural Philosophy Of Mind</a>
-<br></br>
-<br></br>
-<p class="top_words">view, system, indeed, obvious, analogy, articles, assumed, emergence, nervous</p>
-<p class="least_words">read, related, prof, 2020, while, longstanding, according, argued, follows</p>
-</td>
-<td class="logit">4.832546710968018</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/flavorwire-rss/~3/zavZ69VA5XY/book-excerpt-james-thurbers-collected-fables-19625842">Book Excerpt: James Thurber's 'Collected Fables'</a>
-<br></br>
-<br></br>
-<p class="top_words">reprinted, friend, thus, kill, articles, inc, preface, ten, copyright, twenty</p>
-<p class="least_words">previously, celebrate, said, edited, also, announced, singing</p>
-</td>
-<td class="logit">4.814444541931152</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://evonomics.com/keynes-was-really-a-conservative/">Keynes Was Really a Conservative</a>
-<br></br>
-<br></br>
-<p class="top_words">whilst, inbox, economics, fiscal, deficits, obama, stimulus, ten, hundred</p>
-<p class="least_words">trump, added, wrote, while, said, deal, decried, told, also</p>
-</td>
-<td class="logit">4.793371200561523</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.nationalaffairs.com//blog/detail/findings-a-daily-roundup/econ-gone-wild">Econ Gone Wild</a>
-<br></br>
-<br></br>
-<p class="top_words">behavior, liquidity, behavioral, pages</p>
-<p class="least_words">explaining, related, previously, while, according, journal, crucially, escalate, due</p>
-</td>
-<td class="logit">4.792867660522461</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://medium.com/@Chris_arnade/hell-this-is-reno-2f35d8875ba1?source=rss-9e28ee9292dc------2">Hell, this is Reno</a>
-<br></br>
-<br></br>
-<p class="top_words">shit, talk, parking, drug, clients, hair, ten, fifteen</p>
-<p class="least_words">explaining, wednesday, shows, doesn, follows, fun, hurt, says, particularly, deal</p>
-</td>
-<td class="logit">4.768763065338135</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://standpointmag.co.uk/issues/april-2020/robert-conquest-garland-for-a-propagandist/">Robert Conquest: Garland for a Propagandist</a>
-<br></br>
-<br></br>
-<p class="top_words">books, overthrow, boldly, introduction, sir, insist, indeed, balance, ten, twentieth</p>
-<p class="least_words">2015, 2018, verse, elizabeth, said, edited, twist, told, also</p>
-</td>
-<td class="logit">4.763932228088379</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/craigmod/~3/TtqagfV5ByM/">[essays] The Long Road Back to 2000</a>
-<br></br>
-<br></br>
-<p class="top_words">sitting, page, wikipedia, bubble, html, mail, ten, web</p>
-<p class="least_words">digital, pretty, released, fun, dovetails, releasing, stalwart, originally</p>
-</td>
-<td class="logit">4.742609024047852</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.zocalopublicsquare.org/2020/05/15/where-i-go-rancho-penasquitos-san-diego-apartment-identity/chronicles/where-i-go/">Where I Go: Penasquitos Gardens</a>
-<br></br>
-<br></br>
-<p class="top_words">begged, talk, neighborhood, neighbor, cell, balance, hair, shotgun</p>
-<p class="least_words">holiday, bunch, shooting, said, families, aren, 90s, plans</p>
-</td>
-<td class="logit">4.733719825744629</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/online-only/online-only/the-psychiatrist/">The Psychiatrist</a>
-<br></br>
-<br></br>
-<p class="top_words">cell, hair, israel, afternoon, jeans, twelve, ten, forty, twenty</p>
-<p class="least_words">read, stone, characters, shows, wrote, ruth, isn, while, pop, thrones</p>
-</td>
-<td class="logit">4.73108434677124</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://copper-nickel.org/odd-numbers/">Odd Numbers</a>
-<br></br>
-<br></br>
-<p class="top_words">neighborhood, thousand, tea, hair, drive, afternoon, ten, hundred, thirteen, twenty</p>
-<p class="least_words">explaining, vulture, read, hide, pretty, rudy, snap, while, watch</p>
-</td>
-<td class="logit">4.722705841064453</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/nybooks/~3/N-A4AqYm_PU/">Beyond Meaning: Joseph Brodsky’s Poetry of Exile</a>
-<br></br>
-<br></br>
-<p class="top_words">typed, meters, whereas, seventies, giroux, farrar, straus, nineties, thirty, nineteenth</p>
-<p class="least_words">read, wrote, boris, beloved, previously, verse, while, artifacts, existential, solidarity</p>
-</td>
-<td class="logit">4.7214035987854</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/delanceyplace/rwVN/~3/5KtQl7Jtat0/view-archives.php">the leadership of deng xiaoping -- 4/28/20</a>
-<br></br>
-<br></br>
-<p class="top_words">northwest, harvard, chairman, eighty, pages, twelve, copyright, twenty</p>
-<p class="least_words">sen, ezra, while, dedicated, above, key, secretary, donated, attend</p>
-</td>
-<td class="logit">4.7209062576293945</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/online-only/online-only/remainder/">Remainder</a>
-<br></br>
-<br></br>
-<p class="top_words">gray, tea, hair, license, drive, brotherhood, ten, hundred, thirty</p>
-<p class="least_words">read, rolling, lightly, pretty, wrote, digs, snap, isn</p>
-</td>
-<td class="logit">4.717398166656494</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://neo.life/2019/05/vanilla-memories/">Vanilla Memories</a>
-<br></br>
-<br></br>
-<p class="top_words">graph, drive, cofounder, afternoon, nervous, jeans, wondered, pages, neighboring</p>
-<p class="least_words">read, quarantine, pretty, boost, wrote, video, cdc, code, while</p>
-</td>
-<td class="logit">4.7165703773498535</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.berfrois.com/2020/05/emily-ogden-mind-games/">Emily Ogden: Mind Games</a>
-<br></br>
-<br></br>
-<p class="top_words">remembers, faculty, talk, satisfaction, wikimedia, lapham, image, sixty, illustration</p>
-<p class="least_words">guardian, read, monday, wrote, 2018, museum, while, journal, released</p>
-</td>
-<td class="logit">4.715446949005127</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/Everywhereist/~3/A8e-cdZRan8/">I Write About Mice But Actually Anxiety.</a>
-<br></br>
-<br></br>
-<p class="top_words">driveway, sitting, manner, dozen, onto, upper, articles, crap, neighborhood</p>
-<p class="least_words">twitter, while, doesn, released, carrie, literally, particularly, deal</p>
-</td>
-<td class="logit">4.711244583129883</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://stormbear.com/the-bubba-sudsa/">The Bubba Sudsa</a>
-<br></br>
-<br></br>
-<p class="top_words">insist, drunk, television, indeed, etc, credit</p>
-<p class="least_words">rating, smithsonian, read, changing, while, watch, according, debbie, bunch</p>
-</td>
-<td class="logit">4.710445404052734</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://ben-kay.com/2020/05/advertising-by-gaslight/">Advertising by Gaslight</a>
-<br></br>
-<br></br>
-<p class="top_words">behave, anymore, shit, crap, clients, hair, occasional</p>
-<p class="least_words">fun, initially, behaviour, week, seeing, also, paying, bit</p>
-</td>
-<td class="logit">4.708834648132324</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.allendowney.com/blog/2020/04/13/bayesian-hypothesis-testing/">Bayesian hypothesis testing</a>
-<br></br>
-<br></br>
-<p class="top_words">algorithms, hypothesis, probability, statistician, insist, summary, economics, statistical, euro</p>
-<p class="least_words">guardian, friday, statement, ahead, said, series, means, testing</p>
-</td>
-<td class="logit">4.702567100524902</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/a-hot-mess">A Hot Mess</a>
-<br></br>
-<br></br>
-<p class="top_words">statistical, suppose, expectation, whereas, illustration</p>
-<p class="least_words">related, researchers, shows, according, released, argued, follows, hardware, due, proposal</p>
-</td>
-<td class="logit">4.702016830444336</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/TheRationalWalkFeed/~3/Qmm8tzy2IqE/">The Song Remains the Same</a>
-<br></br>
-<br></br>
-<p class="top_words">ten, interviews, hundred, fifty, cent, twenty, twentieth</p>
-<p class="least_words">read, tuesday, cnbc, wrote, percent, 2020, doesn, warned, thinks</p>
-</td>
-<td class="logit">4.697851657867432</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://inference-review.com/index.php/article/kept-in-mind">Kept in Mind</a>
-<br></br>
-<br></br>
-<p class="top_words">whereas, deficits, concentrate, stimulus, twentieth</p>
-<p class="least_words">read, related, percent, previously, while, argued, follows, remarks</p>
-</td>
-<td class="logit">4.6826276779174805</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/online-only/online-only/more-or-less/">More or Less</a>
-<br></br>
-<br></br>
-<p class="top_words">desk, fuck, arranged, sitting, parking, gray, lobby, tea</p>
-<p class="least_words">isn, while, ahead, says, said, length, chair, week</p>
-</td>
-<td class="logit">4.681431293487549</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.scottaaronson.com/blog/?p=4794">Four striking papers</a>
-<br></br>
-<br></br>
-<p class="top_words">mentioned, graph, blog, twenty</p>
-<p class="least_words">related, wrote, previously, formally, recommended, favorite, matt, week, upshot</p>
-</td>
-<td class="logit">4.676440238952637</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://medium.com/@tdietterich/reflections-on-innateness-in-machine-learning-4eebefa3e1af?source=rss-d5e56dd33516------2">Reflections on Innateness in Machine Learning</a>
-<br></br>
-<br></br>
-<p class="top_words">wikipedia, languages, hence, exceed, obvious, behavior, org, web</p>
-<p class="least_words">https, researchers, while, according, adding, elizabeth, guide, typically, particularly</p>
-</td>
-<td class="logit">4.675137042999268</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://philosophynow.org/issues/137/Bullshit_Jobs_by_David_Graeber">Bullshit Jobs by David Graeber</a>
-<br></br>
-<br></br>
-<p class="top_words">multiplied, articles, image, pages, nineteenth, twenty</p>
-<p class="least_words">read, researchers, equality, 2020, 2018, essentially, while, follows, due</p>
-</td>
-<td class="logit">4.667534828186035</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="http://feedproxy.google.com/~r/delanceyplace/rwVN/~3/YFyNtomxq28/view-archives.php">gutenberg, failed entrepreneur -- 4/22/20</a>
-<br></br>
-<br></br>
-<p class="top_words">owed, the, books, money, manner, license, pages, fifty, copyright</p>
-<p class="least_words">related, 2016, characters, percent, credited, incredible, donated, tackled, truly</p>
-</td>
-<td class="logit">4.6641011238098145</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.lemonde.fr/blog/piketty/2019/07/09/will-money-creation-save-us/">Will money creation save us?</a>
-<br></br>
-<br></br>
-<p class="top_words">system, ecb, furthermore, balance, whereas, euro</p>
-<p class="least_words">2018, above, clarified, particularly, deal, climate, hyper, during, entering</p>
-</td>
-<td class="logit">4.657807350158691</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://nplusonemag.com/online-only/online-only/in-the-pit/">In the Pit</a>
-<br></br>
-<br></br>
-<p class="top_words">nervous, jeans, translated, ten, fifteen, hundred, thirty, copyright, twenty</p>
-<p class="least_words">2016, previously, serve, while, according, earnings, meanwhile, literally, dip</p>
-</td>
-<td class="logit">4.624243259429932</td>
-</tr>
-<tr>
-<td class="title mdl-data-table__cell--non-numeric"><a class="article_link" href="https://www.perell.com/blog/wall-of-heroes">Your Wall of Heroes</a>
-<br></br>
-<br></br>
-<p class="top_words">room, friends, coaches, the, direction, television, explanations, marshall</p>
-<p class="least_words">read, lyrics, moments, adding, includes, favorite, aren, heroes</p>
-</td>
-<td class="logit">4.613435745239258</td>
-</tr>
-  </tbody>
-</table>
-</div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="master.js" type="text/javascript"></script>
-  </body>
-  </html>
+  </section>
+  </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="master.js" type="text/javascript"></script>
+</body>
+
+</html>

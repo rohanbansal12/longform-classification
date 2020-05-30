@@ -5,6 +5,7 @@ $(document).ready(function() {
 });
   $("button").click(function() {
     $("#rank_results").remove();
+    var current_selected_tab = $("div.mdl-layout__tab-bar a.is-active").text();
     $("#spinner").show();
     var a = $("#s1").val();
     var b = $("#s2").val();
@@ -13,7 +14,7 @@ $(document).ready(function() {
     var e = $("#s5").val();
     const Url = "https://jp0pvkfc6f.execute-api.us-east-2.amazonaws.com/default/rank_news_demo";
     var Data = {
-      change: 1,
+      dataset: 1,
       a: a,
       b: b,
       c: c,
@@ -70,7 +71,7 @@ $(document).ready(function() {
   prepend += '<tr><th class="mdl-data-table__cell--non-numeric">Articles</th><th class="mdl-data-table__cell--non-numeric">Prediction</th></tr></thead><tbody>'
   var final_html_str = prepend + grand_html
   $("#spinner").hide();
-  $("#table-wrapper").append(final_html_str)
+  $("#table-wrapper-browser").append(final_html_str)
 })()
 });
 });
