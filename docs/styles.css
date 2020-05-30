@@ -93,13 +93,16 @@ th {
 
 .mdl-layout__header-row {
   text-align: center;
-  margin: auto;
   margin-bottom: 50px;
   margin-top: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
-.mdl-layout__title, .mdl-layout-title {
+#main-heading {
   font-size: 50px;
+  margin: auto;
+  display: inline-block;
 }
 
 table {

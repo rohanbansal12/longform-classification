@@ -36,7 +36,7 @@ def calculate_predictions(loader, model, device, target_publication, version, st
                 correct_150 += 1
         print(f"{version} Performance: Step - {step}")
         print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
-        print(f"Top 150: {correct_150} / 100 or {(correct_150*2)/3} %")
+        print(f"Top 150: {correct_150} / 150 or {(correct_150*2)/3} %")
         print("--------------------")
         if writer is not None:
             writer.add_scalar(f'{version}/Top-10', correct_10, step)

@@ -222,6 +222,7 @@ for step, batch in enumerate(cycle(train_loader)):
         sorted_preds, indices = eval_util.calculate_predictions(eval_loader,
                                                                 model, device,
                                                                 args.target_publication,
+                                                                version="Evaluation",
                                                                 step=step, writer=writer,
                                                                 check_recall=True)
         model.train()
@@ -233,14 +234,15 @@ for step, batch in enumerate(cycle(train_loader)):
         print("--------------------")
         sorted_preds, indices = eval_util.calculate_predictions(eval_loader, model, device,
                                                                 args.target_publication,
+                                                                version="Evaluation",
                                                                 step=step, writer=writer,
                                                                 check_recall=True)
-        writer.close()
-        ranked_df = eval_util.create_ranked_eval_list(final_word_ids,
+        ranked_df = eval_util.create_ranked_results_list(final_word_ids,
                                                       args.word_embedding_type,
                                                       sorted_preds, indices,
                                                       eval_data)
         eval_util.save_ranked_df(output_path,
+                                "evaluation",
                                  ranked_df,
                                  args.word_embedding_type)
         print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'}!")
@@ -254,3 +256,20 @@ if not model_path.is_dir():
 model_string = args.word_embedding_type + "-inner-product-model.pt"
 model_path = model_path / model_string
 torch.save(model.state_dict(), model_path)
+sorted_preds, indices = eval_util.calculate_predictions(test_loader,
+                                                        model, device,
+                                                        args.target_publication,
+                                                        version="Test",
+                                                        step=step, writer=writer,
+                                                        check_recall=True)
+writer.close()
+ranked_df = eval_util.create_ranked_results_list(final_word_ids,
+                                                args.word_embedding_type,
+                                                sorted_preds, indices,
+                                                test_data)
+eval_util.save_ranked_df(output_path,
+                        "test",
+                        ranked_df,
+                        args.word_embedding_type)
+print(f"Ranked Data Saved to {output_path / 'results' / 'test'}!")
+print("Done!")

@@ -23,10 +23,11 @@ def create_merged_dictionaries(all_examples, tokenizer, target_publication):
     publication_to_id = {publication: id for id, publication in enumerate(publication_counter.keys())}
     article_to_id.update({"miscellaneous": len(article_to_id)})
     publication_to_id.update({"miscellaneous": len(publication_to_id)})
-    final_word_ids = []
+    word_id_list = []
     for idx, word in enumerate(tokenizer.vocab.keys()):
-        final_word_ids.append({word: idx})
-    return json.dumps(final_word_ids), article_to_id, publication_to_id
+        word_id_list.append({word: idx})
+    final_word_ids = json.loads(final_word_ids)
+    return final_word_ids, article_to_id, publication_to_id
 
 
 # save dictionary files for future use and ease of access

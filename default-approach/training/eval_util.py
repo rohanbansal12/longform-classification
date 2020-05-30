@@ -18,37 +18,37 @@ def create_full_batch(data_loader, device):
     return data_publications, data_articles, data_word_attributes, data_attribute_offsets, data_real_labels
 
 
-def calculate_predictions(eval_loader, model, device, target_publication, step=0, check_recall=False, writer=None):
-    eval_publications, eval_articles, eval_word_attributes, eval_attribute_offsets, eval_real_labels = create_full_batch(eval_loader, device)
+def calculate_predictions(loader, model, device, target_publication, version, step=0, check_recall=False, writer=None):
+    publications, articles, word_attributes, attribute_offsets, real_labels = create_full_batch(loader, device)
     model.eval()
-    publication_set = [target_publication]*len(eval_real_labels)
+    publication_set = [target_publication]*len(real_labels)
     publication_set = torch.tensor(publication_set, dtype=torch.long)
     publication_set = publication_set.to(device)
-    preds = model(publication_set, eval_articles, eval_word_attributes, eval_attribute_offsets)
+    preds = model(publication_set, articles, word_attributes, attribute_offsets)
     sorted_preds, indices = torch.sort(preds, descending=True)
     if check_recall:
         correct_10 = 0
         correct_150 = 0
         for i in range(0, 150):
-            if eval_real_labels[indices[i]] == target_publication:
+            if real_labels[indices[i]] == target_publication:
                 if i < 10:
                     correct_10 += 1
                 correct_150 += 1
-        print(f"Evaluation Performance: Step - {step}")
+        print(f"{version} Performance: Step - {step}")
         print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
-        print(f"Top 150: {correct_150} / 100 or {(correct_150*2)/3} %")
+        print(f"Top 150: {correct_150} / 150 or {(correct_150*2)/3} %")
         print("--------------------")
         if writer is not None:
-            writer.add_scalar('Eval/Top-10', correct_10, step)
-            writer.add_scalar('Eval/Top-150', correct_150, step)
+            writer.add_scalar(f'{version}/Top-10', correct_10, step)
+            writer.add_scalar(f'{version}/Top-150', correct_150, step)
     return sorted_preds, indices
 
 
-def create_ranked_eval_list(final_word_ids, word_embedding_type, sorted_preds, indices, eval_data):
+def create_ranked_results_list(final_word_ids, word_embedding_type, sorted_preds, indices, data):
     df = pd.DataFrame(columns=['title', 'url', 'text',
                                'publication', 'target_prediction'])
     for i in range(0, 1500):
-        example = eval_data[indices[i]]
+        example = data[indices[i]]
         prediction = sorted_preds[i].item()
         title = example['title']
         unique_text = list(set(example['text']))
@@ -58,7 +58,7 @@ def create_ranked_eval_list(final_word_ids, word_embedding_type, sorted_preds, i
     return df
 
 
-def save_ranked_df(output_path, df, word_embedding_type, word_count=0):
+def save_ranked_df(output_path, version, df, word_embedding_type, word_count=0):
     if not output_path.is_dir():
         output_path.mkdir()
     dateTimeObj = datetime.now()
@@ -69,7 +69,7 @@ def save_ranked_df(output_path, df, word_embedding_type, word_count=0):
     results_date_path = results_path / timestampStr
     if not results_date_path.is_dir():
         results_date_path.mkdir()
-    evaluation_results_path = results_date_path / "evaluation"
+    evaluation_results_path = results_date_path / version
     if not evaluation_results_path.is_dir():
         evaluation_results_path.mkdir()
     if word_count != 0:

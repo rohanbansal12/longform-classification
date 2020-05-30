@@ -112,7 +112,6 @@ neg_sampler = train_data.create_negative_sampler(args.target_publication)
 train_batch_sampler = sampler_util.BatchSamplerWithNegativeSamples(
     pos_sampler=pos_sampler, neg_sampler=neg_sampler,
     items=train_data.examples, batch_size=args.batch_size)
-
 # define function to return necessary data for dataloader to pass into model
 def collate_fn(examples):
     words = []
@@ -126,6 +125,7 @@ def collate_fn(examples):
             if len(example['text']) > args.words_to_use:
                 words.append(list(set(example['text'][:args.words_to_use])))
             else:
+                print(list(set(example['text'])))
                 words.append(list(set(example['text'])))
         articles.append(example['url'])
         publications.append(example['model_publication'])
@@ -157,7 +157,7 @@ else:
 # create dataloaders for iterable data when training and testing recall
 train_loader = torch.utils.data.DataLoader(train_data, batch_sampler=train_batch_sampler, collate_fn=collate_with_neg_fn, pin_memory=pin_mem)
 eval_loader = torch.utils.data.DataLoader(eval_data, batch_size=len(eval_data), collate_fn=collate_fn, pin_memory=pin_mem)
-train_loader = torch.utils.data.DataLoader(train_data, batch_size=len(train_data), collate_fn=collate_fn, pin_memory=pin_mem)
+test_loader = torch.utils.data.DataLoader(train_data, batch_size=len(test_data), collate_fn=collate_fn, pin_memory=pin_mem)
 
 # function that allows for infinite iteration over training batches
 def cycle(iterable):
@@ -203,6 +203,7 @@ print("--------------------")
 for step, batch in enumerate(cycle(train_loader)):
     optimizer.zero_grad()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
+    print(len(publications))
     publications = publications.to(device)
     articles = articles.to(device)
     word_attributes = word_attributes.to(device)
@@ -252,7 +253,7 @@ if not model_path.is_dir():
 model_string = args.word_embedding_type + "-inner-product-model.pt"
 model_path = model_path / model_string
 torch.save(model.state_dict(), model_path)
-sorted_preds, indices = eval_util.calculate_predictions(train_loader,
+sorted_preds, indices = eval_util.calculate_predictions(test_loader,
                                                         model, device,
                                                         args.target_publication,
                                                         version="Test",
@@ -262,7 +263,7 @@ writer.close()
 ranked_df = eval_util.create_ranked_results_list(final_word_ids,
                                                 args.word_embedding_type,
                                                 sorted_preds, indices,
-                                                eval_data)
+                                                test_data)
 eval_util.save_ranked_df(output_path,
                         "test",
                         ranked_df,
