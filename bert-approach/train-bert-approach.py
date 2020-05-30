@@ -203,7 +203,6 @@ print("--------------------")
 for step, batch in enumerate(cycle(train_loader)):
     optimizer.zero_grad()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
-    print(len(publications))
     publications = publications.to(device)
     articles = articles.to(device)
     word_attributes = word_attributes.to(device)
