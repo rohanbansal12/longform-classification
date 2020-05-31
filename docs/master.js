@@ -11,9 +11,9 @@ $(document).ready(function() {
     var slider_values = [];
     var slider_indexes = [];
     current_selected_tab.find(".mdl-slider").each(function(index) {
-      slider_values[index] = $(this).val();
-      slider_indexes[index] = $(this).attr("id").split('-')[1].slice(1)
-    })
+      slider_values[index] = parseFloat($(this).val());
+      slider_indexes[index] = parseInt($(this).attr("id").split('-')[1].slice(1));
+    });
     var a = slider_values[0];
     var b = slider_values[1];
     var c = slider_values[2];
