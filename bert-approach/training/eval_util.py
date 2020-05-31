@@ -18,7 +18,7 @@ def create_full_batch(data_loader, device):
     return data_publications, data_articles, data_word_attributes, data_attribute_offsets, data_real_labels
 
 
-def calculate_predictions(loader, model, device, target_publication, version, step=0, check_recall=False, writer=None):
+def calculate_predictions(loader, model, device, target_publication, version='', step=0, check_recall=False, writer=None):
     publications, articles, word_attributes, attribute_offsets, real_labels = create_full_batch(loader, device)
     model.eval()
     publication_set = [target_publication]*len(real_labels)

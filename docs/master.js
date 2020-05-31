@@ -71,7 +71,7 @@ $(document).ready(function() {
     grand_html = grand_html.slice(0, -1)
     grand_html += '</p>';
     grand_html += '</td>';
-    grand_html += '<td>'
+    grand_html += '<td class="publication">'
     grand_html += article['publication']
     grand_html += '</td>';
     grand_html += '<td class="logit">';
