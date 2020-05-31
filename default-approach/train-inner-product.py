@@ -217,7 +217,7 @@ for step, batch in enumerate(cycle(train_loader)):
     L.backward()
     optimizer.step()
     running_loss += L.item()
-    if step % 100 == 0 and step % args.training_steps != 0:
+    if step % 20 == 0 and step != args.training_steps:
         writer.add_scalar('Loss/train', running_loss/100, step)
         print(f"Training Loss: {running_loss/100}")
         sorted_preds, indices = eval_util.calculate_predictions(eval_loader,

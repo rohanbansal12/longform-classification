@@ -33,8 +33,8 @@ if __name__ == '__main__':
     base_grid.emb_size = [5, 10, 20, 50, 100]
     base_grid.tokenize = False
     base_grid.target_publication = 0
-    base_grid.batch_size = 2000
-    base_grid.training_steps = 1500
+    base_grid.batch_size = 1500
+    base_grid.training_steps = 500
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
