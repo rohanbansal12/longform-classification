@@ -24,7 +24,7 @@
       <!-- Tabs -->
       <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
         <a href="#fixed-tab-browser" class="mdl-layout__tab is-active">Browser-Esque</a>
-        <a href="#fixed-tab-corona" class="mdl-layout__tab">Coronavirus</a>
+        <a href="#fixed-tab-coronavirus" class="mdl-layout__tab">Coronavirus</a>
       </div>
     </header>
     <main class="mdl-layout__content">
@@ -40,23 +40,23 @@
           <div class="input_div" style="display: flex;align-items: center;width:70%;margin: auto;">
             <div style="width:85%; text-align: center;">
               <p class="embedding_slider_holder">
-                <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="s1" min="-50" max="50"
+                <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="browser-s1" min="-50" max="50"
                   value="5" step="5">
               </p>
               <p class="embedding_slider_holder">
-                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s2" min="-50"
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-s2" min="-50"
                   max="50" value="5" step="5">
               </p>
               <p class="embedding_slider_holder">
-                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s3" min="-50"
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-s3" min="-50"
                   max="50" value="5" step="5">
               </p>
               <p class="embedding_slider_holder">
-                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s4" min="-50"
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-s4" min="-50"
                   max="50" value="5" step="5">
               </p>
               <p class="embedding_slider_holder">
-                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="s5" min="-50"
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-s5" min="-50"
                   max="50" value="5" step="5">
               </p>
             </div>
@@ -67,9 +67,9 @@
               </button>
             </div>
           </div>
-          <div id="spinner" class="mdl-spinner mdl-js-spinner is-active" style="display:none;"></div>
-          <div id="table-wrapper-browser">
-            <table id="rank_results" class="mdl-data-table mdl-js-data-table">
+          <div id="browser-spinner" class="spinner mdl-spinner mdl-js-spinner is-active" style="display:none;"></div>
+          <div class="table-wrapper">
+            <table class="mdl-data-table mdl-js-data-table rank_results">
               <thead>
                 <tr>
                   <th class="mdl-data-table__cell--non-numeric">Articles</th>
@@ -998,11 +998,42 @@
           </div>
         </div>
       </section>
-      <section class="mdl-layout__tab-panel" id="fixed-tab-corona">
+      <section class="mdl-layout__tab-panel" id="fixed-tab-coronavirus">
         <div class="page-content">
           <!-- Your content goes here -->
-          <div id="table-wrapper-corona">
-            <table id="rank_results" class="mdl-data-table mdl-js-data-table">
+          <div class="input_div" style="display: flex;align-items: center;width:70%;margin: auto;">
+            <div style="width:85%; text-align: center;">
+              <p class="embedding_slider_holder">
+                <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="corona-s1" min="-50" max="50"
+                  value="5" step="5">
+              </p>
+              <p class="embedding_slider_holder">
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="corona-s2" min="-50"
+                  max="50" value="5" step="5">
+              </p>
+              <p class="embedding_slider_holder">
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="corona-s3" min="-50"
+                  max="50" value="5" step="5">
+              </p>
+              <p class="embedding_slider_holder">
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="corona-s4" min="-50"
+                  max="50" value="5" step="5">
+              </p>
+              <p class="embedding_slider_holder">
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="corona-s5" min="-50"
+                  max="50" value="5" step="5">
+              </p>
+            </div>
+            <div style="width:15%; text-align: center">
+              <button style="display: inline-block"
+                class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="material-icons">forward</i>
+              </button>
+            </div>
+          </div>
+          <div id="corona-spinner" class="spinner mdl-spinner mdl-js-spinner is-active" style="display:none;"></div>
+          <div id="table-wrapper">
+            <table class="mdl-data-table mdl-js-data-table rank_results">
               <thead>
                 <tr>
                   <th class="mdl-data-table__cell--non-numeric">Articles</th>

@@ -4,22 +4,34 @@ $(document).ready(function() {
     $(this).attr('target', '_blank');
 });
   $("button").click(function() {
-    $("#rank_results").remove();
-    var current_selected_tab = $("div.mdl-layout__tab-bar a.is-active").text();
-    $("#spinner").show();
-    var a = $("#s1").val();
-    var b = $("#s2").val();
-    var c = $("#s3").val();
-    var d = $("#s4").val();
-    var e = $("#s5").val();
-    const Url = "https://jp0pvkfc6f.execute-api.us-east-2.amazonaws.com/default/rank_news_demo";
+    var current_selected_tab = $("section.is-active");
+    var current_data_from_id = current_selected_tab.attr('id').slice(10)
+    current_selected_tab.find(".rank_results").remove();
+    current_selected_tab.find(".spinner").show();
+    var slider_values = [];
+    var slider_indexes = [];
+    current_selected_tab.find(".mdl-slider").each(function(index) {
+      slider_values[index] = $(this).val();
+      slider_indexes[index] = $(this).attr("id").split('-')[1].slice(1)
+    })
+    var a = slider_values[0];
+    var b = slider_values[1];
+    var c = slider_values[2];
+    var d = slider_values[3];
+    var e = slider_values[4];
+    const Url = "fffffffffffffff";
     var Data = {
-      dataset: 1,
+      dataset: current_data_from_id,
       a: a,
       b: b,
       c: c,
       d: d,
-      e: e
+      e: e,
+      idx1: slider_indexes[0],
+      idx2: slider_indexes[1],
+      idx3: slider_indexes[2],
+      idx4: slider_indexes[3],
+      idx5: slider_indexes[4],
     };
     console.log(Data);
     var payLoad = {
@@ -59,6 +71,9 @@ $(document).ready(function() {
     grand_html = grand_html.slice(0, -1)
     grand_html += '</p>';
     grand_html += '</td>';
+    grand_html += '<td>'
+    grand_html += article['publication']
+    grand_html += '</td>';
     grand_html += '<td class="logit">';
     grand_html += article['logit'].toString();
     grand_html += '</td>'
@@ -66,12 +81,12 @@ $(document).ready(function() {
   });
   grand_html += '</tbody>'
   grand_html += '</table>'
-  var prepend = '<table id="rank_results" style="width:90%; margin-left:5%; margin-right:5%;" class="mdl-data-table mdl-js-data-table">'
+  var prepend = '<table class="mdl-data-table mdl-js-data-table rank_results">'
   prepend += "<thead>"
-  prepend += '<tr><th class="mdl-data-table__cell--non-numeric">Articles</th><th class="mdl-data-table__cell--non-numeric">Prediction</th></tr></thead><tbody>'
+  prepend += '<tr><th class="mdl-data-table__cell--non-numeric">Articles</th><th class="mdl-data-table__cell--non-numeric">Publication</th><th class="mdl-data-table__cell--non-numeric">Prediction</th></tr></thead><tbody>'
   var final_html_str = prepend + grand_html
-  $("#spinner").hide();
-  $("#table-wrapper-browser").append(final_html_str)
+  current_selected_tab.find(".spinner").hide();
+  current_selected_tab.find(".table-wrapper").append(final_html_str);
 })()
 });
 });
