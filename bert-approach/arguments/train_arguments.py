@@ -79,6 +79,10 @@ def add_training(parser):
                         type=int,
                         default=1000,
                         help="Total Number Of Steps For Training")
+    parser.add_argument("--frequency",
+                        type=int,
+                        default=1000,
+                        help="How often to calculate recall and test performance.")
 
 def add_model(parser):
     parser.add_argument('--emb_size',

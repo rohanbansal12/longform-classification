@@ -203,24 +203,25 @@ print("--------------------")
 for step, batch in enumerate(cycle(train_loader)):
     writer.add_scalar('Loss/train', running_loss/100, step)
     print(f"Training Loss: {running_loss/100}")
-    sorted_preds, indices = eval_util.calculate_predictions(eval_loader,
+    if step % args.frequency == 0 and step != args.training_steps:
+        sorted_preds, indices = eval_util.calculate_predictions(eval_loader,
                                                             model, device,
                                                             args.target_publication,
                                                             version="Evaluation",
                                                             step=step, writer=writer,
                                                             check_recall=True)
-    sorted_preds, indices = eval_util.calculate_predictions(test_loader,
+        sorted_preds, indices = eval_util.calculate_predictions(test_loader,
                                                         model, device,
                                                         args.target_publication,
                                                         version="Test",
                                                         step=step, writer=writer,
                                                         check_recall=True)
-    model_path = output_path / "model"
-    if not model_path.is_dir():
-        model_path.mkdir()
-    model_string = step + args.word_embedding_type + "-inner-product-model.pt"
-    model_path = model_path / model_string
-    torch.save(model.state_dict(), model_path)
+        model_path = output_path / "model"
+        if not model_path.is_dir():
+            model_path.mkdir()
+        model_string = step + args.word_embedding_type + "-inner-product-model.pt"
+        model_path = model_path / model_string
+        torch.save(model.state_dict(), model_path)
     model.train()
     running_loss = 0.0
     optimizer.zero_grad()
