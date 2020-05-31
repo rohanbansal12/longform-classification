@@ -26,7 +26,7 @@ def create_merged_dictionaries(all_examples, tokenizer, target_publication):
     word_id_list = []
     for idx, word in enumerate(tokenizer.vocab.keys()):
         word_id_list.append({word: idx})
-    final_word_ids = json.loads(word_id_list)
+    final_word_ids = json.dumps(word_id_list)
     return final_word_ids, article_to_id, publication_to_id
 
 
