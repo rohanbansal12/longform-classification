@@ -201,6 +201,28 @@ print("Beginning Training")
 print("--------------------")
 # training loop with validation checks every 100 steps and final validation recall calcualation
 for step, batch in enumerate(cycle(train_loader)):
+    writer.add_scalar('Loss/train', running_loss/100, step)
+    print(f"Training Loss: {running_loss/100}")
+    sorted_preds, indices = eval_util.calculate_predictions(eval_loader,
+                                                            model, device,
+                                                            args.target_publication,
+                                                            version="Evaluation",
+                                                            step=step, writer=writer,
+                                                            check_recall=True)
+    sorted_preds, indices = eval_util.calculate_predictions(test_loader,
+                                                        model, device,
+                                                        args.target_publication,
+                                                        version="Test",
+                                                        step=step, writer=writer,
+                                                        check_recall=True)
+    model_path = output_path / "model"
+    if not model_path.is_dir():
+        model_path.mkdir()
+    model_string = step + args.word_embedding_type + "-inner-product-model.pt"
+    model_path = model_path / model_string
+    torch.save(model.state_dict(), model_path)
+    model.train()
+    running_loss = 0.0
     optimizer.zero_grad()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
     publications = publications.to(device)
@@ -212,17 +234,6 @@ for step, batch in enumerate(cycle(train_loader)):
     L.backward()
     optimizer.step()
     running_loss += L.item()
-    if step % 5 == 0 and step % args.training_steps != 0:
-        writer.add_scalar('Loss/train', running_loss/100, step)
-        print(f"Training Loss: {running_loss/100}")
-        sorted_preds, indices = eval_util.calculate_predictions(eval_loader,
-                                                                model, device,
-                                                                args.target_publication,
-                                                                version="Evaluation",
-                                                                step=step, writer=writer,
-                                                                check_recall=True)
-        model.train()
-        running_loss = 0.0
     if step != 0 and step % args.training_steps == 0:
         writer.add_scalar('Loss/train', running_loss/100, step)
         print(f"Training Loss: {running_loss/100}")
@@ -241,31 +252,25 @@ for step, batch in enumerate(cycle(train_loader)):
                                 "evaluation",
                                  ranked_df,
                                  args.word_embedding_type)
+        sorted_preds, indices = eval_util.calculate_predictions(test_loader,
+                                                    model, device,
+                                                    args.target_publication,
+                                                    version="Test",
+                                                    step=step, writer=writer,
+                                                    check_recall=True)
+        ranked_df = eval_util.create_ranked_results_list(final_word_ids,
+                                                args.word_embedding_type,
+                                                sorted_preds, indices,
+                                                test_data)
+        eval_util.save_ranked_df(output_path,
+                                "test",
+                                ranked_df,
+                                args.word_embedding_type)
         print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'}!")
         check = False
         break
 
 # save model for easy future reloading
-model_path = output_path / "model"
-if not model_path.is_dir():
-    model_path.mkdir()
-model_string = args.word_embedding_type + "-inner-product-model.pt"
-model_path = model_path / model_string
-torch.save(model.state_dict(), model_path)
-sorted_preds, indices = eval_util.calculate_predictions(test_loader,
-                                                        model, device,
-                                                        args.target_publication,
-                                                        version="Test",
-                                                        step=step, writer=writer,
-                                                        check_recall=True)
 writer.close()
-ranked_df = eval_util.create_ranked_results_list(final_word_ids,
-                                                args.word_embedding_type,
-                                                sorted_preds, indices,
-                                                test_data)
-eval_util.save_ranked_df(output_path,
-                        "test",
-                        ranked_df,
-                        args.word_embedding_type)
 print(f"Ranked Data Saved to {output_path / 'results' / 'test'}!")
 print("Done!")
