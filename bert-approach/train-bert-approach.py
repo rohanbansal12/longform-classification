@@ -157,7 +157,7 @@ else:
 # create dataloaders for iterable data when training and testing recall
 train_loader = torch.utils.data.DataLoader(train_data, batch_sampler=train_batch_sampler, collate_fn=collate_with_neg_fn, pin_memory=pin_mem)
 eval_loader = torch.utils.data.DataLoader(eval_data, batch_size=len(eval_data), collate_fn=collate_fn, pin_memory=pin_mem)
-test_loader = torch.utils.data.DataLoader(train_data, batch_size=len(test_data), collate_fn=collate_fn, pin_memory=pin_mem)
+test_loader = torch.utils.data.DataLoader(test_data, batch_size=len(test_data), collate_fn=collate_fn, pin_memory=pin_mem)
 
 # function that allows for infinite iteration over training batches
 def cycle(iterable):
