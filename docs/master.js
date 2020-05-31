@@ -19,7 +19,7 @@ $(document).ready(function() {
     var c = slider_values[2];
     var d = slider_values[3];
     var e = slider_values[4];
-    const Url = "fffffffffffffff";
+    const Url = "https://jp0pvkfc6f.execute-api.us-east-2.amazonaws.com/default/rank_news_demo";
     var Data = {
       dataset: current_data_from_id,
       a: a,
