@@ -20,7 +20,7 @@ from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 from transformers import BertTokenizer
 
-parser = argparse.ArgumentParser(description='Get Ranked Predictions on New Dataset.')
+parser = argparse.ArgumentParser(description="Get Ranked Predictions on New Dataset.")
 arguments.add_data(parser)
 arguments.add_model(parser)
 args = parser.parse_args()
@@ -45,12 +45,14 @@ print("Data Loaded")
 print("-------------------")
 
 # initialize tokenizer from BERT library
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
 print("Tokenizer Initialized!")
 
 # load dictionaries from path
 dictionary_dir = Path(args.dict_dir)
-final_word_ids, final_url_ids, final_publication_ids = dictionary.load_dictionaries(dictionary_dir)
+final_word_ids, final_url_ids, final_publication_ids = dictionary.load_dictionaries(
+    dictionary_dir
+)
 print("Dictionaries Loaded")
 print("-------------------")
 
@@ -59,12 +61,14 @@ if args.map_items:
     # tokenize data and split into words
     raw_data.tokenize(tokenizer)
     # map items to their ids in dictionaries and filter articles
-    proper_data = raw_data.map_items(tokenizer,
-                                     final_word_ids,
-                                     final_url_ids,
-                                     final_publication_ids,
-                                     filter=True,
-                                     min_length=args.min_article_length)
+    proper_data = raw_data.map_items(
+        tokenizer,
+        final_word_ids,
+        final_url_ids,
+        final_publication_ids,
+        filter=True,
+        min_length=args.min_article_length,
+    )
     print("Mapped and Filtered Data!")
     data_path = Path(args.data_dir)
     if not data_path.is_dir():
@@ -81,6 +85,7 @@ if args.map_items:
     print(f"Filtered, Mapped Data saved to {mapped_data_path} directory")
     print("-------------------")
 
+
 def collate_fn(examples):
     words = []
     articles = []
@@ -88,15 +93,15 @@ def collate_fn(examples):
     publications = []
     for example in examples:
         if args.use_all_words:
-            words.append(list(set(example['text'])))
+            words.append(list(set(example["text"])))
         else:
-            if len(example['text']) > args.words_to_use:
-                words.append(list(set(example['text'][:args.words_to_use])))
+            if len(example["text"]) > args.words_to_use:
+                words.append(list(set(example["text"][: args.words_to_use])))
             else:
-                words.append(list(set(example['text'])))
-        articles.append(example['url'])
-        publications.append(example['model_publication'])
-        labels.append(example['model_publication'])
+                words.append(list(set(example["text"])))
+        articles.append(example["url"])
+        publications.append(example["model_publication"])
+        labels.append(example["model_publication"])
     num_words = [len(x) for x in words]
     words = np.concatenate(words, axis=0)
     word_attributes = torch.tensor(words, dtype=torch.long)
@@ -111,21 +116,32 @@ def collate_fn(examples):
 
 # change negative example publication ids to the ids of the first half for predictions
 def collate_with_neg_fn(examples):
-    publications, articles, word_attributes, attribute_offsets, real_labels = collate_fn(examples)
-    publications[len(publications)//2:] = publications[:len(publications)//2]
+    (
+        publications,
+        articles,
+        word_attributes,
+        attribute_offsets,
+        real_labels,
+    ) = collate_fn(examples)
+    publications[len(publications) // 2 :] = publications[: len(publications) // 2]
     return publications, articles, word_attributes, attribute_offsets, real_labels
 
+
 # Generates a dataloader on the dataset that outputs entire set as a batch for one time predictions
-raw_loader = torch.utils.data.DataLoader(raw_data, batch_size=len(raw_data), collate_fn=collate_fn, pin_memory=pin_mem)
+raw_loader = torch.utils.data.DataLoader(
+    raw_data, batch_size=len(raw_data), collate_fn=collate_fn, pin_memory=pin_mem
+)
 
 abs_model_path = Path(args.model_path)
-kwargs = dict(n_publications=len(final_publication_ids),
-              n_articles=len(final_url_ids),
-              n_attributes=len(final_word_ids),
-              emb_size=args.emb_size,
-              sparse=args.use_sparse,
-              use_article_emb=args.use_article_emb,
-              mode=args.word_embedding_type)
+kwargs = dict(
+    n_publications=len(final_publication_ids),
+    n_articles=len(final_url_ids),
+    n_attributes=len(final_word_ids),
+    emb_size=args.emb_size,
+    sparse=args.use_sparse,
+    use_article_emb=args.use_article_emb,
+    mode=args.word_embedding_type,
+)
 model = InnerProduct(**kwargs)
 model.load_state_dict(torch.load(abs_model_path))
 model.to(device)
@@ -133,15 +149,14 @@ print("Model Loaded")
 print(model)
 print("-------------------")
 
-sorted_preds, indices = eval_util.calculate_predictions(raw_loader, model, device,
-                                                        args.target_publication)
-ranked_df = eval_util.create_ranked_eval_list(final_word_ids,
-                                              args.word_embedding_type,
-                                              sorted_preds, indices,
-                                              raw_data)
-eval_util.save_ranked_df(output_path,
-                         ranked_df,
-                         args.word_embedding_type,
-                         word_count=args.min_article_length)
+sorted_preds, indices = eval_util.calculate_predictions(
+    raw_loader, model, device, args.target_publication
+)
+ranked_df = eval_util.create_ranked_eval_list(
+    final_word_ids, args.word_embedding_type, sorted_preds, indices, raw_data
+)
+eval_util.save_ranked_df(
+    output_path, ranked_df, args.word_embedding_type, word_count=args.min_article_length
+)
 print("Predictions Made")
 print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'} directory!")

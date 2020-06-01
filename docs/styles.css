@@ -2,12 +2,13 @@
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
 .main_header {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  background-color: rgb(255,64,129);
+  background-color: rgb(255, 64, 129);
   text-align: center;
   color: white;
   padding: 25px 0;
@@ -15,14 +16,16 @@
   margin-bottom: 20px;
   height: 70px;
 }
+
 .embedding_slider_holder {
   width: 600px;
   margin: 15px;
 }
+
 .title {
   padding-bottom: 5px;
   margin-bottom: 5px;
-  line-height:20px;
+  line-height: 20px;
   vertical-align: center;
 }
 
@@ -35,7 +38,7 @@
 }
 
 .article_link {
-  color: rgb(63,81,181);
+  color: rgb(63, 81, 181);
   padding-bottom: 5px;
   margin-bottom: 5px;
   line-height: 20px;
@@ -73,18 +76,18 @@ th {
 }
 
 .description {
-  width:70%;
+  width: 70%;
   margin: auto;
-  text-align:center;
+  text-align: center;
   color: black !important;
   font-weight: bold !important;
   font-size: 20px !important;
 }
 
 .rank_results {
-  width:90%; 
-  margin-left:5%; 
-  margin-right:5%;
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 .description {
