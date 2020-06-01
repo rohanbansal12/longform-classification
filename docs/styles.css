@@ -24,7 +24,7 @@
 }
 
 .article_link {
-  color: rgb(63, 81, 181);
+  color: black;
   padding-bottom: 5px;
   margin-bottom: 5px;
   line-height: 20px;
@@ -122,11 +122,11 @@ button {
 }
 
 .mdl-layout__tab.is-active::after {
-  background: rgb(63, 81, 181) !important;
+  background: black !important;
 }
 
 table tr {
-  border-bottom: 2px solid #ff9900;
+  border-bottom: 2px dashed #ff9900;
   height: 100px !important;
   margin-bottom: 10px !important;
 }
@@ -136,5 +136,5 @@ table th {
 }
 
 table td {
-  padding-bottom: 10px !important;
+  height: 100px !important;
 }
