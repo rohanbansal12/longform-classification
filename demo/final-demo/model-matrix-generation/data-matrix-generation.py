@@ -79,6 +79,12 @@ args = parser.parse_args()
 
 
 data_path = Path(args.data_path)
+# dictionaries
+dict_dir = Path(args.dict_dir)
+final_word_ids, final_url_ids, final_publication_ids = dictionary.load_dictionaries(
+    dict_dir
+)
+print("Dictionaries loaded.")
 
 # tokenize, map, and filter data
 if args.map_items:
@@ -86,13 +92,6 @@ if args.map_items:
     # initialize tokenizer from BERT library
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
     print("Tokenizer Initialized!")
-
-    # dictionaries
-    dict_dir = Path(args.dict_dir)
-    final_word_ids, final_url_ids, final_publication_ids = dictionary.load_dictionaries(
-        dict_dir
-    )
-    print("Dictionaries loaded.")
 
     dataset = Articles(data_path)
     print("Data loaded.")
@@ -121,7 +120,6 @@ else:
     raw_data = Articles(data_path)
 
 # generate sparse matrix with word ids for each article
-"""
 rows = []
 cols = []
 for idx, item in enumerate(raw_data.examples):
@@ -133,17 +131,10 @@ for idx, item in enumerate(raw_data.examples):
 final_rows = np.concatenate(rows, axis=None)
 final_cols = np.concatenate(cols, axis=None)
 final_data = np.ones_like(final_cols)
-"""
 
-rows = []
-cols = []
-word_articles = csr_matrix((len(raw_data), len(final_word_ids)), dtype=np.int32)
-
-for idx, item in enumerate(raw_data.examples):
-    word_ids = list(set(item["text"]))
-    number_of_words = np.arange(len(word_ids))
-    word_articles[idx, word_ids] = 1
-
+word_articles = csr_matrix(
+    (final_data, (final_rows, final_cols)), shape=(len(raw_data), len(final_word_ids))
+)
 print("Article Matrix Created!")
 
 ending = "csr_articles_" + args.dataset_name + ".npz"
