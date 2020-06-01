@@ -41,6 +41,10 @@ def add_data(parser):
     parser.add_argument('--dict_dir',
                         type=expand_path,
                         help="Path where dictionaries are located. Required if --create_dict is False.")
+    parser.add_argument('--bad_token_path',
+                        type=expand_path,
+                        default='foo',
+                        help="Path to file with unwanted tokens.")
     parser.add_argument('--map_items',
                         type=str2bool,
                         default=True,
