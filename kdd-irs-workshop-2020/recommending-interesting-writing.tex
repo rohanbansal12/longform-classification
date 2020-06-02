@@ -122,22 +122,23 @@
 %% information and the body of the document, and typically spans the
 %% page.
 \begin{teaserfigure}
-  \includegraphics[width=\textwidth]{sampleteaser}
-  \caption{Seattle Mariners at Spring Training, 2010.}
-  \Description{Enjoying the baseball game from the third-base
-  seats. Ichiro Suzuki preparing to bat.}
-  \label{fig:teaser}
+  \includegraphics[width=\textwidth]{fig/pipeline.pdf}
+  \caption{\textbf{End-to-end pipeline for recommending nonfiction writing to editors at The Browser.} Positive examples for the \acrlong{rfs} recommendation model~\citep{altosaar2020rankfromsets:} are collected from editors' history of curated articles, and negative examples from news sources. After training and offline evaluation of the recommendation model, it is deployed as a microservice, and editors' feedback on the recommendation performance is used to inform refinement of data collection, training, and architectural choices in the recommendation model.}
+  \Description{End-to-end pipeline for recommending nonfiction writing to editors at The Browser.}
+  \label{fig:pipeline}
 \end{teaserfigure}
 
 %%
 %% This command processes the author and affiliation and title
 %% information and builds the first part of the formatted document.
 \maketitle
-% \input{sec_intro}
+\input{sec_intro}
 % \input{sec_background}
-% \input{sec_method}
+\input{sec_method}
 % \input{sec_experiments}
-% \input{sec_discussion}
+\input{sec_discussion}
+\section*{Acknowledgments}
+The authors are grateful to Christian Bjartli for help with data collection.
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{bib}
 \end{document}
