@@ -36,10 +36,12 @@ class Articles(torch.utils.data.Dataset):
                 prob[idx] = 1
         return torch.utils.data.WeightedRandomSampler(weights=prob, num_samples=len(self), replacement=True)
 
-    def map_items(self, tokenizer, url_to_id, publication_to_id, filter=False, min_length=0):
+    def map_items(self, tokenizer, url_to_id, publication_to_id, badTokens = [], filter=False, min_length=0):
         min_length_articles = []
         for idx, example in enumerate(self.examples):
             self.examples[idx]['text'] = tokenizer.convert_tokens_to_ids(example['text'])
+            if badTokens:
+                self.examples[idx]['text'] = [token for token in self.examples[idx]['text'] if token not in badTokens]
             if filter:
                 if len(self.examples[idx]['text']) > min_length:
                     min_length_articles.append(self.examples[idx])
