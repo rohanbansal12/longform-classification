@@ -18,7 +18,7 @@ $(document).ready(function () {
     var b = slider_values[1];
     var c = slider_values[2];
     var d = slider_values[3];
-    const Url = "https://jp0pvkfc6f.execute-api.us-east-2.amazonaws.com/default/rank_news_demo";
+    const Url = "https://p8h4jxnzz4.execute-api.us-east-2.amazonaws.com/api/";
     var Data = {
       dataset: current_data_from_id,
       a: a,
@@ -34,15 +34,19 @@ $(document).ready(function () {
     var payLoad = {
       method: "POST",
       mode: "cors",
-      body: JSON.stringify(Data)
+      body: JSON.stringify(Data),
+      headers: {
+        "Content-Type": "application/json"
+      },
     };
 
     (async () => {
-      let ranked_articles = await fetch(Url, payLoad)
+      let basic_articles = await fetch(Url, payLoad)
         .then(response => response.json())
         .then(data => {
           return data
         });
+      var ranked_articles = JSON.parse(basic_articles['body'])
       var grand_html = ""
       ranked_articles.forEach(function (article) {
         grand_html += "<tr>";

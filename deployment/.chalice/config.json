@@ -1,0 +1,15 @@
+{
+  "version": "2.0",
+  "app_name": "deployment",
+  "environment_variables": {
+    "ACCESS_KEY": "AKIA3BCGRHV5NZ7FC57V",
+    "SECRET_ACCESS_KEY": "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"
+  },
+  "lambda_memory_size": 3008,
+  "stages": {
+    "dev": {
+      "api_gateway_stage": "api",
+      "layers": ["arn:aws:lambda:us-east-2:259788987135:layer:AWSLambda-Python38-SciPy1x:14"]
+    }
+  }
+}
