@@ -41,10 +41,11 @@ if __name__ == "__main__":
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = 2000
-    base_grid.training_steps = 15
+    base_grid.training_steps = 100
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
+    base_grid.frequency = 5
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/BERT/dictionaries"
     )
