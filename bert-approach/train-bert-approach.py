@@ -59,6 +59,7 @@ print("Data Loaded")
 
 # initialize tokenizer from BERT library
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+# tokenizer = BertTokenizer.from_pretrained("/scratch/gpfs/altosaar/dat/longform-data/BERT/bert-base-uncased.txt")
 print("Tokenizer Initialized!")
 
 # check and tokenize data if items need to be tokenized

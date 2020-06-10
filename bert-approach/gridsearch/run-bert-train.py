@@ -25,7 +25,7 @@ def get_slurm_script_gpu(output_dir, command):
 
 if __name__ == "__main__":
     commands = [
-        "PYTHONPATH=. python train-bert-approach.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/BERT/mapped-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/BERT/mapped-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/BERT/mapped-data/evaluation.json "
+        "PYTHONPATH=. python train-bert-approach.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/BERT/shortened-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/BERT/shortened-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/BERT/shortened-data/evaluation.json "
     ]
 
     experiment_name = "news-inner-product"
