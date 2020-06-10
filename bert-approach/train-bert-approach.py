@@ -19,6 +19,7 @@ from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 from transformers import BertTokenizer
+import random
 
 parser = argparse.ArgumentParser(
     description="Train model on article data and test evaluation"
@@ -151,9 +152,10 @@ def collate_fn(examples):
             words.append(list(set(example["text"])))
         else:
             if len(example["text"]) > args.words_to_use:
-                words.append(list(set(example["text"][: args.words_to_use])))
+                words.append(
+                    random.sample(list(set(example["text"])), args.words_to_use)
+                )
             else:
-                print(list(set(example["text"])))
                 words.append(list(set(example["text"])))
         articles.append(example["url"])
         publications.append(example["model_publication"])
@@ -308,6 +310,7 @@ for step, batch in enumerate(cycle(train_loader)):
             device,
             args.target_publication,
             version="Evaluation",
+            recall_value=args.recall_max,
             step=step,
             writer=writer,
             check_recall=True,
