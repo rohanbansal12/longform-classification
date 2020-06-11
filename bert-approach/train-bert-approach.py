@@ -152,7 +152,7 @@ def collate_fn(examples):
         if args.use_all_words:
             words.append(list(set(example["text"])))
         else:
-            if len(example["text"]) > args.words_to_use:
+            if len(list(set(example["text"]))) > args.words_to_use:
                 words.append(
                     random.sample(list(set(example["text"])), args.words_to_use)
                 )
