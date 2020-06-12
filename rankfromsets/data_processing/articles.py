@@ -1,7 +1,7 @@
 import numpy as np
 from tokenizers import BertWordPieceTokenizer
 import torch
-import json
+import ujson as json
 import collections
 
 # define Articles dataset class for easy sampling, iteration, and weight creating

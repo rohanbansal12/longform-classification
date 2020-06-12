@@ -12,7 +12,7 @@ from data_processing.articles import Articles
 from models.models import InnerProduct
 import data_processing.dictionaries as dictionary
 from pathlib import Path
-import json
+import ujson as json
 import scipy
 import argparse
 from tokenizers import BertWordPieceTokenizer

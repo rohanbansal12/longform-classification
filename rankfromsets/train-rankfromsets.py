@@ -4,7 +4,7 @@ import re
 import torch
 import collections
 import numpy as np
-import json
+import ujson as json
 import time
 import torch.nn as nn
 import os
