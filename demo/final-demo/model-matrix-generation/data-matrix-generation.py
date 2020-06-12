@@ -15,7 +15,7 @@ from pathlib import Path
 import json
 import scipy
 import argparse
-from transformers import BertTokenizer
+from tokenizers import BertWordPieceTokenizer
 
 
 def str2bool(v):
@@ -90,12 +90,14 @@ print("Dictionaries loaded.")
 if args.map_items:
 
     # initialize tokenizer from BERT library
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    tokenizer = BertWordPieceTokenizer(
+        "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt",
+        lowercase=True,
+    )
     print("Tokenizer Initialized!")
 
     dataset = Articles(data_path)
     print("Data loaded.")
-    dataset.tokenize(tokenizer)
     proper_data = dataset.map_items(
         tokenizer, final_url_ids, final_publication_ids, filter=True, min_length=200
     )

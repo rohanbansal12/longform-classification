@@ -18,7 +18,7 @@ import training.eval_util as eval_util
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
-from transformers import BertTokenizer
+from tokenizers import BertWordPieceTokenizer
 import random
 
 parser = argparse.ArgumentParser(
@@ -58,18 +58,11 @@ eval_data = Articles(eval_path)
 print("Data Loaded")
 
 # initialize tokenizer from BERT library
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
-# tokenizer = BertTokenizer.from_pretrained("/scratch/gpfs/altosaar/dat/longform-data/BERT/bert-base-uncased.txt")
+tokenizer = BertWordPieceTokenizer(
+    "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt", lowercase=True
+)
+# tokenizer = BertWordPieceTokenizer("/scratch/gpfs/altosaar/dat/longform-data/BERT/bert-base-uncased.txt", lowercase=True)
 print("Tokenizer Initialized!")
-
-# check and tokenize data if items need to be tokenized
-if args.map_items and args.tokenize:
-    train_data.tokenize(tokenizer)
-    print("Train Data Tokenized")
-    test_data.tokenize(tokenizer)
-    print("Test Data Tokenized")
-    eval_data.tokenize(tokenizer)
-print("All Data Tokenized!")
 
 # create and save or load dictionaries based on arguments
 if args.create_dicts:
@@ -77,7 +70,7 @@ if args.create_dicts:
         final_word_ids,
         final_url_ids,
         final_publication_ids,
-    ) = dictionary.create_merged_dictionaries(train_data.examples, tokenizer, "target")
+    ) = dictionary.create_merged_dictionaries(train_data.examples, "target")
     print("Dictionaries Created")
 
     dict_path = Path(args.data_dir) / "dictionaries"
