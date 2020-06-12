@@ -12,7 +12,7 @@ ifile = open("fake-news.csv", "r")
 reader = csv.reader(ifile)
 ofile = open("mapped-fake-news.csv", "w")
 writer = csv.writer(ofile, delimiter=",")
-header_row = ["title", "text", "url", "link", "publication", "model_publication"]
+header_row = ["title", "text", "url", "publication", "model_publication", "link"]
 writer.writerow(header_row)
 i = 0
 for row in tqdm(reader):
@@ -27,7 +27,7 @@ for row in tqdm(reader):
     id_text.pop(0)
     current_row.append(id_text)
     current_row.append(8000000)
-    current_row.append(row[4])
     current_row.append("fake-news-corpus")
     current_row.append(25)
+    current_row.append(row[4])
     writer.writerow(current_row)

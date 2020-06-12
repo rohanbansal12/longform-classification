@@ -25,7 +25,7 @@ def get_slurm_script_gpu(output_dir, command):
 
 if __name__ == "__main__":
     commands = [
-        "PYTHONPATH=. python train-bert-approach.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/BERT/shortened-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/BERT/shortened-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/BERT/shortened-data/evaluation.json "
+        "PYTHONPATH=. python train-rankfromsets.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/BERT/combined-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/BERT/combined-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/BERT/combined-data/evaluation.json "
     ]
 
     experiment_name = "news-inner-product"
@@ -36,16 +36,16 @@ if __name__ == "__main__":
     base_grid = addict.Dict()
     base_grid.create_dicts = False
     base_grid.map_items = False
-    base_grid.emb_size = [5, 10, 25, 50, 100]
+    base_grid.emb_size = [10, 25, 100]
     base_grid.recall_max = 1000
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = 2000
-    base_grid.training_steps = 100
+    base_grid.training_steps = 15000
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
-    base_grid.frequency = 5
+    base_grid.frequency = 1000
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/BERT/dictionaries"
     )

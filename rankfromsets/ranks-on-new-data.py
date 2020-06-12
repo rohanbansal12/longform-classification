@@ -18,7 +18,7 @@ import training.eval_util as eval_util
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
-from transformers import BertTokenizer
+from tokenizers import BertWordPieceTokenizer
 
 parser = argparse.ArgumentParser(description="Get Ranked Predictions on New Dataset.")
 arguments.add_data(parser)
@@ -45,7 +45,10 @@ print("Data Loaded")
 print("-------------------")
 
 # initialize tokenizer from BERT library
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+tokenizer = BertWordPieceTokenizer(
+    "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt", lowercase=True
+)
+# tokenizer = BertWordPieceTokenizer("/scratch/gpfs/altosaar/dat/longform-data/BERT/bert-base-uncased.txt", lowercase=True)
 print("Tokenizer Initialized!")
 
 # load dictionaries from path
@@ -58,9 +61,7 @@ print("-------------------")
 
 # map items to their dictionary values
 if args.map_items:
-    # tokenize data and split into words
-    raw_data.tokenize(tokenizer)
-    # map items to their ids in dictionaries and filter articles
+    # tokenizer and bmap items to their ids in dictionaries and filter articles
     proper_data = raw_data.map_items(
         tokenizer,
         final_word_ids,
