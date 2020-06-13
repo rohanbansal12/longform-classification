@@ -115,13 +115,15 @@ def save_ranked_df(output_path, version, df, word_embedding_type, word_count=0):
 def calculate_batched_predictions(
     batch, model, device,
 ):
+    model.eval()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
     publications = publications.to(device)
     articles = articles.to(device)
     word_attributes = word_attributes.to(device)
     attribute_offsets = attribute_offsets.to(device)
     logits = model(publications, articles, word_attributes, attribute_offsets)
-    return logits.cpu().numpy()
+    final_logits = logits.detach().cpu().numpy()
+    return final_logits
 
 
 def calculate_recall(
