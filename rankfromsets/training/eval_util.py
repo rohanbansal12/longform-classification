@@ -74,14 +74,11 @@ def calculate_predictions(
     return sorted_preds, indices
 
 
-def create_ranked_results_list(
-    final_word_ids, word_embedding_type, sorted_preds, indices, data
-):
-    df = pd.DataFrame(
-        columns=["title", "url", "text", "publication", "target_prediction"]
-    )
+def create_ranked_results_list(final_word_ids, sorted_preds, indices, data):
+    df = pd.DataFrame(columns=["title", "url", "text", "publication", "prediction"])
+    ranked_indices = indices[::-1]
     for i in range(0, 1500):
-        example = data[indices[i]]
+        example = data[ranked_indices[i]]
         prediction = sorted_preds[i].item()
         title = example["title"]
         unique_text = list(set(example["text"]))
@@ -113,3 +110,45 @@ def save_ranked_df(output_path, version, df, word_embedding_type, word_count=0):
         result_path = word_embedding_type + "-top-1500.csv"
     eval_folder_path = evaluation_results_path / result_path
     df.to_csv(eval_folder_path, index=False)
+
+
+def calculate_batched_predictions(
+    batch, model, device,
+):
+    publications, articles, word_attributes, attribute_offsets, real_labels = batch
+    publications = publications.to(device)
+    articles = articles.to(device)
+    word_attributes = word_attributes.to(device)
+    attribute_offsets = attribute_offsets.to(device)
+    logits = model(publications, articles, word_attributes, attribute_offsets)
+    return logits.cpu().numpy()
+
+
+def calculate_recall(
+    dataset,
+    predictions,
+    indices,
+    recall_value,
+    target_publication,
+    version,
+    writer,
+    step,
+):
+    top_preds = predictions[-recall_value:]
+    top_indices = indices[-recall_value:]
+    correct_10 = 0
+    correct_big = 0
+    for i in range(recall_value):
+        if dataset[top_indices[i]]["model_publication"] == target_publication:
+            if i < 10:
+                correct_10 += 1
+            correct_big += 1
+    print(f"{version} Performance: Step - {step}")
+    print(f"Top 10: {correct_10} / 10 or {correct_10*10} %")
+    print(
+        f"Top {str(recall_value)}: {correct_big} / {str(recall_value)} or {(correct_big*100)/recall_value} %"
+    )
+    print("--------------------")
+    writer.add_scalar(f"{version}/Top-10", correct_10, step)
+    writer.add_scalar(f"{version}/Top-{recall_value}", correct_big, step)
+    return correct_big
