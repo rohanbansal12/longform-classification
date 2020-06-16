@@ -30,6 +30,7 @@ def create_full_batch(data_loader, device):
     )
 
 
+@torch.no_grad()
 def calculate_predictions(
     loader,
     model,
@@ -112,36 +113,30 @@ def save_ranked_df(output_path, version, df, word_embedding_type, word_count=0):
     df.to_csv(eval_folder_path, index=False)
 
 
-def calculate_batched_predictions(
-    batch, model, device,
-):
+@torch.no_grad()
+def calculate_batched_predictions(batch, model, device, target):
     model.eval()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
-    publications = publications.to(device)
+    publication_set = [target] * len(real_labels)
+    publication_set = torch.tensor(publication_set, dtype=torch.long)
+    publication_set = publication_set.to(device)
     articles = articles.to(device)
     word_attributes = word_attributes.to(device)
     attribute_offsets = attribute_offsets.to(device)
-    logits = model(publications, articles, word_attributes, attribute_offsets)
-    final_logits = logits.detach().cpu().numpy()
+    logits = model(publication_set, articles, word_attributes, attribute_offsets)
+    final_logits = logits.cpu().numpy()
     return final_logits
 
 
+@torch.no_grad()
 def calculate_recall(
-    dataset,
-    predictions,
-    indices,
-    recall_value,
-    target_publication,
-    version,
-    writer,
-    step,
+    dataset, indices, recall_value, target_publication, version, writer, step,
 ):
-    top_preds = predictions[-recall_value:]
-    top_indices = indices[-recall_value:]
+    rev_indices = indices[::-1]
     correct_10 = 0
     correct_big = 0
     for i in range(recall_value):
-        if dataset[top_indices[i]]["model_publication"] == target_publication:
+        if dataset[rev_indices[i]]["model_publication"] == target_publication:
             if i < 10:
                 correct_10 += 1
             correct_big += 1

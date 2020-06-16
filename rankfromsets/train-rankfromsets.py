@@ -254,9 +254,9 @@ for step, batch in enumerate(cycle(train_loader)):
         logit_list = []
         for batch in tqdm(eval_loader):
             current_logits = eval_util.calculate_batched_predictions(
-                batch, model, device
+                batch, model, device, args.target_publication
             )
-            logit_list = logit_list + current_logits
+            logit_list = logit_list + list(current_logits)
         print(len(eval_data))
         print(len(logit_list))
         converted_list = np.array(logit_list)
@@ -264,7 +264,6 @@ for step, batch in enumerate(cycle(train_loader)):
         indices = np.argsort(converted_list)
         calc_recall = eval_util.calculate_recall(
             eval_data,
-            sorted_preds,
             indices,
             args.recall_max,
             args.target_publication,
@@ -317,20 +316,15 @@ for step, batch in enumerate(cycle(train_loader)):
 # get final evaluation results and create a basic csv of top articles
 eval_logit_list = []
 for batch in tqdm(eval_loader):
-    current_logits = eval_util.calculate_batched_predictions(batch, model, device)
+    current_logits = eval_util.calculate_batched_predictions(
+        batch, model, device, args.target_publication
+    )
     eval_logit_list = eval_logit_list + current_logits
 converted_list = np.array(eval_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
 calc_recall = eval_util.calculate_recall(
-    eval_data,
-    sorted_preds,
-    indices,
-    args.recall_max,
-    args.target_publication,
-    "Eval",
-    writer,
-    step,
+    eval_data, indices, args.recall_max, args.target_publication, "Eval", writer, step,
 )
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, eval_data
@@ -340,20 +334,15 @@ eval_util.save_ranked_df(output_path, "evaluation", ranked_df, args.word_embeddi
 # get final test results and create a basic csv of top articles
 test_logit_list = []
 for batch in tqdm(eval_loader):
-    current_logits = eval_util.calculate_batched_predictions(batch, model, device)
+    current_logits = eval_util.calculate_batched_predictions(
+        batch, model, device, args.target_publication
+    )
     test_logit_list = test_logit_list + current_logits
 converted_list = np.array(test_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
 calc_recall = eval_util.calculate_recall(
-    eval_data,
-    sorted_preds,
-    indices,
-    args.recall_max,
-    args.target_publication,
-    "Test",
-    writer,
-    step,
+    eval_data, indices, args.recall_max, args.target_publication, "Test", writer, step,
 )
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, eval_data
