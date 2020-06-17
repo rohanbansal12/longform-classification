@@ -297,11 +297,13 @@ for step, batch in enumerate(cycle(train_loader)):
     running_loss = 0.0
     optimizer.zero_grad()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
-    publications = publications.to(device)
+    publication_set = [args.target_publication] * len(real_labels)
+    publication_set = torch.tensor(publication_set, dtype=torch.long)
+    publication_set = publication_set.to(device)
     articles = articles.to(device)
     word_attributes = word_attributes.to(device)
     attribute_offsets = attribute_offsets.to(device)
-    logits = model(publications, articles, word_attributes, attribute_offsets)
+    logits = model(publication_set, articles, word_attributes, attribute_offsets)
     L = loss(logits, labels)
     L.backward()
     optimizer.step()
