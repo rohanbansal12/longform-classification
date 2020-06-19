@@ -247,14 +247,16 @@ print("--------------------")
 
 # training loop with validation checks
 for step, batch in enumerate(cycle(train_loader)):
-    writer.add_scalar("Loss/train", running_loss / 100, step)
-    print(f"Training Loss: {running_loss/100}")
     # calculate test and evaluation performance based on user intended frequency
     if step % args.frequency == 0 and step != args.training_steps:
+        # output loss
+        writer.add_scalar("Loss/train", running_loss / args.frequency, step)
+        print(f"Training Loss: {running_loss/args.frequency}")
+
         logit_list = []
-        for batch in tqdm(eval_loader):
+        for eval_batch in tqdm(eval_loader):
             current_logits = eval_util.calculate_batched_predictions(
-                batch, model, device, args.target_publication
+                eval_batch, model, device, args.target_publication
             )
             logit_list = logit_list + list(current_logits)
         print(len(eval_data))
@@ -292,6 +294,7 @@ for step, batch in enumerate(cycle(train_loader)):
             ):
                 print("Validation Recall Decreased For Two Successive Iterations!")
                 break
+
     # turn to training mode and calculate loss for backpropagation
     model.train()
     running_loss = 0.0
