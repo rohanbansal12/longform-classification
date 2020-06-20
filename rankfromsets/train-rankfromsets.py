@@ -9,18 +9,19 @@ import time
 import torch.nn as nn
 import os
 import argparse
-import arguments.train_arguments as arguments
-from data_processing.articles import Articles
-from models.models import InnerProduct
-import data_processing.dictionaries as dictionary
-import sampling.sampler_util as sampler_util
-import training.eval_util as eval_util
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 from tokenizers import BertWordPieceTokenizer
 import random
 from tqdm import tqdm
+import numpy as np
+import arguments.train_arguments as arguments
+from data_processing.articles import Articles
+from models.models import InnerProduct
+import data_processing.dictionaries as dictionary
+import sampling.sampler_util as sampler_util
+import training.eval_util as eval_util
 
 parser = argparse.ArgumentParser(
     description="Train model on article data and test evaluation"
@@ -59,10 +60,15 @@ eval_data = Articles(eval_path)
 print("Data Loaded")
 
 # initialize tokenizer from BERT library
+"""
 tokenizer = BertWordPieceTokenizer(
     "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt", lowercase=True
 )
-# tokenizer = BertWordPieceTokenizer("/scratch/gpfs/altosaar/dat/longform-data/BERT/bert-base-uncased.txt", lowercase=True)
+"""
+tokenizer = BertWordPieceTokenizer(
+    "/scratch/gpfs/altosaar/dat/longform-data/rankfromsets/bert-base-uncased.txt",
+    lowercase=True,
+)
 print("Tokenizer Initialized!")
 
 # create and save or load dictionaries based on arguments
@@ -276,21 +282,22 @@ for step, batch in enumerate(cycle(train_loader)):
         validation_recall_list.append(calc_recall)
 
         # save model for easy reloading
-        model_path = output_path / "model"
-        if not model_path.is_dir():
-            model_path.mkdir()
-        model_string = str(step) + args.word_embedding_type + "-inner-product-model.pt"
-        model_path = model_path / model_string
-        torch.save(model.state_dict(), model_path)
+        if max(validation_recall_list) == validation_recall_list[-1]:
+            model_path = output_path / "model"
+            if not model_path.is_dir():
+                model_path.mkdir()
+            model_string = (
+                str(step) + args.word_embedding_type + "-inner-product-model.pt"
+            )
+            model_path = model_path / model_string
+            torch.save(model.state_dict(), model_path)
 
-        # check if validation loss is decreasing
-        if len(validation_recall_list) > 4:
+        # check if validation recall is increasing
+        if len(validation_recall_list) > 3:
             full_length = len(validation_recall_list)
             if (
-                validation_recall_list[full_length - 1]
-                < validation_recall_list[full_length - 3]
-                and validation_recall_list[full_length - 2]
-                < validation_recall_list[full_length - 3]
+                validation_recall_list[-1] < validation_recall_list[-3]
+                and validation_recall_list[-2] < validation_recall_list[-3]
             ):
                 print("Validation Recall Decreased For Two Successive Iterations!")
                 break
@@ -317,6 +324,26 @@ for step, batch in enumerate(cycle(train_loader)):
         print("Getting Final Evaluation Results")
         print("--------------------")
         break
+
+# load best model for final performance metrics and data saving
+proper_step_model = (
+    str(np.argmax(validation_recall_list) * args.frequency)
+    + args.word_embedding_type
+    + "-inner-product-model.pt"
+)
+abs_model_path = output_path / "model" / proper_step_model
+kwargs = dict(
+    n_publications=len(final_publication_ids),
+    n_articles=len(final_url_ids),
+    n_attributes=len(final_word_ids),
+    emb_size=args.emb_size,
+    sparse=args.use_sparse,
+    use_article_emb=args.use_article_emb,
+    mode=args.word_embedding_type,
+)
+model = InnerProduct(**kwargs)
+model.load_state_dict(torch.load(abs_model_path))
+model.to(device)
 
 # get final evaluation results and create a basic csv of top articles
 eval_logit_list = []
