@@ -331,6 +331,8 @@ proper_step_model = (
     + args.word_embedding_type
     + "-inner-product-model.pt"
 )
+
+writer.add_scalar("Peaked Steps", np.argmax(validation_recall_list) * args.frequency)
 abs_model_path = output_path / "model" / proper_step_model
 kwargs = dict(
     n_publications=len(final_publication_ids),
@@ -351,7 +353,7 @@ for batch in tqdm(eval_loader):
     current_logits = eval_util.calculate_batched_predictions(
         batch, model, device, args.target_publication
     )
-    eval_logit_list = eval_logit_list + current_logits
+    eval_logit_list = eval_logit_list + list(current_logits)
 converted_list = np.array(eval_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
@@ -369,7 +371,7 @@ for batch in tqdm(eval_loader):
     current_logits = eval_util.calculate_batched_predictions(
         batch, model, device, args.target_publication
     )
-    test_logit_list = test_logit_list + current_logits
+    test_logit_list = test_logit_list + list(current_logits)
 converted_list = np.array(test_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
