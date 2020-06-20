@@ -257,8 +257,8 @@ for step, batch in enumerate(cycle(train_loader)):
     if step % args.frequency == 0 and step != args.training_steps:
         # output loss
         writer.add_scalar("Loss/train", running_loss / args.frequency, step)
+        running_loss = 0.0
         print(f"Training Loss: {running_loss/args.frequency}")
-
         logit_list = []
         for eval_batch in tqdm(eval_loader):
             current_logits = eval_util.calculate_batched_predictions(
@@ -304,7 +304,6 @@ for step, batch in enumerate(cycle(train_loader)):
 
     # turn to training mode and calculate loss for backpropagation
     model.train()
-    running_loss = 0.0
     optimizer.zero_grad()
     publications, articles, word_attributes, attribute_offsets, real_labels = batch
     publication_set = [args.target_publication] * len(real_labels)
@@ -319,7 +318,7 @@ for step, batch in enumerate(cycle(train_loader)):
     optimizer.step()
     running_loss += L.item()
     if step != 0 and step % args.training_steps == 0:
-        writer.add_scalar("Loss/train", running_loss / 100, step)
+        writer.add_scalar("Loss/train", running_loss / args.frequency, step)
         print(f"Training Loss: {running_loss/100}")
         print("Getting Final Evaluation Results")
         print("--------------------")
