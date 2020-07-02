@@ -13,7 +13,12 @@ from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 from tokenizers import BertWordPieceTokenizer
-from transformers import BertForSequenceClassification, BertConfig, AdamW
+from transformers import (
+    BertForSequenceClassification,
+    BertConfig,
+    AdamW,
+    get_linear_schedule_with_warmup,
+)
 import random
 from tqdm import tqdm
 import numpy as np
@@ -170,7 +175,7 @@ def cycle(iterable):
 
 model = BertForSequenceClassification.from_pretrained(
     "bert-base-uncased",  # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels=2,  # The number of output labels--2 for binary classification.
+    num_labels=1,  # The number of output labels (1 for a single probability)
     output_attentions=False,  # Whether the model returns attentions weights.
     output_hidden_states=False,  # Whether the model returns all hidden-states.
 )
@@ -182,8 +187,15 @@ if not model_path.is_dir():
 config_file = model_path / "config.json"
 model.config.to_json_file(config_file)
 
+positive_step_iteration = 20000 // (args.batch_size / 2)
+
 loss = torch.nn.BCEWithLogitsLoss()
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.learning_rate)
+scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=positive_step_iteration,  # Default value in run_glue.py
+    num_training_steps=(11 * positive_step_iteration),
+)
 print(model)
 print(optimizer)
 model.train()  # turn on training mode
