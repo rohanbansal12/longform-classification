@@ -68,7 +68,7 @@ def add_data(parser):
         help="Designate target publication.",
     )
     parser.add_argument(
-        "--tokenizer_file", type=expand_path, help="Designate tokenizer source file.",
+        "--tokenizer_file", type=str, help="Designate tokenizer source file.",
     )
 
 

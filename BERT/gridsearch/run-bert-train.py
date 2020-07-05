@@ -44,9 +44,10 @@ if __name__ == "__main__":
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
     )
-    base_grid.tokenizer_file = pathlib.Path(
+    base_grid.tokenizer_file = (
         "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt"
     )
+
     # RMS with all words
     grid = copy.deepcopy(base_grid)
     grid["learning_rate"] = [2e-5, 3e-5, 4e-5, 5e-5]

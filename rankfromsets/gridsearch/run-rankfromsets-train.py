@@ -49,7 +49,7 @@ if __name__ == "__main__":
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
     )
-    base_grid.tokenizer_file = pathlib.Path(
+    base_grid.tokenizer_file = (
         "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt"
     )
 

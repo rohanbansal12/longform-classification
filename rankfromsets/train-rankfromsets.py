@@ -354,7 +354,7 @@ calc_recall = eval_util.calculate_recall(
     eval_data, indices, args.recall_max, args.target_publication, "Eval", writer, step,
 )
 ranked_df = eval_util.create_ranked_results_list(
-    final_word_ids, sorted_preds, indices, eval_data
+    final_word_ids, sorted_preds, indices, eval_data, tokenizer
 )
 eval_util.save_ranked_df(output_path, "evaluation", ranked_df, args.word_embedding_type)
 
@@ -372,7 +372,7 @@ calc_recall = eval_util.calculate_recall(
     eval_data, indices, args.recall_max, args.target_publication, "Test", writer, step,
 )
 ranked_df = eval_util.create_ranked_results_list(
-    final_word_ids, sorted_preds, indices, eval_data
+    final_word_ids, sorted_preds, indices, eval_data, tokenizer
 )
 eval_util.save_ranked_df(output_path, "test", ranked_df, args.word_embedding_type)
 
