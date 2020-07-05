@@ -60,15 +60,7 @@ eval_data = Articles(eval_path)
 print("Data Loaded")
 
 # initialize tokenizer from BERT library
-"""
-tokenizer = BertWordPieceTokenizer(
-    "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt", lowercase=True
-)
-"""
-tokenizer = BertWordPieceTokenizer(
-    "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt",
-    lowercase=True,
-)
+tokenizer = BertWordPieceTokenizer(args.tokenizer_file, lowercase=True)
 print("Tokenizer Initialized!")
 
 # create and save or load dictionaries based on arguments
@@ -77,7 +69,9 @@ if args.create_dicts:
         final_word_ids,
         final_url_ids,
         final_publication_ids,
-    ) = dictionary.create_merged_dictionaries(train_data.examples, "target")
+    ) = dictionary.create_merged_dictionaries(
+        train_data.examples, "target", args.tokenizer_file
+    )
     print("Dictionaries Created")
 
     dict_path = Path(args.data_dir) / "dictionaries"

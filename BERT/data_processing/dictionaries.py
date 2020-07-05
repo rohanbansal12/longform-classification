@@ -5,7 +5,7 @@ import errno
 import os
 
 # function to create dictionaries for words and urls for all datasets at once
-def create_merged_dictionaries(all_examples, target_publication):
+def create_merged_dictionaries(all_examples, target_publication, wordListPath):
     url_counter = collections.Counter()
     publication_counter = collections.Counter()
     urls = []
@@ -24,7 +24,9 @@ def create_merged_dictionaries(all_examples, target_publication):
     }
     article_to_id.update({"miscellaneous": len(article_to_id)})
     publication_to_id.update({"miscellaneous": len(publication_to_id)})
-    word_id_list = {}
+    with open(wordListPath, encoding="utf-8") as f:
+        wordList = [line.rstrip() for line in f.readlines()]
+    word_id_list = {word: id for id, word in enumerate(wordList)}
     return word_id_list, article_to_id, publication_to_id
 
 
