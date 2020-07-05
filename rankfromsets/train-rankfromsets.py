@@ -66,7 +66,7 @@ tokenizer = BertWordPieceTokenizer(
 )
 """
 tokenizer = BertWordPieceTokenizer(
-    "/scratch/gpfs/altosaar/dat/longform-data/rankfromsets/bert-base-uncased.txt",
+    "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt",
     lowercase=True,
 )
 """
