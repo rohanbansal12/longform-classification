@@ -101,5 +101,8 @@ def add_optimization(parser):
         "--learning_rate", type=float, default=1e-4, help="Set optimizer learning rate"
     )
     parser.add_argument(
-        "--momentum", type=float, default=0.9, help="Set optimizer momentum."
+        "--clip_grad",
+        type=str2bool,
+        default=True,
+        help="Turn on gradient clipping to prevent exploding gradient problem",
     )

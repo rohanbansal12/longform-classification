@@ -187,10 +187,13 @@ if not model_path.is_dir():
 config_file = model_path / "config.json"
 model.config.to_json_file(config_file)
 
-positive_step_iteration = 20000 // (args.batch_size / 2)
+positive_step_iteration = int(20000 // (args.batch_size / 2))
+
+if 20000 % (args.batch_size / 2) != 0:
+    positive_step_iteration += 1
 
 loss = torch.nn.BCEWithLogitsLoss()
-optimizer = torch.optim.AdamW(params=model.parameters(), lr=args.learning_rate)
+optimizer = AdamW(params=model.parameters(), lr=args.learning_rate)
 scheduler = get_linear_schedule_with_warmup(
     optimizer,
     num_warmup_steps=positive_step_iteration,  # Default value in run_glue.py
@@ -266,7 +269,10 @@ for step, batch in enumerate(cycle(train_loader)):
     logits = model(word_attributes, attention_masks)
     L = loss(logits, labels)
     L.backward()
+    if args.clip_grad:
+        nn.utils.clip_grad_norm_(model.parameters(), 1.0)
     optimizer.step()
+    scheduler.step()
     running_loss += L.item()
     if step != 0 and step % args.training_steps == 0:
         writer.add_scalar("Loss/train", running_loss / args.frequency, step)

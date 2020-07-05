@@ -60,7 +60,7 @@ eval_data = Articles(eval_path)
 print("Data Loaded")
 
 # initialize tokenizer from BERT library
-"""
+
 tokenizer = BertWordPieceTokenizer(
     "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt", lowercase=True
 )
@@ -69,6 +69,7 @@ tokenizer = BertWordPieceTokenizer(
     "/scratch/gpfs/altosaar/dat/longform-data/rankfromsets/bert-base-uncased.txt",
     lowercase=True,
 )
+"""
 print("Tokenizer Initialized!")
 
 # create and save or load dictionaries based on arguments
