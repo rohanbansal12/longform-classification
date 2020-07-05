@@ -25,7 +25,7 @@ def get_slurm_script_gpu(output_dir, command):
 
 if __name__ == "__main__":
     commands = [
-        "PYTHONPATH=. python train-BERT.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/rankfromsets/combined-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/rankfromsets/combined-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/rankfromsets/combined-data/evaluation.json "
+        "PYTHONPATH=. python train-BERT.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/evaluation.json "
     ]
 
     experiment_name = "news-inner-product"
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     base_grid.use_gpu = True
     base_grid.frequency = 1000
     base_grid.dict_dir = pathlib.Path(
-        "/scratch/gpfs/altosaar/dat/longform-data/rankfromsets/dictionaries"
+        "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
     )
 
     # RMS with all words
