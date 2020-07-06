@@ -4,7 +4,8 @@ import torch
 
 # add special_tokens and generate attention masks for an input
 def prepare_input(ids):
-    altered = ids.insert(0, 101)
+    altered = ids
+    altered.insert(0, 101)
     altered.append(102)
     zeroes_to_add = 512 - len(altered)
     if zeroes_to_add > 0:
