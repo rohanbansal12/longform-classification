@@ -4,7 +4,7 @@ from scipy.sparse import csr_matrix
 import sys
 
 sys.path.append(
-    "/users/rohan/news-classification/ranking-featured-writing/bert-approach"
+    "/users/rohan/news-classification/ranking-featured-writing/rankfromsets"
 )
 import os
 import argparse
@@ -75,6 +75,10 @@ parser.add_argument(
     "--data_path", type=expand_path, required=True, help="Location to actual json data."
 )
 
+parser.add_argument(
+    "--tokenizer_file", type=str, help="Designate tokenizer source file.",
+)
+
 args = parser.parse_args()
 
 
@@ -90,10 +94,7 @@ print("Dictionaries loaded.")
 if args.map_items:
 
     # initialize tokenizer from BERT library
-    tokenizer = BertWordPieceTokenizer(
-        "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt",
-        lowercase=True,
-    )
+    tokenizer = BertWordPieceTokenizer(args.tokenizer_file, lowercase=True,)
     print("Tokenizer Initialized!")
 
     dataset = Articles(data_path)
