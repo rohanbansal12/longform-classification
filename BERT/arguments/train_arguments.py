@@ -109,3 +109,9 @@ def add_optimization(parser):
         default=True,
         help="Turn on gradient clipping to prevent exploding gradient problem",
     )
+
+
+def add_model(parser):
+    parser.add_argument(
+        "--model_path", type=str, help="Path to pretrained model weights."
+    )

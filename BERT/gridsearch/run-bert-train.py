@@ -47,6 +47,7 @@ if __name__ == "__main__":
     base_grid.tokenizer_file = (
         "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt"
     )
+    base_grid.model_path = "/scratch/gpfs/altosaar/dat/longform-data/BERT/model"
 
     # RMS with all words
     grid = copy.deepcopy(base_grid)

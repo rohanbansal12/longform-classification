@@ -35,6 +35,7 @@ parser = argparse.ArgumentParser(
 arguments.add_data(parser)
 arguments.add_training(parser)
 arguments.add_optimization(parser)
+arguments.add_model(parser)
 args = parser.parse_args()
 
 # set device
@@ -166,12 +167,7 @@ def cycle(iterable):
             yield x
 
 
-model = BertForSequenceClassification.from_pretrained(
-    "bert-base-uncased",  # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels=1,  # The number of output labels (1 for a single probability)
-    output_attentions=False,  # Whether the model returns attentions weights.
-    output_hidden_states=False,  # Whether the model returns all hidden-states.
-)
+model = BertForSequenceClassification.from_pretrained(args.model_path)
 model.to(device)
 
 model_path = output_path / "model"
