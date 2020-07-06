@@ -34,7 +34,6 @@ def collate_fn(examples):
         word_subsets.append((len(example["text"]) // 510) + 1)
         labels.append(example["model_publication"])
     word_attributes = torch.tensor(words, dtype=torch.long)
-    articles = torch.tensor(articles, dtype=torch.long)
     word_subsets.insert(0, 0)
     word_subset_counts = torch.tensor(np.cumsum(word_subsets), dytpe=torch.long)
     real_labels = torch.tensor(labels, dtype=torch.long)
