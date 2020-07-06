@@ -34,7 +34,6 @@ parser = argparse.ArgumentParser(
 )
 arguments.add_data(parser)
 arguments.add_training(parser)
-arguments.add_model(parser)
 arguments.add_optimization(parser)
 args = parser.parse_args()
 
