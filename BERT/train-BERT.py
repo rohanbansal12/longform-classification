@@ -51,7 +51,7 @@ print(f"Device: {device}")
 output_path = Path(args.output_dir)
 
 # tensboard log and graph output folder declaration
-log_tensorboard_dir = output_path / "runs" / args.word_embedding_type
+log_tensorboard_dir = output_path / "runs" / "BERT"
 writer = SummaryWriter(log_tensorboard_dir)
 
 # load datasets
