@@ -85,7 +85,7 @@ def create_ranked_results_list(final_word_ids, sorted_preds, indices, data, toke
         text = tokenizer.decode(example["text"])
         url = example["link"]
         publication = example["publication"]
-        df.loc[i] = [title, url, unique_text, publication, prediction]
+        df.loc[i] = [title, url, text, publication, prediction]
     return df
 
 
