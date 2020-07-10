@@ -153,10 +153,10 @@ train_loader = torch.utils.data.DataLoader(
     pin_memory=pin_mem,
 )
 eval_loader = torch.utils.data.DataLoader(
-    eval_data, batch_size=10000, collate_fn=collate_fn, pin_memory=pin_mem
+    eval_data, batch_size=5000, collate_fn=collate_fn, pin_memory=pin_mem
 )
 test_loader = torch.utils.data.DataLoader(
-    test_data, batch_size=10000, collate_fn=collate_fn, pin_memory=pin_mem
+    test_data, batch_size=5000, collate_fn=collate_fn, pin_memory=pin_mem
 )
 
 
