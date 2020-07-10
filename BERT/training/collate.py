@@ -10,6 +10,7 @@ def prepare_input(ids):
     zeroes_to_add = 512 - len(altered)
     if zeroes_to_add > 0:
         altered += [0] * zeroes_to_add
+    altered = np.array(altered)
     altered_mask = np.where(altered != 0, 1, 0)
     return altered, altered_mask
 
@@ -35,7 +36,7 @@ def collate_fn(examples):
         labels.append(example["model_publication"])
     word_attributes = torch.tensor(words, dtype=torch.long)
     word_subsets.insert(0, 0)
-    word_subset_counts = torch.tensor(np.cumsum(word_subsets), dytpe=torch.long)
+    word_subset_counts = torch.tensor(np.cumsum(word_subsets), dtype=torch.long)
     real_labels = torch.tensor(labels, dtype=torch.long)
     attention_masks = torch.tensor(masks, dtype=torch.long)
-    return (word_attributes, attention_masks, real_labels)
+    return (word_attributes, attention_masks, word_subset_counts, real_labels)
