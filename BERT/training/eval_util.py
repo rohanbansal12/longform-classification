@@ -46,7 +46,7 @@ def calculate_batched_predictions(batch, model, device, target):
     word_attributes, attention_masks, word_subset_counts, real_labels = batch
     word_attributes = word_attributes.to(device)
     attention_masks = attention_masks.to(device)
-    logits = model(word_attributes, attention_mask=attention_masks)
+    logits = model(word_attributes, attention_mask=attention_masks)[0]
     final_logits = logits.cpu().numpy()
     return final_logits
 

@@ -153,10 +153,16 @@ train_loader = torch.utils.data.DataLoader(
     pin_memory=pin_mem,
 )
 eval_loader = torch.utils.data.DataLoader(
-    eval_data, batch_size=5000, collate_fn=collate_fn, pin_memory=pin_mem
+    eval_data,
+    batch_size=args.eval_batch_size,
+    collate_fn=collate_fn,
+    pin_memory=pin_mem,
 )
 test_loader = torch.utils.data.DataLoader(
-    test_data, batch_size=5000, collate_fn=collate_fn, pin_memory=pin_mem
+    test_data,
+    batch_size=args.eval_batch_size,
+    collate_fn=collate_fn,
+    pin_memory=pin_mem,
 )
 
 
@@ -217,6 +223,8 @@ for step, batch in enumerate(cycle(train_loader)):
                 eval_batch, model, device, args.target_publication
             )
             logit_list = logit_list + list(current_logits)
+            print(logit_list)
+            print("LENGTH: ", len(logit_list))
         print(len(eval_data))
         print(len(logit_list))
         converted_list = np.array(logit_list)

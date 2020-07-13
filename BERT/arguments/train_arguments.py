@@ -77,6 +77,9 @@ def add_training(parser):
         "--batch_size", type=int, default=32, help="Batch size for training"
     )
     parser.add_argument(
+        "--eval_batch_size", type=int, default=5000, help="Batch size for Evaluation"
+    )
+    parser.add_argument(
         "--use_gpu",
         type=str2bool,
         default=True,
