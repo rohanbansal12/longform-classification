@@ -62,7 +62,7 @@ eval_path = Path(args.eval_path)
 
 train_data = Articles(train_path)
 test_data = Articles(test_path)
-eval_data = Articles(eval_path)
+eval_data = Articles(eval_path, index_file=args.index_file_path)
 print("Data Loaded")
 
 # initialize tokenizer from BERT library
@@ -263,7 +263,8 @@ for step, batch in enumerate(cycle(train_loader)):
     word_attributes, attention_masks, word_subset_counts, real_labels = batch
     word_attributes = word_attributes.to(device)
     attention_masks = attention_masks.to(device)
-    logits = model(word_attributes, attention_masks)
+    logits = model(word_attributes, attention_masks)[0]
+    logits = torch.squeeze(logits)
     L = loss(logits, labels)
     L.backward()
     if args.clip_grad:

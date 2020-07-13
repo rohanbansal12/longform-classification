@@ -260,6 +260,7 @@ for step, batch in enumerate(cycle(train_loader)):
             )
             logit_list = logit_list + list(current_logits)
         print(len(eval_data))
+        print(logit_list)
         print(len(logit_list))
         converted_list = np.array(logit_list)
         sorted_preds = np.sort(converted_list)

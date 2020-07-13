@@ -5,6 +5,7 @@ import pathlib as Path
 import os
 import time
 from datetime import datetime
+import numpy as np
 
 
 def create_ranked_results_list(final_word_ids, sorted_preds, indices, data, tokenizer):
@@ -47,7 +48,7 @@ def calculate_batched_predictions(batch, model, device, target):
     word_attributes = word_attributes.to(device)
     attention_masks = attention_masks.to(device)
     logits = model(word_attributes, attention_mask=attention_masks)[0]
-    final_logits = logits.cpu().numpy()
+    final_logits = np.squeeze(logits.cpu().numpy())
     return final_logits
 
 
