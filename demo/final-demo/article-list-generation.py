@@ -221,6 +221,7 @@ sorted_word_indices = broadcasted_words_per_article.argsort(axis=1)
 return_articles = []
 
 raw_data = Articles(args.real_data_path)
+print(len(raw_data))
 id_to_word = {v: k for k, v in final_word_ids.items()}
 
 i = 0

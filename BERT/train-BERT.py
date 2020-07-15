@@ -223,10 +223,6 @@ for step, batch in enumerate(cycle(train_loader)):
                 eval_batch, model, device, args.target_publication
             )
             logit_list = logit_list + list(current_logits)
-            print(logit_list)
-            print("LENGTH: ", len(logit_list))
-        print(len(eval_data))
-        print(len(logit_list))
         converted_list = np.array(logit_list)
         sorted_preds = np.sort(converted_list)
         indices = np.argsort(converted_list)

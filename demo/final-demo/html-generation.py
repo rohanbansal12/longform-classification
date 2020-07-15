@@ -22,7 +22,7 @@ def expand_path(string):
 
 
 parser = argparse.ArgumentParser(
-    description="Train model on article data and test evaluation"
+    description="Generate default website demo html output for a specific dataset"
 )
 parser.add_argument(
     "--model_matrix_dir",
@@ -277,9 +277,9 @@ for idx, article in enumerate(ordered_return_articles):
     grand_html.append("</tr>")
 
 # save html to text file
-ending = str(args.dataset_name) + ".txt"
+ending = str(args.dataset_name) + "-table.html"
 final_html_path = args.html_output_dir / ending
 
 with open(final_html_path, "w", encoding="utf-8") as file:
     file.write("\n".join(grand_html))
-print("HTML default text saved!")
+print("HTML default table saved!")

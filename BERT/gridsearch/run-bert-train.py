@@ -41,6 +41,7 @@ if __name__ == "__main__":
     base_grid.training_steps = 13750
     base_grid.use_gpu = True
     base_grid.frequency = 1000
+    base_grid.eval_batch_size = 300
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
     )
@@ -48,6 +49,9 @@ if __name__ == "__main__":
         "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt"
     )
     base_grid.model_path = "/scratch/gpfs/altosaar/dat/longform-data/BERT/model"
+    base_grid.index_file_path = (
+        "/scratch/gpfs/altosaar/dat/longform-data/BERT/eval_indices_list.txt"
+    )
 
     # RMS with all words
     grid = copy.deepcopy(base_grid)
