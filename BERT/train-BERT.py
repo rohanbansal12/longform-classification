@@ -216,8 +216,8 @@ for step, batch in enumerate(cycle(train_loader)):
     if step % args.frequency == 0 and step != args.training_steps:
         # output loss
         writer.add_scalar("Loss/train", running_loss / args.frequency, step)
-        running_loss = 0.0
         print(f"Training Loss: {running_loss/args.frequency}")
+        running_loss = 0.0
         logit_list = []
         for eval_batch in tqdm(eval_loader):
             current_logits = eval_util.calculate_batched_predictions(
@@ -241,8 +241,8 @@ for step, batch in enumerate(cycle(train_loader)):
         # save model for easy reloading
         if max(validation_recall_list) == validation_recall_list[-1]:
             model_string = str(step) + "-bert-model.pt"
-            model_path = model_path / model_string
-            torch.save(model.state_dict(), model_path)
+            current_model_path = model_path / model_string
+            torch.save(model.state_dict(), current_model_path)
 
         # check if validation recall is increasing
         if len(validation_recall_list) > 3:
@@ -268,6 +268,7 @@ for step, batch in enumerate(cycle(train_loader)):
     optimizer.step()
     scheduler.step()
     running_loss += L.item()
+    print(f"Step: {step}, Batch Loss: {L.item()}")
     if step != 0 and step % args.training_steps == 0:
         writer.add_scalar("Loss/train", running_loss / args.frequency, step)
         print(f"Training Loss: {running_loss/100}")

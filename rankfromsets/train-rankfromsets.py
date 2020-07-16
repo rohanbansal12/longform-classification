@@ -251,8 +251,8 @@ for step, batch in enumerate(cycle(train_loader)):
     if step % args.frequency == 0 and step != args.training_steps:
         # output loss
         writer.add_scalar("Loss/train", running_loss / args.frequency, step)
-        running_loss = 0.0
         print(f"Training Loss: {running_loss/args.frequency}")
+        running_loss = 0.0
         logit_list = []
         for eval_batch in tqdm(eval_loader):
             current_logits = eval_util.calculate_batched_predictions(
