@@ -211,49 +211,49 @@ print("--------------------")
 
 # training loop with validation checks
 for step, batch in enumerate(cycle(train_loader)):
-    """    
-    # calculate test and evaluation performance based on user intended frequency
-        if step % args.frequency == 0 and step != args.training_steps:
-            # output loss
-            writer.add_scalar("Loss/train", running_loss / args.frequency, step)
-            running_loss = 0.0
-            print(f"Training Loss: {running_loss/args.frequency}")
-            logit_list = []
-            for eval_batch in tqdm(eval_loader):
-                current_logits = eval_util.calculate_batched_predictions(
-                    eval_batch, model, device, args.target_publication
-                )
-                logit_list = logit_list + list(current_logits)
-            converted_list = np.array(logit_list)
-            sorted_preds = np.sort(converted_list)
-            indices = np.argsort(converted_list)
-            calc_recall = eval_util.calculate_recall(
-                eval_data,
-                indices,
-                args.recall_max,
-                args.target_publication,
-                "Eval",
-                writer,
-                step,
-            )
-            validation_recall_list.append(calc_recall)
-            model.train()
-            # save model for easy reloading
-            if max(validation_recall_list) == validation_recall_list[-1]:
-                model_string = str(step) + "-bert-model.pt"
-                model_path = model_path / model_string
-                torch.save(model.state_dict(), model_path)
 
-            # check if validation recall is increasing
-            if len(validation_recall_list) > 3:
-                full_length = len(validation_recall_list)
-                if (
-                    validation_recall_list[-1] < validation_recall_list[-3]
-                    and validation_recall_list[-2] < validation_recall_list[-3]
-                ):
-                    print("Validation Recall Decreased For Two Successive Iterations!")
-                    break
-    """
+    # calculate test and evaluation performance based on user intended frequency
+    if step % args.frequency == 0 and step != args.training_steps:
+        # output loss
+        writer.add_scalar("Loss/train", running_loss / args.frequency, step)
+        running_loss = 0.0
+        print(f"Training Loss: {running_loss/args.frequency}")
+        logit_list = []
+        for eval_batch in tqdm(eval_loader):
+            current_logits = eval_util.calculate_batched_predictions(
+                eval_batch, model, device, args.target_publication
+            )
+            logit_list = logit_list + list(current_logits)
+        converted_list = np.array(logit_list)
+        sorted_preds = np.sort(converted_list)
+        indices = np.argsort(converted_list)
+        calc_recall = eval_util.calculate_recall(
+            eval_data,
+            indices,
+            args.recall_max,
+            args.target_publication,
+            "Eval",
+            writer,
+            step,
+        )
+        validation_recall_list.append(calc_recall)
+        model.train()
+        # save model for easy reloading
+        if max(validation_recall_list) == validation_recall_list[-1]:
+            model_string = str(step) + "-bert-model.pt"
+            model_path = model_path / model_string
+            torch.save(model.state_dict(), model_path)
+
+        # check if validation recall is increasing
+        if len(validation_recall_list) > 3:
+            full_length = len(validation_recall_list)
+            if (
+                validation_recall_list[-1] < validation_recall_list[-3]
+                and validation_recall_list[-2] < validation_recall_list[-3]
+            ):
+                print("Validation Recall Decreased For Two Successive Iterations!")
+                break
+
     # turn to training mode and calculate loss for backpropagation
     optimizer.zero_grad()
     word_attributes, attention_masks, word_subset_counts, real_labels = batch
