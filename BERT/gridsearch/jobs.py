@@ -15,7 +15,7 @@ def get_keys_for_dir_name(grid):
 
 def make_output_dir(log_dir, experiment_name, cfg, keys):
     name = "_".join(["%s=%s" % (key, str(cfg[key])) for key in keys])
-    date = time.strftime("%Y-%m-%d") + "-rankfromsets"
+    date = time.strftime("%Y-%m-%d") + "-BERT"
     output_dir = log_dir / date / experiment_name / name
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
