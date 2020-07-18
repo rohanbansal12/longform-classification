@@ -94,8 +94,14 @@ def add_training(parser):
     parser.add_argument(
         "--training_steps",
         type=int,
-        default=1000,
+        default=10000,
         help="Total Number Of Steps For Training",
+    )
+    parser.add_argument(
+        "--warmup_steps",
+        type=int,
+        default=1000,
+        help="Total Number Of Steps For Linear Learning Rate Warmup",
     )
     parser.add_argument(
         "--frequency",

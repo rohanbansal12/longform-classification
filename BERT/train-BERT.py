@@ -191,13 +191,13 @@ loss = torch.nn.BCEWithLogitsLoss()
 optimizer = AdamW(params=model.parameters(), lr=args.learning_rate)
 scheduler = get_linear_schedule_with_warmup(
     optimizer,
-    num_warmup_steps=steps_per_number_positive_labels,  # Default value in run_glue.py
-    num_training_steps=(11 * steps_per_number_positive_labels),
+    num_warmup_steps=args.warmup_steps,  # Default value in run_glue.py
+    num_training_steps=args.training_steps,
 )
 print(model)
 print(optimizer)
+print(scheduler)
 model.train()  # turn on training mode
-check = True
 running_loss = 0
 
 labels = torch.Tensor(
@@ -246,12 +246,12 @@ for step, batch in enumerate(cycle(train_loader)):
 
         # check if validation recall is increasing
         if len(validation_recall_list) > 3:
-            full_length = len(validation_recall_list)
             if (
-                validation_recall_list[-1] < validation_recall_list[-3]
+                validation_recall_list[-1] < validation_recall_list[-2]
                 and validation_recall_list[-2] < validation_recall_list[-3]
+                and validation_recall_list[-3] < validation_recall_list[-4]
             ):
-                print("Validation Recall Decreased For Two Successive Iterations!")
+                print("Validation Recall Decreased For Three Successive Iterations!")
                 break
 
     # turn to training mode and calculate loss for backpropagation
@@ -303,7 +303,7 @@ calc_recall = eval_util.calculate_recall(
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, eval_data, tokenizer
 )
-eval_util.save_ranked_df(output_path, "evaluation", ranked_df, args.word_embedding_type)
+eval_util.save_ranked_df(output_path, "evaluation", ranked_df)
 
 # get final test results and create a basic csv of top articles
 test_logit_list = []
@@ -321,7 +321,7 @@ calc_recall = eval_util.calculate_recall(
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, eval_data, tokenizer
 )
-eval_util.save_ranked_df(output_path, "test", ranked_df, args.word_embedding_type)
+eval_util.save_ranked_df(output_path, "test", ranked_df)
 
 # close writer and exit
 writer.close()
