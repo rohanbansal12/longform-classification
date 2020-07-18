@@ -25,7 +25,7 @@ def get_slurm_script_gpu(output_dir, command):
 
 if __name__ == "__main__":
     commands = [
-        "PYTHONPATH=. python train-BERT.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/evaluation.json "
+        "PYTHONPATH=. python train-BERT.py  --train_path /scratch/network/altosaar/dat/longform-data/main/combined-data/train.json --test_path /scratch/network/altosaar/dat/longform-data/main/combined-data/test.json --eval_path /scratch/network/altosaar/dat/longform-data/main/combined-data/evaluation.json "
     ]
 
     experiment_name = "news-inner-product"
@@ -43,14 +43,14 @@ if __name__ == "__main__":
     base_grid.frequency = 200
     base_grid.eval_batch_size = 600
     base_grid.dict_dir = pathlib.Path(
-        "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
+        "/scratch/network/altosaar/dat/longform-data/main/dictionaries"
     )
     base_grid.tokenizer_file = (
-        "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt"
+        "/scratch/network/altosaar/dat/longform-data/main/bert-base-uncased.txt"
     )
-    base_grid.model_path = "/scratch/gpfs/altosaar/dat/longform-data/BERT/model"
+    base_grid.model_path = "/scratch/network/altosaar/dat/longform-data/BERT/model"
     base_grid.index_file_path = (
-        "/scratch/gpfs/altosaar/dat/longform-data/BERT/eval_indices_list.txt"
+        "/scratch/network/altosaar/dat/longform-data/BERT/eval_indices_list.txt"
     )
 
     # 100 warmup steps
