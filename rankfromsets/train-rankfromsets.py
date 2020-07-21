@@ -52,7 +52,7 @@ writer = SummaryWriter(log_tensorboard_dir)
 # load datasets
 train_path = Path(args.train_path)
 test_path = Path(args.test_path)
-eval_path = Path(args.eval_path)
+eval_data = Articles(eval_path, index_file=args.index_file_path)
 
 train_data = Articles(train_path)
 test_data = Articles(test_path)

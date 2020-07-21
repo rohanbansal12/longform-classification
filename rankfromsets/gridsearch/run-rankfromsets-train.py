@@ -37,7 +37,7 @@ if __name__ == "__main__":
     base_grid.create_dicts = False
     base_grid.map_items = False
     base_grid.emb_size = [10, 25, 50, 100]
-    base_grid.recall_max = 1000
+    base_grid.recall_max = 100
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = 2000
@@ -45,12 +45,15 @@ if __name__ == "__main__":
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
-    base_grid.frequency = 100
+    base_grid.frequency = 50
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
     )
     base_grid.tokenizer_file = (
         "/scratch/gpfs/altosaar/dat/longform-data/main/bert-base-uncased.txt"
+    )
+    base_grid.index_file_path = (
+        "/scratch/gpfs/altosaar/dat/longform-data/BERT/eval_indices_list.txt"
     )
 
     # RMS with all words

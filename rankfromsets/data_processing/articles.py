@@ -6,10 +6,15 @@ import collections
 
 # define Articles dataset class for easy sampling, iteration, and weight creating
 class Articles(torch.utils.data.Dataset):
-    def __init__(self, json_file):
+    def __init__(self, json_file, index_file=None):
         super().__init__()
         with open(json_file, "r") as data_file:
             self.examples = json.loads(data_file.read())
+
+        if index_file is not None:
+            with open(index_file, "r") as file:
+                indices = [int(index.rstrip()) for index in file.readlines()]
+            self.examples = [self.examples[i] for i in indices]
 
     def __getitem__(self, idx):
         return self.examples[idx]
