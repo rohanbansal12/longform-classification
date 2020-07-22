@@ -307,7 +307,7 @@ eval_util.save_ranked_df(output_path, "evaluation", ranked_df)
 
 # get final test results and create a basic csv of top articles
 test_logit_list = []
-for batch in tqdm(eval_loader):
+for batch in tqdm(test_loader):
     current_logits = eval_util.calculate_batched_predictions(
         batch, model, device, args.target_publication
     )
@@ -316,10 +316,10 @@ converted_list = np.array(test_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
 calc_recall = eval_util.calculate_recall(
-    eval_data, indices, args.recall_max, args.target_publication, "Test", writer, step,
+    test_data, indices, args.recall_max, args.target_publication, "Test", writer, step,
 )
 ranked_df = eval_util.create_ranked_results_list(
-    final_word_ids, sorted_preds, indices, eval_data, tokenizer
+    final_word_ids, sorted_preds, indices, test_data, tokenizer
 )
 eval_util.save_ranked_df(output_path, "test", ranked_df)
 
