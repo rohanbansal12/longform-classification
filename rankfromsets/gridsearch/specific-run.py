@@ -40,12 +40,12 @@ if __name__ == "__main__":
     base_grid.recall_max = 100
     base_grid.tokenize = False
     base_grid.target_publication = 0
-    base_grid.batch_size = [50, 100, 500, 1000]
-    base_grid.training_steps = 5000
+    base_grid.batch_size = [100, 500, 1000, 2000]
+    base_grid.training_steps = 10000
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
-    base_grid.frequency = 20
+    base_grid.frequency = 25
     base_grid.word_embedding_type = "mean"
     base_grid.dict_dir = pathlib.Path(
         "/scratch/gpfs/altosaar/dat/longform-data/main/dictionaries"
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     grid = copy.deepcopy(base_grid)
     grid["optimizer_type"] = "RMS"
     grid["use_all_words"] = True
-    grid["learning_rate"] = [1e-4, 1e-5]
+    grid["learning_rate"] = [1e-3, 1e-4, 1e-5]
     keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
     keys_for_dir_name.insert(0, "optimizer_type")
     for cfg in jobs.param_grid(grid):
