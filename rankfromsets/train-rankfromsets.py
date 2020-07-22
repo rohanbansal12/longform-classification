@@ -259,9 +259,6 @@ for step, batch in enumerate(cycle(train_loader)):
                 eval_batch, model, device, args.target_publication
             )
             logit_list = logit_list + list(current_logits)
-        print(len(eval_data))
-        print(logit_list)
-        print(len(logit_list))
         converted_list = np.array(logit_list)
         sorted_preds = np.sort(converted_list)
         indices = np.argsort(converted_list)
@@ -291,8 +288,9 @@ for step, batch in enumerate(cycle(train_loader)):
         if len(validation_recall_list) > 3:
             full_length = len(validation_recall_list)
             if (
-                validation_recall_list[-1] < validation_recall_list[-3]
+                validation_recall_list[-1] < validation_recall_list[-2]
                 and validation_recall_list[-2] < validation_recall_list[-3]
+                and validation_recall_list[-3] < validation_recall_list[-4]
             ):
                 print("Validation Recall Decreased For Two Successive Iterations!")
                 break
@@ -326,7 +324,9 @@ proper_step_model = (
     + "-inner-product-model.pt"
 )
 
-writer.add_scalar("Peaked Steps", np.argmax(validation_recall_list) * args.frequency)
+writer.add_scalar("Peaked_Steps", np.argmax(validation_recall_list) * args.frequency)
+writer.add_scalar("Max_Evaluation_Recall", np.max(validation_recall_list))
+
 abs_model_path = output_path / "model" / proper_step_model
 kwargs = dict(
     n_publications=len(final_publication_ids),

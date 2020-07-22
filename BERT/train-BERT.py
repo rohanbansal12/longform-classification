@@ -278,6 +278,8 @@ for step, batch in enumerate(cycle(train_loader)):
 
 # write peak for training steps and load best model for final performance metrics and data saving
 writer.add_scalar("Peaked Steps", np.argmax(validation_recall_list) * args.frequency)
+writer.add_scalar("Max_Evaluation_Recall", np.max(validation_recall_list))
+
 proper_step_model = (
     str(np.argmax(validation_recall_list) * args.frequency) + "-bert-model.pt"
 )
