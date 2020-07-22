@@ -28,7 +28,7 @@ if __name__ == "__main__":
         "PYTHONPATH=. python train-rankfromsets.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/evaluation.json "
     ]
 
-    experiment_name = "news-BERT"
+    experiment_name = "news-rankfromsets"
     log_dir = (
         pathlib.Path(pathlib.os.environ["LOG"]) / "news-classification-inner-product"
     )
