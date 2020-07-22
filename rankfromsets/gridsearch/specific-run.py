@@ -36,11 +36,12 @@ if __name__ == "__main__":
     base_grid = addict.Dict()
     base_grid.create_dicts = False
     base_grid.map_items = False
-    base_grid.emb_size = [10, 25, 50, 100]
-    base_grid.recall_max = 100
+    base_grid.emb_size = [10, 25, 50, 100, 500, 1000]
+    base_grid.eval_recall_max = 100
+    base_grid.test_recall_max = 1000
     base_grid.tokenize = False
     base_grid.target_publication = 0
-    base_grid.batch_size = [100, 500, 1000, 2000]
+    base_grid.batch_size = [500, 1000, 2000, 5000, 10000]
     base_grid.training_steps = 10000
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
@@ -62,6 +63,19 @@ if __name__ == "__main__":
     grid["optimizer_type"] = "RMS"
     grid["use_all_words"] = True
     grid["learning_rate"] = [1e-3, 1e-4, 1e-5]
+    keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
+    keys_for_dir_name.insert(0, "optimizer_type")
+    for cfg in jobs.param_grid(grid):
+        cfg["output_dir"] = jobs.make_output_dir(
+            log_dir, experiment_name, cfg, keys_for_dir_name
+        )
+        jobs.submit(commands, cfg, get_slurm_script_gpu)
+
+    # RMS with all words
+    grid = copy.deepcopy(base_grid)
+    grid["optimizer_type"] = "SGD"
+    grid["use_all_words"] = True
+    grid["learning_rate"] = [5, 15]
     keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
     keys_for_dir_name.insert(0, "optimizer_type")
     for cfg in jobs.param_grid(grid):

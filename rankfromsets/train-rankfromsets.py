@@ -265,7 +265,7 @@ for step, batch in enumerate(cycle(train_loader)):
         calc_recall = eval_util.calculate_recall(
             eval_data,
             indices,
-            args.recall_max,
+            args.eval_recall_max,
             args.target_publication,
             "Eval",
             writer,
@@ -352,7 +352,13 @@ converted_list = np.array(eval_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
 calc_recall = eval_util.calculate_recall(
-    eval_data, indices, args.recall_max, args.target_publication, "Eval", writer, step,
+    eval_data,
+    indices,
+    args.eval_recall_max,
+    args.target_publication,
+    "Eval",
+    writer,
+    step,
 )
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, eval_data, tokenizer
@@ -370,7 +376,13 @@ converted_list = np.array(test_logit_list)
 sorted_preds = np.sort(converted_list)
 indices = np.argsort(converted_list)
 calc_recall = eval_util.calculate_recall(
-    test_data, indices, args.recall_max, args.target_publication, "Test", writer, step,
+    test_data,
+    indices,
+    args.test_recall_max,
+    args.target_publication,
+    "Test",
+    writer,
+    step,
 )
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, test_data, tokenizer
