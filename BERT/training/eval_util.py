@@ -11,9 +11,10 @@ import numpy as np
 def create_ranked_results_list(final_word_ids, sorted_preds, indices, data, tokenizer):
     df = pd.DataFrame(columns=["title", "url", "text", "publication", "prediction"])
     ranked_indices = indices[::-1]
+    predictions = sorted_preds[::-1]
     for i in range(0, 1500):
         example = data[ranked_indices[i]]
-        prediction = sorted_preds[i].item()
+        prediction = predictions[i]
         title = example["title"]
         text = tokenizer.decode(example["text"][:510])
         url = example["link"]

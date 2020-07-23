@@ -110,7 +110,16 @@ def add_training(parser):
         help="How often to calculate recall and test performance.",
     )
     parser.add_argument(
-        "--recall_max", type=int, default=150, help="What to calculate recall out of."
+        "--eval_recall_max",
+        type=int,
+        default=100,
+        help="What to calculate recall out of.",
+    )
+    parser.add_argument(
+        "--test_recall_max",
+        type=int,
+        default=1000,
+        help="What to calculate recall out of.",
     )
 
 
