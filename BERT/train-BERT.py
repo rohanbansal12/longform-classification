@@ -217,6 +217,8 @@ for step, batch in enumerate(cycle(train_loader)):
     # calculate test and evaluation performance based on user intended frequency
     if step % args.frequency == 0 and step != args.training_steps:
         # output loss
+        model.eval()
+        torch.no_grad()
         writer.add_scalar("Loss/train", running_loss / args.frequency, step)
         print(f"Training Loss: {running_loss/args.frequency}")
         running_loss = 0.0
@@ -257,6 +259,7 @@ for step, batch in enumerate(cycle(train_loader)):
                 break
 
     # turn to training mode and calculate loss for backpropagation
+    torch.enable_grad()
     optimizer.zero_grad()
     word_attributes, attention_masks, word_subset_counts, real_labels = batch
     word_attributes = word_attributes.to(device)
@@ -290,6 +293,8 @@ model = BertForSequenceClassification(config)
 abs_model_path = output_path / "model" / proper_step_model
 model.load_state_dict(torch.load(abs_model_path))
 model.to(device)
+model.eval()
+torch.no_grad()
 
 # get final evaluation results and create a basic csv of top articles
 eval_logit_list = []
