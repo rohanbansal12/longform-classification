@@ -23,6 +23,8 @@ import data_processing.dictionaries as dictionary
 import sampling.sampler_util as sampler_util
 import training.eval_util as eval_util
 
+np.random.seed(0)
+
 parser = argparse.ArgumentParser(
     description="Train model on article data and test evaluation"
 )
