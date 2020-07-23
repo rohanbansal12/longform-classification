@@ -28,21 +28,22 @@ if __name__ == "__main__":
         "PYTHONPATH=. python train-rankfromsets.py  --train_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/train.json --test_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/test.json --eval_path /scratch/gpfs/altosaar/dat/longform-data/main/combined-data/evaluation.json "
     ]
 
-    experiment_name = "news-rankfromsets"
+    experiment_name = "news-rankfromsets-init"
     log_dir = (
-        pathlib.Path(pathlib.os.environ["LOG"]) / "news-classification-inner-product"
+        pathlib.Path(pathlib.os.environ["LOG"])
+        / "news-classification-inner-product-init"
     )
 
     base_grid = addict.Dict()
     base_grid.create_dicts = False
     base_grid.map_items = False
-    base_grid.emb_size = [10, 25, 50, 100, 500, 1000]
+    base_grid.emb_size = 768
     base_grid.eval_recall_max = 100
     base_grid.test_recall_max = 1000
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = [500, 1000, 2000, 5000, 10000]
-    base_grid.training_steps = 10000
+    base_grid.training_steps = 6000
     base_grid.momentum = 0.9
     base_grid.use_sparse = False
     base_grid.use_gpu = True
@@ -70,4 +71,3 @@ if __name__ == "__main__":
             log_dir, experiment_name, cfg, keys_for_dir_name
         )
         jobs.submit(commands, cfg, get_slurm_script_gpu)
-
