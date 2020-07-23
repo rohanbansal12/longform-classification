@@ -75,18 +75,17 @@ def calculate_predictions(
     return sorted_preds, indices
 
 
-def create_ranked_results_list(final_word_ids, sorted_preds, indices, data, tokenizer):
-    df = pd.DataFrame(columns=["title", "url", "text", "publication", "prediction"])
+def create_ranked_results_list(final_word_ids, sorted_preds, indices, data):
+    df = pd.DataFrame(columns=["title", "url", "publication", "prediction"])
     ranked_indices = indices[::-1]
     predictions = sorted_preds[::-1]
     for i in range(0, 1500):
         example = data[ranked_indices[i]]
         prediction = predictions[i]
         title = example["title"]
-        text = tokenizer.decode(example["text"])
         url = example["link"]
         publication = example["publication"]
-        df.loc[i] = [title, url, text, publication, prediction]
+        df.loc[i] = [title, url, publication, prediction]
     return df
 
 

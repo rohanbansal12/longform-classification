@@ -309,7 +309,7 @@ calc_recall = eval_util.calculate_recall(
     step,
 )
 ranked_df = eval_util.create_ranked_results_list(
-    final_word_ids, sorted_preds, indices, eval_data, tokenizer
+    final_word_ids, sorted_preds, indices, eval_data
 )
 eval_util.save_ranked_df(output_path, "evaluation", ranked_df)
 
@@ -333,7 +333,7 @@ calc_recall = eval_util.calculate_recall(
     step,
 )
 ranked_df = eval_util.create_ranked_results_list(
-    final_word_ids, sorted_preds, indices, test_data, tokenizer
+    final_word_ids, sorted_preds, indices, test_data
 )
 eval_util.save_ranked_df(output_path, "test", ranked_df)
 
