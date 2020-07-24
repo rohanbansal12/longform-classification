@@ -1,24 +1,19 @@
 # import necessary libraries
-import pandas as pd
-import re
 import torch
-import collections
 import numpy as np
-import json
-import time
+import ujson as json
 import torch.nn as nn
-import os
 import argparse
-import arguments.train_arguments as arguments
-from data_processing.articles import Articles
-from models.models import InnerProduct
-import data_processing.dictionaries as dictionary
-import sampling.sampler_util as sampler_util
-import training.eval_util as eval_util
 from pathlib import Path
-from torch.utils.tensorboard import SummaryWriter
-import matplotlib.pyplot as plt
 from tokenizers import BertWordPieceTokenizer
+from transformers import BertForSequenceClassification, BertConfig
+from tqdm import tqdm
+import numpy as np
+import arguments.rank_arguments as arguments
+from data_processing.articles import Articles
+import data_processing.dictionaries as dictionary
+import training.eval_util as eval_util
+from training.collate import collate_fn
 
 parser = argparse.ArgumentParser(description="Get Ranked Predictions on New Dataset.")
 arguments.add_data(parser)
@@ -45,10 +40,8 @@ print("Data Loaded")
 print("-------------------")
 
 # initialize tokenizer from BERT library
-tokenizer = BertWordPieceTokenizer(
-    "/users/rohan/news-classification/data/BERT/bert-base-uncased.txt", lowercase=True
-)
-# tokenizer = BertWordPieceTokenizer("/scratch/gpfs/altosaar/dat/longform-data/BERT/bert-base-uncased.txt", lowercase=True)
+# initialize tokenizer from BERT library
+tokenizer = BertWordPieceTokenizer(args.tokenizer_file, lowercase=True)
 print("Tokenizer Initialized!")
 
 # load dictionaries from path
@@ -87,77 +80,37 @@ if args.map_items:
     print("-------------------")
 
 
-def collate_fn(examples):
-    words = []
-    articles = []
-    labels = []
-    publications = []
-    for example in examples:
-        if args.use_all_words:
-            words.append(list(set(example["text"])))
-        else:
-            if len(example["text"]) > args.words_to_use:
-                words.append(list(set(example["text"][: args.words_to_use])))
-            else:
-                words.append(list(set(example["text"])))
-        articles.append(example["url"])
-        publications.append(example["model_publication"])
-        labels.append(example["model_publication"])
-    num_words = [len(x) for x in words]
-    words = np.concatenate(words, axis=0)
-    word_attributes = torch.tensor(words, dtype=torch.long)
-    articles = torch.tensor(articles, dtype=torch.long)
-    num_words.insert(0, 0)
-    num_words.pop(-1)
-    attribute_offsets = torch.tensor(np.cumsum(num_words), dtype=torch.long)
-    publications = torch.tensor(publications, dtype=torch.long)
-    real_labels = torch.tensor(labels, dtype=torch.long)
-    return publications, articles, word_attributes, attribute_offsets, real_labels
-
-
-# change negative example publication ids to the ids of the first half for predictions
-def collate_with_neg_fn(examples):
-    (
-        publications,
-        articles,
-        word_attributes,
-        attribute_offsets,
-        real_labels,
-    ) = collate_fn(examples)
-    publications[len(publications) // 2 :] = publications[: len(publications) // 2]
-    return publications, articles, word_attributes, attribute_offsets, real_labels
-
-
 # Generates a dataloader on the dataset that outputs entire set as a batch for one time predictions
 raw_loader = torch.utils.data.DataLoader(
-    raw_data, batch_size=len(raw_data), collate_fn=collate_fn, pin_memory=pin_mem
+    raw_data, batch_size=args.data_batch_size, collate_fn=collate_fn, pin_memory=pin_mem
 )
 
 abs_model_path = Path(args.model_path)
-kwargs = dict(
-    n_publications=len(final_publication_ids),
-    n_articles=len(final_url_ids),
-    n_attributes=len(final_word_ids),
-    emb_size=args.emb_size,
-    sparse=args.use_sparse,
-    use_article_emb=args.use_article_emb,
-    mode=args.word_embedding_type,
-)
-model = InnerProduct(**kwargs)
+config_file = abs_model_path.parent / "config.json"
+config = BertConfig.from_json_file(config_file)
+model = BertForSequenceClassification(config)
 model.load_state_dict(torch.load(abs_model_path))
 model.to(device)
+model.eval()
+torch.no_grad()
 print("Model Loaded")
 print(model)
 print("-------------------")
 
-sorted_preds, indices = eval_util.calculate_predictions(
-    raw_loader, model, device, args.target_publication
+data_logit_list = []
+for batch in tqdm(raw_loader):
+    current_logits = eval_util.calculate_batched_predictions(
+        batch, model, device, args.target_publication
+    )
+    data_logit_list = data_logit_list + list(current_logits)
+converted_list = np.array(data_logit_list)
+sorted_preds = np.sort(converted_list)
+indices = np.argsort(converted_list)
+
+ranked_df = eval_util.create_ranked_results_list(
+    final_word_ids, sorted_preds, indices, raw_data
 )
-ranked_df = eval_util.create_ranked_eval_list(
-    final_word_ids, args.word_embedding_type, sorted_preds, indices, raw_data
-)
-eval_util.save_ranked_df(
-    output_path, ranked_df, args.word_embedding_type, word_count=args.min_article_length
-)
+eval_util.save_ranked_df(output_path, arggs.data_name, ranked_df)
+
 print("Predictions Made")
 print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'} directory!")
