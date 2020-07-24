@@ -45,27 +45,31 @@ class Articles(torch.utils.data.Dataset):
         tokenizer,
         url_to_id,
         publication_to_id,
-        badTokens=[],
         filter=False,
         min_length=0,
+        day_range=None,
     ):
         min_length_articles = []
         for idx, example in enumerate(self.examples):
             encoded = tokenizer.encode(example["text"], add_special_tokens=False).ids
             self.examples[idx]["text"] = encoded
-            if badTokens:
-                self.examples[idx]["text"] = [
-                    token
-                    for token in self.examples[idx]["text"]
-                    if token not in badTokens
-                ]
-            if filter:
-                if len(self.examples[idx]["text"]) > min_length:
-                    min_length_articles.append(self.examples[idx])
             self.examples[idx]["url"] = url_to_id.get(
                 example["url"], url_to_id.get("miscellaneous")
             )
             self.examples[idx]["model_publication"] = publication_to_id.get(
                 example["model_publication"], publication_to_id.get("miscellaneous")
             )
+            if filter:
+                if day_range is not None:
+                    dated = datetime.strptime(example["date"], "%Y-%m-%d")
+                    now = datetime.now()
+                    last_month = now - timedelta(days=day_range)
+                    if (
+                        len(self.examples[idx]["text"]) > min_length
+                        and last_month <= dated <= now
+                    ):
+                        min_length_articles.append(self.examples[idx])
+                else:
+                    if len(self.examples[idx]["text"]) > min_length:
+                        min_length_articles.append(self.examples[idx])
         return min_length_articles

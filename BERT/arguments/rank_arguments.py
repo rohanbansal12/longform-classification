@@ -82,6 +82,9 @@ def add_data(parser):
         default=100,
         help="Minimum article length to generate predictions for.",
     )
+    parser.add_argument(
+        "--days_old", type=int, help="Maximum age of the article in days",
+    )
 
 
 def add_model(parser):

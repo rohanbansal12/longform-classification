@@ -9,7 +9,7 @@ import numpy as np
 
 
 def create_ranked_results_list(final_word_ids, sorted_preds, indices, data):
-    df = pd.DataFrame(columns=["title", "url", "publication", "prediction"])
+    df = pd.DataFrame(columns=["title", "url", "publication", "date", "prediction"])
     ranked_indices = indices[::-1]
     predictions = sorted_preds[::-1]
     for i in range(0, 1500):
@@ -18,7 +18,8 @@ def create_ranked_results_list(final_word_ids, sorted_preds, indices, data):
         title = example["title"]
         url = example["link"]
         publication = example["publication"]
-        df.loc[i] = [title, url, publication, prediction]
+        date = example["date"]
+        df.loc[i] = [title, url, publication, date, prediction]
     return df
 
 

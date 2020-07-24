@@ -62,6 +62,7 @@ if args.map_items:
         final_publication_ids,
         filter=True,
         min_length=args.min_article_length,
+        day_range=args.days_old,
     )
     print("Mapped and Filtered Data!")
     data_path = Path(args.data_dir)

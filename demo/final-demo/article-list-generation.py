@@ -68,6 +68,10 @@ parser.add_argument(
     "--amount", type=int, default=75, help="Quantity of articles to include in list!"
 )
 
+parser.add_argument(
+    "--emb_size", type=int, default=10, help="Embedding Size of Model Used"
+)
+
 args = parser.parse_args()
 
 # load dictionaries
@@ -198,7 +202,9 @@ print(word_articles.shape)
 print(word_emb.shape)
 article_embeddings = word_articles.dot(word_emb)
 
-emb_times_publication = np.dot(article_embeddings, publication_emb.reshape(100, 1))
+emb_times_publication = np.dot(
+    article_embeddings, publication_emb.reshape(args.emb_size, 1)
+)
 
 article_bias = word_articles.dot(word_bias)
 
@@ -210,7 +216,7 @@ final_logits = np.divide(product_with_bias, word_counts) + float(publication_bia
 
 indices = final_logits.argsort(axis=0)[-args.amount :].reshape(args.amount)
 
-word_logits = np.dot(word_emb, publication_emb.reshape(100, 1)) + word_bias
+word_logits = np.dot(word_emb, publication_emb.reshape(args.emb_size, 1)) + word_bias
 
 top_articles = word_articles[indices.tolist()[0]]
 

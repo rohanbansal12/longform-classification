@@ -78,6 +78,13 @@ parser.add_argument(
 parser.add_argument(
     "--tokenizer_file", type=str, help="Designate tokenizer source file.",
 )
+parser.add_argument(
+    "--min_length",
+    type=int,
+    default=100,
+    help="Minimum length of articles if mapping/filtering",
+)
+parser.add_argument("--days_old", type=int, help="How many days old articles can be")
 
 args = parser.parse_args()
 
@@ -100,7 +107,12 @@ if args.map_items:
     dataset = Articles(data_path)
     print("Data loaded.")
     proper_data = dataset.map_items(
-        tokenizer, final_url_ids, final_publication_ids, filter=True, min_length=200
+        tokenizer,
+        final_url_ids,
+        final_publication_ids,
+        filter=True,
+        min_length=200,
+        day_range=args.days_old,
     )
 
     # save mapped data for easier access next iteration
