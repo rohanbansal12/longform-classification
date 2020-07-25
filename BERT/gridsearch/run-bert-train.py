@@ -34,7 +34,8 @@ if __name__ == "__main__":
     base_grid = addict.Dict()
     base_grid.create_dicts = False
     base_grid.map_items = False
-    base_grid.recall_max = 300
+    base_grid.eval_recall_max = 100
+    base_grid.test_recall_max = 1000
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = 32

@@ -28,13 +28,14 @@ if __name__ == "__main__":
         "PYTHONPATH=. python train-BERT.py  --train_path /scratch/network/altosaar/dat/longform-data/main/combined-data/train.json --test_path /scratch/network/altosaar/dat/longform-data/main/combined-data/test.json --eval_path /scratch/network/altosaar/dat/longform-data/main/combined-data/evaluation.json "
     ]
 
-    experiment_name = "news-inner-product"
+    experiment_name = "news-BERT"
     log_dir = pathlib.Path(pathlib.os.environ["LOG"]) / "news-classification-BERT"
 
     base_grid = addict.Dict()
     base_grid.create_dicts = False
     base_grid.map_items = False
-    base_grid.recall_max = 300
+    base_grid.eval_recall_max = 100
+    base_grid.test_recall_max = 1000
     base_grid.tokenize = False
     base_grid.target_publication = 0
     base_grid.batch_size = 32
@@ -55,7 +56,7 @@ if __name__ == "__main__":
 
     # 100 warmup steps
     grid = copy.deepcopy(base_grid)
-    grid.warmup_steps = 100
+    grid.warmup_steps = 1000
     grid.training_steps = [5000, 50000, 100000]
     keys_for_dir_name = jobs.get_keys_for_dir_name(grid)
     keys_for_dir_name.insert(0, "warmup_steps")
