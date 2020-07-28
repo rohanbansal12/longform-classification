@@ -1,4 +1,4 @@
-% !TEX root = set_recommendation.tex
+% !TEX root = recommending-interesting-writing.tex
 \section{Experiments}
 \label{sec:experiments}
 
@@ -181,7 +181,7 @@ words occurring in the food names.
 
 \paragraph{Evaluation.} We hold out 1\% of the items (meals) for validation and
 hold out 1\% of the items for evaluating test performance. We use the sampled
-recall metric in \Cref{eq:sampled-recall} with $K=10$. 
+recall metric in \Cref{eq:sampled-recall} with $K=10$.
 
 \input{fig/fig_meals}
 \input{table/nearest_meals.tex}
@@ -201,7 +201,7 @@ performed every $50$k iterations.
 % For the neural
 % network and residual models in \Cref{eq:neural-network,eq:residual}
 % respectively, we use a two-hidden-layer neural network with rectifier
-% nonlinearities and $256$~hidden units per layer. 
+% nonlinearities and $256$~hidden units per layer.
 
 \paragraph{Hyperparameters for the permutation-marginalized recurrent neural
   network.} We grid search over batch sizes of $\{32, 64, 128\}$. For every item
@@ -221,7 +221,7 @@ in~\cite{gopalan2014content-based} did not scale to this size of data.
 
 % In \gls{rfs}, the
 % residual parameterization is the most flexible and marginally outperforms the
-% other models. 
+% other models.
 % , despite several attempts on systems with sufficient
 % computational resources.
 Qualitatively, \gls{rfs} learns an interpretable representation of

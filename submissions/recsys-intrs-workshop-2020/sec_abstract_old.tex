@@ -1,4 +1,4 @@
-% !TEX root = set_recommendation.tex
+% !TEX root = recommending-interesting-writing.tex
 \begin{abstract}
   Recommendation models suggest items to users. We study a variant of this
   problem where each item has an unordered collection of attributes, such as
@@ -30,7 +30,7 @@
   These results demonstrate that if a practitioner has data where items have
   attributes and measures recommendation performance with recall, building a
   classifier such as \acrlong{rfs} is the best course of action.
-  
+
   % Code for is available at \url{https://github.com/altosaar/rankfromsets}.
   % Matrix factorization approaches that handle side-information exist, but they
   % cannot handle large attribute vocabularies. We consider recommending items
@@ -65,7 +65,7 @@
   % Recall is inherently binary: a model does or does not recall an item.
   % % our algorithm is to fit the parameters via classification
   % This means we can fit a recommendation model's parameters using classification
-  % to maximize the evaluation metric of recall. 
+  % to maximize the evaluation metric of recall.
   % % contribution: we show it approximates other algorithms
   % We build \acrshort{rankfromsets}, a recommendation model that can approximate
   % any order-invariant model such as matrix factorization, and that theoretically
