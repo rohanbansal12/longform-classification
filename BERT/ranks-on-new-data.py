@@ -39,11 +39,6 @@ raw_data = Articles(raw_data_path)
 print("Data Loaded")
 print("-------------------")
 
-# initialize tokenizer from BERT library
-# initialize tokenizer from BERT library
-tokenizer = BertWordPieceTokenizer(args.tokenizer_file, lowercase=True)
-print("Tokenizer Initialized!")
-
 # load dictionaries from path
 dictionary_dir = Path(args.dict_dir)
 final_word_ids, final_url_ids, final_publication_ids = dictionary.load_dictionaries(
@@ -54,7 +49,11 @@ print("-------------------")
 
 # map items to their dictionary values
 if args.map_items:
-    # tokenizer and bmap items to their ids in dictionaries and filter articles
+    # initialize tokenizer from BERT library
+    tokenizer = BertWordPieceTokenizer(args.tokenizer_file, lowercase=True)
+    print("Tokenizer Initialized!")
+
+    # tokenize and map items to their ids in dictionaries and filter articles
     proper_data = raw_data.map_items(
         tokenizer,
         final_word_ids,
@@ -111,7 +110,7 @@ indices = np.argsort(converted_list)
 ranked_df = eval_util.create_ranked_results_list(
     final_word_ids, sorted_preds, indices, raw_data
 )
-eval_util.save_ranked_df(output_path, arggs.data_name, ranked_df)
+eval_util.save_ranked_df(output_path, args.data_name, ranked_df)
 
 print("Predictions Made")
 print(f"Ranked Data Saved to {output_path / 'results' / 'evaluation'} directory!")

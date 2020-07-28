@@ -79,12 +79,19 @@ parser.add_argument(
     "--tokenizer_file", type=str, help="Designate tokenizer source file.",
 )
 parser.add_argument(
-    "--min_length",
-    type=int,
-    default=100,
-    help="Minimum length of articles if mapping/filtering",
+    "--min_length", type=int, default=0, help="Minimum Length for Articles in Dataset",
 )
-parser.add_argument("--days_old", type=int, help="How many days old articles can be")
+
+parser.add_argument(
+    "--days", type=int, help="How many days old articles can be.",
+)
+
+parser.add_argument(
+    "--filter",
+    type=str2bool,
+    default=True,
+    help="Whether to apply filtering to the raw dataset",
+)
 
 args = parser.parse_args()
 
@@ -103,36 +110,45 @@ if args.map_items:
     # initialize tokenizer from BERT library
     tokenizer = BertWordPieceTokenizer(args.tokenizer_file, lowercase=True,)
     print("Tokenizer Initialized!")
-
-    dataset = Articles(data_path)
-    print("Data loaded.")
-    proper_data = dataset.map_items(
-        tokenizer,
-        final_url_ids,
-        final_publication_ids,
-        filter=True,
-        min_length=200,
-        day_range=args.days_old,
-    )
-
+    if args.filter:
+        raw_dataset = Articles(data_path)
+        print("Initial: ", len(raw_dataset))
+        if args.days is not None:
+            proper_data = raw_dataset.map_items(
+                tokenizer,
+                final_url_ids,
+                final_publication_ids,
+                filter=True,
+                min_length=args.min_length,
+                day_range=args.days,
+            )
+        else:
+            proper_data = raw_dataset.map_items(
+                tokenizer,
+                final_url_ids,
+                final_publication_ids,
+                filter=True,
+                min_length=args.min_length,
+            )
+    else:
+        proper_data = Articles(data_path)
+        proper_data.map_items(tokenizer, final_url_ids, final_publication_ids)
     # save mapped data for easier access next iteration
     data_path = Path(args.data_output_dir)
     if not data_path.is_dir():
         data_path.mkdir()
-    mapped_data_path = data_path / "mapped-data"
-    if not mapped_data_path.is_dir():
-        mapped_data_path.mkdir()
     ending = "mapped_dataset_" + args.dataset_name + ".json"
-    train_mapped_path = mapped_data_path / ending
+    train_mapped_path = data_path / ending
     with open(train_mapped_path, "w") as file:
         json.dump(proper_data, file)
     raw_data = Articles(train_mapped_path)
     print("Final: ", len(raw_data))
-    print(f"Filtered, Mapped Data saved to {mapped_data_path} directory")
+    print(f"Filtered, Mapped Data saved to {data_path} directory")
     print("-------------------")
 
 else:
     raw_data = Articles(data_path)
+    print("Length: ", len(raw_data))
 
 # generate sparse matrix with word ids for each article
 rows = []

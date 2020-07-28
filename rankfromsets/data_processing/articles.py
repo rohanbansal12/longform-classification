@@ -4,6 +4,7 @@ import torch
 import ujson as json
 import collections
 from datetime import datetime, timedelta
+from dateutil import parser
 
 # define Articles dataset class for easy sampling, iteration, and weight creating
 class Articles(torch.utils.data.Dataset):
@@ -62,7 +63,7 @@ class Articles(torch.utils.data.Dataset):
             )
             if filter:
                 if day_range is not None:
-                    dated = datetime.strptime(example["date"], "%Y-%m-%d")
+                    dated = parser.parse(example["date"])
                     now = datetime.now()
                     last_month = now - timedelta(days=day_range)
                     if (
