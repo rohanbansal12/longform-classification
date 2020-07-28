@@ -95,11 +95,5 @@ def add_model(parser):
         "--use_gpu", type=str2bool, default=True, help="Use GPU for predictions"
     )
     parser.add_argument(
-        "--target_publication",
-        type=int,
-        default=0,
-        help="Designate target publication.",
-    )
-    parser.add_argument(
         "--data_batch_size", type=int, default=500, help="Batch size for Data Loader"
     )
