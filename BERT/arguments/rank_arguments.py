@@ -70,7 +70,6 @@ def add_data(parser):
     parser.add_argument(
         "--index_file_path",
         type=expand_path,
-        required=True,
         help="Designate randomized indices for Evaluation performance collection.",
     )
     parser.add_argument(
