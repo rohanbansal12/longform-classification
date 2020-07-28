@@ -18,7 +18,3 @@ In this architecture, the user embedding $\theta_u$ includes a dimension that is
 
 \paragraph{Empirical Study.} Performance was assessed with recall, and $15\%$ of the data was held-out for validation and test sets. The performance of the model was similar for large embedding sizes, and we selected the dimension of the embeddings to be $25$. We cross-validate using the RMSProp optimizer~\citep{tieleman2012lecture} and grid search over learning rates of $\{10^{-1}, 10^{-3}, 10^{-4}, 10^{-5}\}$ and select the best-performing model for deployment.
 
-\section{Deployment and User Interface}
-
-As curation services can be constrained by computational and financial resources, we choose to deploy the \gls{rfs} model as a cloud computing-based microservice. Further, we exploit the properties of the the \gls{rfs} architecture in \Cref{eq:inner-product} to aid explainability and exploration. For explainability, we display words $j$ with high (low) inner product $\theta_u^\top\beta_j$, as these words contribute the most (least) to a prediction of a positive label. To enable users to explore patterns in a large list of articles, we enable them to modulate the dimensions of $\theta_u$ with the greatest weight. After a user has scaled these dimensions according to their preference, the recommendation results are returned by the microservice using \Cref{eq:inner-product}.
-
