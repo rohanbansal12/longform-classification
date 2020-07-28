@@ -40,6 +40,7 @@ $(document).ready(function () {
         .then((data) => {
           return data;
         });
+      var grand_html = "";
       ranked_articles.forEach(function (article) {
         grand_html += "<tr>";
         grand_html += '<td class="logit">';
