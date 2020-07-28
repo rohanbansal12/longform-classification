@@ -1,0 +1,24 @@
+% !TEX root = recommending-interesting-writing.tex
+\section{Method}
+We describe the recommendation model and the pipeline for data collection, training of the model, and evaluation. This is illustrated in \Cref{fig:pipeline}.
+
+\paragraph{Recommendation Model.} \acrfull{rfs} is a recommendation model suitable for our problem. It is scalable to large numbers of articles and words, and can maximize the evaluation metric of recall~\citep{altosaar2020rankfromsets:,altosaar2020probabilistic}. Recall, or the fraction of true positives returned by a recommendation model, is an appropriate evaluation metric for recommending interesting writing to editors at The Browser. A recommendation model such as \gls{rfs} can be readily backtested with recall as an evaluation metric, as historical data contains positive examples (articles selected by the editors) but rarely contains negative examples (articles seen but not selected by the editors).
+
+\gls{rfs} is a recommendation model defined by a binary classifier. For a user $u$ and item $m$ with attributes $x_m$ (the set of unique words in an article), \gls{rfs} is described by the probability of $y_{um} = 1$ (user $u$ consuming item $m$):
+$$p(\yum = 1 \mid u, m) = \sigma\left( f \left (u, x_m\right) \right)\, ,$$
+where $\sigma$ is the sigmoid function. To parameterize the binary classifier in \gls{rfs}, we use an inner product architecture:
+\begin{equation}
+\label{eq:inner-product}
+  f\left(u, x_m\right) = \theta_u^\top\left(\frac{1}{|x_m|}\sum_{j\in x_m}
+  \beta_j\right)\, .
+\end{equation}
+In this architecture, the user embedding $\theta_u$ includes a dimension that is fixed to unity. Word embeddings $\beta_j$ (including a bias dimension for every word) and the publication embedding are fit with maximum likelihood estimation, and negative examples are sampled uniformly at random to balance positive examples.
+
+\paragraph{Data Collection and Preprocessing.} For positive examples, we use the historical set of articles curated by editors at The Browser. We augment the training data with articles selected by the editors of other curation services, and treat all positively-labeled examples curated by editors as data from a single user due to a paucity of data. We use articles from news websites as examples with negative labels, and collect additional articles with negative labels from websites most-featured by the editors to mimic the editorial process of reading a large swath of articles in a feed and distilling an article list to a select few. For preprocessing the data we use the tokenizer released by \citet{devlin2019bert:} and discard words not recognized by the tokenizer. This procedure leaves a dictionary with $30$k words, and $148$k training examples with $28$k positive labels.
+
+\paragraph{Empirical Study.} Performance was assessed with recall, and $15\%$ of the data was held-out for validation and test sets. The performance of the model was similar for large embedding sizes, and we selected the dimension of the embeddings to be $25$. We cross-validate using the RMSProp optimizer~\citep{tieleman2012lecture} and grid search over learning rates of $\{10^{-1}, 10^{-3}, 10^{-4}, 10^{-5}\}$ and select the best-performing model for deployment.
+
+\section{Deployment and User Interface}
+
+As curation services can be constrained by computational and financial resources, we choose to deploy the \gls{rfs} model as a cloud computing-based microservice. Further, we exploit the properties of the the \gls{rfs} architecture in \Cref{eq:inner-product} to aid explainability and exploration. For explainability, we display words $j$ with high (low) inner product $\theta_u^\top\beta_j$, as these words contribute the most (least) to a prediction of a positive label. To enable users to explore patterns in a large list of articles, we enable them to modulate the dimensions of $\theta_u$ with the greatest weight. After a user has scaled these dimensions according to their preference, the recommendation results are returned by the microservice using \Cref{eq:inner-product}.
+
