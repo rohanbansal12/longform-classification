@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Recommendation Writing</title>
   <script src="https://kit.fontawesome.com/044c0d86f3.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -28,7 +29,8 @@
       <p class="description">
         This is a demo submission to the KDD 2020 IRS Workshop. Please see the <a
           href="https://github.com/the-browser/recommending-interesting-writing" class="info_link">GitHub Repo</a> or
-        <a href="#" class="info_link">Demo Paper</a> for details
+        <a href="https://github.com/the-browser/recommending-interesting-writing/blob/master/recommending-interesting-writing.pdf"
+          class="info_link">Demo Paper</a> for details.
       </p>
       <section class="mdl-layout__tab-panel is-active" id="fixed-tab-browser">
         <div class="page-content">
@@ -36,20 +38,20 @@
           <div class="input_div">
             <div style="width:85%; text-align: center;">
               <p class="embedding_slider_holder">
-                <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="browser-s14" min="-50"
-                  max="50" value="5" step="5">
+                <input style="display: inline" class="mdl-slider mdl-js-slider" type="range" id="browser-crime"
+                  min="-50" max="50" value="0" step="10">
               </p>
               <p class="embedding_slider_holder">
-                <input class="mdl-slider mdl-js-slider" type="range" id="browser-s2" min="-50" max="50" value="5"
-                  step="5">
+                <input class="mdl-slider mdl-js-slider" type="range" id="browser-business" min="-50" max="50" value="0"
+                  step="10">
               </p>
               <p class="embedding_slider_holder">
-                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-s1" min="-50"
-                  max="50" value="5" step="5">
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-technology"
+                  min="-50" max="50" value="0" step="10">
               </p>
               <p class="embedding_slider_holder">
-                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-s6" min="-50"
-                  max="50" value="5" step="5">
+                <input style="text-align:center" class="mdl-slider mdl-js-slider" type="range" id="browser-politics"
+                  min="-50" max="50" value="0" step="10">
               </p>
             </div>
             <div style="width:15%; text-align: center">
