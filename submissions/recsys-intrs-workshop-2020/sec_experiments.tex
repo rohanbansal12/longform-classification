@@ -4,9 +4,11 @@
 
 We study the performance of \acrlong{rfs} on a dataset that we collect to assess whether \gls{rfs}, in addition to providing interpretable recommendations to help editors make decisions about articles.
 
-\paragraph{Data collection}
+\paragraph{Data Collection and Preprocessing.} For positive examples, we use the historical set of articles curated by editors at The Browser. We augment the training data with articles selected by the editors of other curation services, and treat all positively-labeled examples curated by editors as data from a single user due to a paucity of data. We use articles from news websites as examples with negative labels, and collect additional articles with negative labels from websites most-featured by the editors to mimic the editorial process of reading a large swath of articles in a feed and distilling an article list to a select few. For preprocessing the data we use the tokenizer released by \citet{devlin2019bert:} and discard words not recognized by the tokenizer. This procedure leaves a dictionary with $30$k words, and $148$k training examples with $28$k positive labels.
 
-\paragraph{Experimental setup: RankFromSets}
+\paragraph{Metrics} Performance of the recommendation models is assessed with recall, and $15\%$ of the data is held-out for validation and test sets.
+
+\paragraph{Experimental setup: RankFromSets} The performance of the model was similar for large embedding sizes, and we selected the dimension of the embeddings to be $25$. We cross-validate using the RMSProp optimizer~\citep{tieleman2012lecture} and grid search over learning rates of $\{10^{-1}, 10^{-3}, 10^{-4}, 10^{-5}\}$ and select the best-performing model for deployment.
 
 \paragraph{Experimental setup: BERT}
 
@@ -16,7 +18,13 @@ Test -      Total: 272448          Positive: 4049                  Negative: 268
 Evaluation -      Total: 272447            Positive: 4039                  Negative: 268348
 Both models used the same randomly selected 50k articles from the evaluation set for validation, and the entire test set was used at the end to generate predictions on new data.
 
+for BERT, used AdamW optimizer with a linear scheduler, with 4 different learning rates [2e-5, 3e-5, 4e-5, 5e-5] and a batch size of 32. Tried four different amounts for warmup steps [100, 1000, 1000, 10000] and total training steps were within the set [500, 5000, 50000, 100000] depending on the warmup step amount
+First 510 tokens were taken from the article to generate predictions so as to fit the BERT length requirements
+
 \input{fig/training-recall}
 \input{table/recall}
+
+BERT 466/1000
+rankfromsets 531/1000
 
 \paragraph{Evaluation.} Qualitatively, editors at The Browser preferred the recommendations of our pipeline over their current workflow of a reading list sorted in terms of recency and use the system in production.
