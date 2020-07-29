@@ -3,14 +3,16 @@
 \centering
 \begin{tabular}{lSS}
 \toprule
-Model & \multicolumn{1}{c}{Recall @ 10 (\%)} & \multicolumn{1}{c}{Recall @ 100 (\%)}
+Recommendation Model & \multicolumn{1}{c}{Recall @ 1000 (\%)}
 \\
 \midrule
-\gls{rfs} & 0.32 & 2.54\\
-\gls{bert} &\bfseries 0.44 & 2.54 \\
+\acrlong{rfs} &  \bfseries 53.1\\
+\acrshort{bert} & 46.6 \\
 \bottomrule
 \end{tabular}
+% BERT 466/1000
+% rankfromsets 531/1000
 % \vspace{1ex}
-\caption{\textbf{ with the entropy proximity statistic improves top-10 out-matrix recall of \gls{rfs} fit to arXiv user behavior data.} We report the recall for items with no clicks in the training data (described in \Cref{sec:rfs-experiments}) for the best-performing settings of both  and \gls{rfs}. Recall at $100$ recommendations is comparable between the methods.}
-\label{tab:pvi-rfs}
+\caption{\gls{rfs} outperforms \acrshort{bert} in an offline evaluation, on a task of predicting which articles editors at The Browser would feature based on words in the articles.}
+\label{tab:recall}
 \end{table}

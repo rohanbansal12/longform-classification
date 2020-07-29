@@ -1,4 +1,4 @@
 % !TEX root = recommending-interesting-writing.tex
-\section{Deployment and User Interface}
+\section{Deployment}
 
-As curation services can be constrained by computational and financial resources, we choose to deploy the \gls{rfs} model as a cloud computing-based microservice. Further, we exploit the properties of the the \gls{rfs} architecture in \Cref{eq:inner-product} to aid explainability and exploration. For explainability, we display words $j$ with high (low) inner product $\theta_u^\top\beta_j$, as these words contribute the most (least) to a prediction of a positive label. To enable users to explore patterns in a large list of articles, we enable them to modulate the dimensions of $\theta_u$ with the greatest weight. After a user has scaled these dimensions according to their preference, the recommendation results are returned by the microservice using \Cref{eq:inner-product}.
+We deploy the visual interface using Github Pages, and deploy the backend recommendation model, \gls{rfs}, as a microservice hosted on Amazon Web Services Lambda. As \Cref{eq:inner-product-control} is cheap to compute, the lambda function is a short python script that simply requires numpy as a dependency, compared to \acrshort{bert} which would require a hosted GPU solution.

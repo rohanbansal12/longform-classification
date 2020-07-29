@@ -1,0 +1,19 @@
+% !TEX root = recommending-interesting-writing.tex
+\section{Visual Interface}
+
+The visual interface is designed using \gls{rfs} as the backend recommendation model. Using the inner product architecture for \gls{rfs} makes it easy to build a visual interface that is interpretable to provide explanations for why an item was recommended, and enables control so users can filter recommendations to help with decision-making.
+
+\paragraph{Explanation-aware recommendation} The user embedding $\theta_u$ and word embeddings $\beta_j$ in \Cref{eq:inner-product} can be used to interpret a recommendation. The logit for a given document with a set of words $x_m$ is the sum of per-word logits, which are computed as the inner product of the user embedding and word embedding. The per-word contribution of a word in a document to the logit that determines the document's ranking in a list of recommendations is therefore
+\begin{equation}
+  w_{uj} = \theta_u^\top \beta_j\, .
+  \label{eq:word-weight}
+\end{equation}
+This weight $w_{uj}$ helps explain why a document was recommended, using information about both the user $u$ and the word $j$. In the visual interface, words in a document are first sorted by their contributions to a document's logit $w_{uj}$, and the top words are displayed. Similarly, words that lower a document's ranking are also displayed, to inform a user of which words detract from the recommendation of a document.
+
+\paragraph{Interface for controlling recommendations} In a decision-making task, a user such as an editor for The Browser may wish to filter recommendations according to topics such as crime, technology, or business. The recommendations output by \gls{rfs} can be controlled, by altering the per-word contributions in \Cref{eq:word-weight} according to whether a word is topical. This is accomplished by first calculating words related to a topic word using pre-trained word embeddings from \acrshort{bert}~\citep{devlin2019bert:,wolf2019huggingfaces}. Words related to a topic are defined by a heuristic: the cosine similarity between all words and a topic word such as `business' are computed, and the top $15$ words closest in cosine distance are stored as topical words. Then, a slider in a visual interface is used to increase or decrease the per-word contributions of topical words to a document's logit. Let the user-input slider value be $\alpha$, and the set of topical word indices be $T$. Then the user-controlled version of \Cref{eq:inner-product} becomes
+\begin{equation}
+\label{eq:inner-product-control}
+  f\left(u, x_m\right) = \theta_u^\top\left(\frac{1}{|x_m|}\sum_{j\in x_m}
+  (1 - \mbI[j \in T])\beta_j + \mbI[j \in T]\alpha \textrm{sgn}(w_{uj})\beta_j\right)\, .
+\end{equation}
+The sign function $\textrm{sgn}(~\cdot~)$ is applied to the per-word contribution to a document's logit. This is included since a word might contribute negatively to a document's logit, yet a user may wish to increase the weight of a related topical word.

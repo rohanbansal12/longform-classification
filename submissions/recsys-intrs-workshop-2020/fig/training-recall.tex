@@ -1,12 +1,7 @@
+% !TEX root = ../recommending-interesting-writing.tex
 \begin{figure}[!tb]
   \centering
   \includegraphics[width=0.95\linewidth]{fig/training-recall}
-  \caption{\acrlong{rfs} outperforms models based on word embeddings
-    permutation-marginalized recurrent neural networks (denoted by LSTM) on meal
-    recommendation. The recommendation models are trained on data from a food
-    tracking app as described in \Cref{sec:experiments_meals} and are evaluated
-    using the sampled recall metric, \Cref{eq:sampled-recall}. The inner
-    product, neural network, and residual regression functions for \acrlong{rfs}
-    are in \Cref{eqn:rankfromsets,eqn:neural-network,eqn:residual}.}
+  \caption{\acrlong{rfs} achieves better performance faster than \acrshort{bert} in terms of validation recall during training.}
   \label{fig:training-recall}
 \end{figure}

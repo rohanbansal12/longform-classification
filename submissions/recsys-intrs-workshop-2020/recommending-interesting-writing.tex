@@ -52,7 +52,7 @@
 \input{preamble/preamble_math}
 \input{preamble/preamble_acronyms}
 
-\title{Recommending Interesting Writing}
+\title{Recommending Interesting Writing using a Controllable, Explanation-Aware Visual Interface}
 % keywords:
 % deep learning
 % collaborative filtering
@@ -91,7 +91,7 @@
 %% other information printed in the page headers. This command allows
 %% the author to define a more concise list
 %% of authors' names for this purpose.
-\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
+\renewcommand{\shortauthors}{Bansal, Olmstead, Bram, Cottrell, and Altosaar}
 
 \begin{document}
 \input{sec_abstract}
@@ -127,7 +127,7 @@
 %% page.
 \begin{teaserfigure}
   \includegraphics[width=\textwidth]{fig/pipeline.pdf}
-  \caption{\textbf{End-to-end pipeline for recommending writing to editors at The Browser.} The \acrlong{rfs} recommendation model~\citep{altosaar2020rankfromsets:} is trained on data consisting of positive examples and negative examples collected from the editors' history of curated articles, and negative examples from news sources. After training and offline evaluation of the recommendation model, \acrlong{rfs} is deployed as a microservice on AWS Lambda, with the visual interface hosted on Github Pages. Editors can control the recommender system using the visual interface, which can aid in their decision-making. The editors' interrogation of the recommendation model and feedback is then used to inform of data collection and training.}
+  \caption{End-to-end pipeline for recommending writing to editors at The Browser. The \acrlong{rfs} recommendation model~\citep{altosaar2020rankfromsets:} is trained on data consisting of positive examples and negative examples collected from the editors' history of curated articles, and negative examples from news sources. After training and offline evaluation of the recommendation model, \acrlong{rfs} is deployed as a microservice on Amazon Web Services Lambda, with the visual interface hosted on Github Pages. Editors can control the recommender system using the visual interface, which can aid in their decision-making. The editors' interrogation of the recommendation model and feedback is then used to inform of data collection and training.}
   \Description{End-to-end pipeline for recommending nonfiction writing to editors at The Browser.}
   \label{fig:pipeline}
 \end{teaserfigure}
@@ -139,6 +139,7 @@
 \input{sec_intro}
 % \input{sec_background}
 \input{sec_method}
+\input{sec_interface}
 \input{sec_experiments}
 \input{sec_deployment}
 \input{sec_discussion}

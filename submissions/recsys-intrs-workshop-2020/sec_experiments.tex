@@ -2,29 +2,19 @@
 \section{Evaluation}
 \label{sec:experiments}
 
-We study the performance of \acrlong{rfs} on a dataset that we collect to assess whether \gls{rfs}, in addition to providing interpretable recommendations to help editors make decisions about articles.
+We conduct an offline empirical study of the performance of \acrlong{rfs} to assess its performance as a recommendation model. Then we qualitatively evaluate the visual interface to see whether the explanation-aware, controllable interface enabled by \gls{rfs} can help make editors at The Browser make better decisions.
 
-\paragraph{Data Collection and Preprocessing.} For positive examples, we use the historical set of articles curated by editors at The Browser. We augment the training data with articles selected by the editors of other curation services, and treat all positively-labeled examples curated by editors as data from a single user due to a paucity of data. We use articles from news websites as examples with negative labels, and collect additional articles with negative labels from websites most-featured by the editors to mimic the editorial process of reading a large swath of articles in a feed and distilling an article list to a select few. For preprocessing the data we use the tokenizer released by \citet{devlin2019bert:} and discard words not recognized by the tokenizer. This procedure leaves a dictionary with $30$k words, and $148$k training examples with $28$k positive labels.
+\paragraph{Data Collection and Preprocessing.} For positive examples, we use the historical set of articles curated by editors at The Browser. We augment the training data with articles selected by the editors of other curation services, and treat all positively-labeled examples curated by editors as data from a single user due to a paucity of data. We use articles from news websites as examples with negative labels, and collect additional articles with negative labels from websites most-featured by the editors to mimic the editorial process of reading a large swath of articles in a feed and distilling an article list to a select few. For preprocessing the data we use the tokenizer released by \citet{devlin2019bert:} and discard words not recognized by the tokenizer. This procedure results in a dictionary with $30$k words, and $646$k datapoints with $27$k positive labels.
 
-\paragraph{Metrics} Performance of the recommendation models is assessed with recall, and $15\%$ of the data is held-out for validation and test sets.
+\paragraph{Metrics} Performance of the recommendation models is assessed with recall, and $15\%$ of the datapoints are held out for the validation and test sets respectively.
 
-\paragraph{Experimental setup: RankFromSets} The performance of the model was similar for large embedding sizes, and we selected the dimension of the embeddings to be $25$. We cross-validate using the RMSProp optimizer~\citep{tieleman2012lecture} and grid search over learning rates of $\{10^{-1}, 10^{-3}, 10^{-4}, 10^{-5}\}$ and select the best-performing model for deployment.
+\paragraph{Experimental setup: RankFromSets} We cross-validate using the RMSProp optimizer~\citep{tieleman2012lecture} with a momentum of $0.9$ and grid search over learning rates of $\{10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}\}$, whether or not to initialize from pre-trained \acrshort{bert} embeddings~\citep{wolf2019huggingfaces}, and embedding sizes of $\{10,25,50, 100, 500, 1000\}$. This model is trained on an NVIDIA Tesla P100 GPU.
 
-\paragraph{Experimental setup: BERT}
+\paragraph{Experimental setup: \acrshort{bert}} To fine-tune \acrshort{bert}, we use the AdamW optimizer with a linear learning rate scheduler and warmup steps, with a batch size of $32$ and maximum input length of $512$ as in \citet{devlin2019bert:} and \citet{wolf2019huggingfaces}. A grid search is performed over learning rates of $\{2, 3, 4, 5\} \times 10^{-5}$, warmup steps of $\{10^2, 10^3, 10^4\}$, and total training steps of $\{10^2, 10^3, 10^4, 10^5\} \times 5$. The model is trained on an NVIDIA Tesla V100 GPU.
 
-for rankfromsets we searched over 6 embedding sizes [10,25,50, 100, 500, 1000] and 5 batch sizes [500, 1000, 2000, 5000, 10000]. We tried two optimizers, RMS and SGD, both with a momentum of 0.9 and learning rates of [1e-2, 1e-3, 1e-4, 1e-5] for RMS, while learning rates for SGD varied based on batch size and average token count
-Breakdown of Data: Train -      Total: 100797            Positive: 18598                 Negative: 82199
-Test -      Total: 272448          Positive: 4049                  Negative: 268399
-Evaluation -      Total: 272447            Positive: 4039                  Negative: 268348
-Both models used the same randomly selected 50k articles from the evaluation set for validation, and the entire test set was used at the end to generate predictions on new data.
-
-for BERT, used AdamW optimizer with a linear scheduler, with 4 different learning rates [2e-5, 3e-5, 4e-5, 5e-5] and a batch size of 32. Tried four different amounts for warmup steps [100, 1000, 1000, 10000] and total training steps were within the set [500, 5000, 50000, 100000] depending on the warmup step amount
-First 510 tokens were taken from the article to generate predictions so as to fit the BERT length requirements
+The best-performing model of \gls{rfs} is selected for deployment, and recall is evaluated on the test set, after using early stopping according to validation recall. The results are shown in \Cref{tab:recall}, and \gls{rfs} outperforms \acrshort{bert} by $14\%$. Furthermore, \gls{rfs} achieves better performance ten times faster than \acrshort{bert}, as shown in \Cref{fig:training-recall}. In a test to measure the speed of recommending $10^4$ held-out articles, \gls{rfs} ranked all articles in $120$ ms on a CPU, while \acrshort{bert} took $4$ m $54$ s to rank the articles on an NVIDIA Tesla V100 GPU. This represents a 2000-fold improvement in speed, which is beneficial for the controllable visual interface that requires \Cref{eq:inner-product-control} to be quickly computed in response to user input.
 
 \input{fig/training-recall}
 \input{table/recall}
 
-BERT 466/1000
-rankfromsets 531/1000
-
-\paragraph{Evaluation.} Qualitatively, editors at The Browser preferred the recommendations of our pipeline over their current workflow of a reading list sorted in terms of recency and use the system in production.
+\paragraph{Qualitative Evaluation} In a user study, editors at The Browser provided feedback that they used the visual interface to choose articles, and found this to be an improved workflow. The control over recommendations, and explanation-aware visual interface provided by \gls{rfs} helped elicit bugs in data collection (such as foreign language sources, or fiction writing) and provides an enjoyable user experience.
