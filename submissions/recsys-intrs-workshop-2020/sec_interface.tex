@@ -1,9 +1,9 @@
 % !TEX root = recommending-interesting-writing.tex
 \section{Visual Interface}
 
-The visual interface is designed using \gls{rfs} as the backend recommendation model. Using the inner product architecture for \gls{rfs} makes it easy to build a visual interface that is interpretable to provide explanations for why an item was recommended, and enables control so users can filter recommendations to help with decision-making.
+The visual interface is designed with \gls{rfs} as the backend recommendation model. We describe how the inner product architecture for \gls{rfs} enables a visual interface that is interpretable to provide explanations for why an item is recommended, and enables control so users can filter recommendations to help with decision-making.
 
-\paragraph{Explanation-aware recommendation} The user embedding $\theta_u$ and word embeddings $\beta_j$ in \Cref{eq:inner-product} can be used to interpret a recommendation. The logit for a given document with a set of words $x_m$ is the sum of per-word logits, which are computed as the inner product of the user embedding and word embedding. The per-word contribution of a word in a document to the logit that determines the document's ranking in a list of recommendations is therefore
+\paragraph{Explanation-aware recommendation} The user embedding $\theta_u$ and word embeddings $\beta_j$ in \Cref{eq:inner-product} can be used to interpret a recommendation. The logit for a given document with a set of words $x_m$ is the sum of per-word logits, which are computed as the inner product of the user embedding and word embedding. The per-word contribution of a word in a document to the logit that determines the document's ranking in a list of recommendations is
 \begin{equation}
   w_{uj} = \theta_u^\top \beta_j\, .
   \label{eq:word-weight}
