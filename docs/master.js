@@ -2,7 +2,7 @@ $(document).ready(function () {
   $("a").click(function () {
     $(this).attr("target", "_blank");
   });
-  $(".mdl-slider").on('change', function () {
+  $("button").click(function () {
     var current_selected_tab = $("section.is-active");
     var current_data_from_id = current_selected_tab.attr("id").slice(10);
     current_selected_tab.find(".rank_results").remove();
