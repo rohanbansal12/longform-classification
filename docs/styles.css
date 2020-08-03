@@ -35,15 +35,13 @@
   }
   .top_words {
     padding-top: 1%;
-    /*color: rgb(51, 204, 51, .7);*/
-    color: #292828;
+    color: rgb(51, 204, 51, .7);
     display : inline-block;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
   .least_words {
-    /*color: rgb(255, 102, 102, .7);*/
-    color: #969595;
+    color: rgb(255, 102, 102, .7);
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -181,15 +179,13 @@
 }
 .top_words {
   padding-top: 1%;
-  /*color: rgb(51, 204, 51, .7);*/
-  color: #292828;
+  color: rgb(51, 204, 51, .7);
   display : inline-block;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 .least_words {
-  /*color: rgb(255, 102, 102, .7);*/
-  color: #969595;
+  color: rgb(255, 102, 102, .7);
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -278,10 +274,10 @@ button {
   font-weight: bold;
 }
 
+
 .mdl-layout__tab.is-active::after {
   background: black !important;
 }
-
 table tr {
   border-bottom: 2px gray;
   height: 100px !important;
@@ -293,9 +289,8 @@ table th {
 table td {
   height: 100px !important; 
   word-wrap: break-word;
-  white-space: pre-wrap; 
+  /*white-space: pre-wrap; */
   overflow-wrap: break-word;
 }
-
 
 
