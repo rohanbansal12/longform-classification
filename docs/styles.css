@@ -34,11 +34,16 @@
     display : inline-block;
   }
   .top_words {
+    padding-top: 1%;
     color: rgb(51, 204, 51, .7);
     display : inline-block;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   .least_words {
     color: rgb(255, 102, 102, .7);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   .article_link {
     width:10px;
@@ -53,7 +58,7 @@
     overflow-wrap: break-word;
   }
   p {
-    margin: 2px;
+    margin: 0px;
   }
   .logit {
     text-align: left !important;
@@ -173,11 +178,16 @@
   overflow-wrap: break-word;
 }
 .top_words {
+  padding-top: 1%;
   color: rgb(51, 204, 51, .7);
   display : inline-block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .least_words {
   color: rgb(255, 102, 102, .7);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .toggle_words {
     display : inline-block;
@@ -195,7 +205,7 @@
   overflow-wrap: break-word;
 }
 p {
-  margin: 2px;
+  margin: 0px;
 }
 .logit {
   text-align: left !important;
@@ -279,7 +289,7 @@ table th {
 table td {
   height: 100px !important; 
   word-wrap: break-word;
-  white-space: pre-wrap; 
+  /*white-space: pre-wrap; */
   overflow-wrap: break-word;
 }
 
