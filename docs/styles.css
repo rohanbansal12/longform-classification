@@ -48,6 +48,7 @@
     color: #969595;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    white-space: break-spaces;
   }
   .article_link {
     width:10px;
@@ -195,6 +196,7 @@
   color: #969595;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  white-space: break-spaces;
 }
 .toggle_words {
     display : inline-block;
