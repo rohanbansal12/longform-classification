@@ -80,6 +80,17 @@ if args.map_items:
     print("-------------------")
 
 
+# pin memory if using GPU for high efficiency
+if args.use_gpu:
+    pin_mem = True
+else:
+    pin_mem = False
+
+
+
+
+
+
 # Generates a dataloader on the dataset that outputs entire set as a batch for one time predictions
 raw_loader = torch.utils.data.DataLoader(
     raw_data, batch_size=args.data_batch_size, collate_fn=collate_fn, pin_memory=pin_mem
