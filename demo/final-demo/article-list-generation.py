@@ -15,7 +15,7 @@ import data_processing.dictionaries as dictionary
 import scipy
 import json
 import pandas as pd
-
+import time
 
 # get arguments for script and parse
 def expand_path(string):
@@ -110,6 +110,7 @@ word_bias = np.load(word_bias_path)
 # perform mathematical calculations to get default top predictions
 print(word_articles.shape)
 print(word_emb.shape)
+time1 = time.time()
 article_embeddings = word_articles.dot(word_emb)
 
 emb_times_publication = np.dot(
@@ -123,6 +124,8 @@ product_with_bias = emb_times_publication + article_bias
 word_counts = word_articles.sum(axis=1).reshape(word_articles.shape[0], 1)
 
 final_logits = np.divide(product_with_bias, word_counts) + float(publication_bias)
+time2 = time.time()
+print(time2 - time1)
 
 indices = final_logits.argsort(axis=0)[-args.amount :].reshape(args.amount)
 

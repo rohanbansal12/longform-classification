@@ -81,7 +81,7 @@ final_output += corona_table
 final_output += section_tail
 final_output += footer
 
-with open(args.output_file, "w") as file:
+with open(args.output_file, "w", encoding="utf-8") as file:
     file.write(final_output)
 
 print("Final HTML created and saved to output file!")

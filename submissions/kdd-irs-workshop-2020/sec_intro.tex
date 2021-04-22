@@ -1,0 +1,10 @@
+% !TEX root = recommending-interesting-writing.tex
+\section{Introduction}
+\label{sec:introduction}
+Creative nonfiction, longform journalism, and blog posts are examples of the types of articles curated by The Browser's team of editors. The editors filter through a large number of articles from various publications to select content to recommend to subscribers.
+
+Journalism and content curation services such as The Browser can be constrained by financial resources, and this affects the types of machine learning solutions that might be feasible to aid editors in filtering through large numbers of articles. For example, serving models on GPUs may be too expensive, and a trade-off must be made between cost and performance.
+
+Similar to the trade-off in performance due to constraints, there is a trade-off in user privacy intrinsic to recommender systems. A machine learning model must be trained on historical consumption data, and for a performant model, the items in the training data should be similar to new content the recommender is designed to filter. However, the incentive structures of operating a recommender system within a business can influence decisions around privacy and transparency~\citep{diakopoulos2020oxford}. For example, advertising business models may engender recommender systems that upweight attention-grabbing content and hence time spent looking at ads. Such content might maximize a user's time spent with the service over time at the expense of long-term user experience or consent. Outside of recommender systems, privacy-preserving and open source tools such as the Signal encrypted messaging service\footnote{\url{https://signal.org/}} may provide improved user experience in terms of privacy-preserving, transparent, and explainable algorithms~\citep{cohn-gordon2017a-formal}.
+
+We build an end-to-end recommender system to address two aims: (1) to recommend interesting writing to editors at The Browser that provides interpretable recommendations and (2) to release a lightweight, open-source machine learning framework for developing and deploying recommender systems for quality writing.

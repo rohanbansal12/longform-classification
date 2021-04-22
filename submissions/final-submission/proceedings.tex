@@ -1,0 +1,232 @@
+\documentclass{sigchi}
+
+% Use this section to set the ACM copyright statement (e.g. for
+% preprints).  Consult the conference website for the camera-ready
+% copyright statement.
+
+% Copyright
+%\CopyrightYear{2020}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\setcopyright{usgov}
+%\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+% DOI
+%\doi{https://doi.org/10.1145/3313831.XXXXXXX}
+% ISBN
+%\isbn{978-1-4503-6708-0/20/04}
+%Conference
+%\conferenceinfo{CHI'20,}{April  25--30, 2020, Honolulu, HI, USA}
+%Price
+%\acmPrice{\$15.00}
+
+% Use this command to override the default ACM copyright statement
+% (e.g. for preprints).  Consult the conference website for the
+% camera-ready copyright statement.
+
+\toappear{\scriptsize
+ Copyright (c) 2020 for this paper by its authors. Use permitted under Creative Commons License Attribution 4.0 International (CC BY 4.0). \\
+ \emph{IntRS '20 - Joint Workshop on Interfaces and Human Decision Making for Recommender Systems},  September 26, 2020, Virtual Event}
+
+\clubpenalty=10000
+\widowpenalty = 10000
+
+%% HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP --
+%% Please note you need to make sure the copy for your specific
+%% license is used here!
+% \toappear{
+% Permission to make digital or hard copies of all or part of this work
+% for personal or classroom use is granted without fee provided that
+% copies are not made or distributed for profit or commercial advantage
+% and that copies bear this notice and the full citation on the first
+% page. Copyrights for components of this work owned by others than ACM
+% must be honored. Abstracting with credit is permitted. To copy
+% otherwise, or republish, to post on servers or to redistribute to
+% lists, requires prior specific permission and/or a fee. Request
+% permissions from \href{mailto:Permissions@acm.org}{Permissions@acm.org}. \\
+% \emph{CHI '16},  May 07--12, 2016, San Jose, CA, USA \\
+% ACM xxx-x-xxxx-xxxx-x/xx/xx\ldots \$15.00 \\
+% DOI: \url{http://dx.doi.org/xx.xxxx/xxxxxxx.xxxxxxx}
+% }
+
+% Arabic page numbers for submission.  Remove this line to eliminate
+% page numbers for the camera ready copy
+% \pagenumbering{arabic}
+
+% Load basic packages
+\PassOptionsToPackage{usenames,dvipsnames}{xcolor}
+\PassOptionsToPackage{colorlinks,linktoc=all}{hyperref}
+\usepackage{balance}       % to better equalize the last page
+\usepackage{graphics}      % for EPS, load graphicx instead 
+\usepackage[T1]{fontenc}   % for umlauts and other diaeresis
+\usepackage{txfonts}
+\usepackage{mathptmx}
+\usepackage{color}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{cuted}
+\usepackage{capt-of}
+\usepackage[pdflang={en-US},pdftex]{hyperref}
+
+% Some optional stuff you might like/need.
+\usepackage{microtype}        % Improved Tracking and Kerning
+% \usepackage[all]{hypcap}    % Fixes bug in hyperref caption linking
+\usepackage{ccicons}          % Cite your images correctly!
+% \usepackage[utf8]{inputenc} % for a UTF8 editor only
+
+% If you want to use todo notes, marginpars etc. during creation of
+% your draft document, you have to enable the "chi_draft" option for
+% the document class. To do this, change the very first line to:
+% "\documentclass[chi_draft]{sigchi}". You can then place todo notes
+% by using the "\todo{...}"  command. Make sure to disable the draft
+% option again before submitting your final document.
+\usepackage{todonotes}
+
+% Paper metadata (use plain text, for PDF inclusion and later
+% re-using, if desired).  Use \emtpyauthor when submitting for review
+% so you remain anonymous.
+\def\plaintitle{Recommending Interesting Writing using a Controllable, Explanation-Aware Visual Interface}
+\def\plainauthor{Rohan Bansal, Jordan Olmstead, Uri Bram, Robert Cottrell, Gabriel Reder, Jaan Altosaar}
+\def\emptyauthor{}
+\def\plainkeywords{content-based recommendation, open source, visual interface}
+\def\plaingeneralterms{Documentation, Standardization}
+
+% llt: Define a global style for URLs, rather that the default one
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{
+    \def\UrlFont{\sf}
+  }{
+    \def\UrlFont{\small\bf\ttfamily}
+  }}
+\makeatother
+\urlstyle{leo}
+
+% To make various LaTeX processors do the right thing with page size.
+\def\pprw{8.5in}
+\def\pprh{11in}
+\special{papersize=\pprw,\pprh}
+\setlength{\paperwidth}{\pprw}
+\setlength{\paperheight}{\pprh}
+\setlength{\pdfpagewidth}{\pprw}
+\setlength{\pdfpageheight}{\pprh}
+
+% Make sure hyperref comes last of your loaded packages, to give it a
+% fighting chance of not being over-written, since its job is to
+% redefine many LaTeX commands.
+\definecolor{linkColor}{RGB}{6,125,233}
+\hypersetup{%
+  pdftitle={\plaintitle},
+% Use \plainauthor for final version.
+  pdfauthor={\plainauthor},
+  pdfkeywords={\plainkeywords},
+  pdfdisplaydoctitle=true, % For Accessibility
+  bookmarksnumbered,
+  pdfstartview={FitH},
+  colorlinks,
+  citecolor=black,
+  filecolor=black,
+  linkcolor=black,
+  urlcolor=linkColor,
+  breaklinks=true,
+  hypertexnames=false
+}
+
+% create a shortcut to typeset table headings
+% \newcommand\tabhead[1]{\small\textbf{#1}}
+
+\input{preamble/preamble}
+\input{preamble/preamble_math}
+\input{preamble/preamble_acronyms}
+\bibliography{bib} 
+% End of preamble. Here it comes the document.
+\begin{document}
+
+\title{\plaintitle}
+
+\numberofauthors{6}
+\author{%
+  \alignauthor{Rohan Bansal\\
+    \affaddr{The Browser}\\
+    \email{rohan@thebrowser.com}}\\
+  \alignauthor{Jordan Olmstead\\
+    \affaddr{The Browser}\\
+    \email{jordan@thebrowser.com}}\\
+  \alignauthor{Uri Bram\\
+    \affaddr{The Browser}\\
+    \email{uri@thebrowser.com}}\\
+  \alignauthor{Robert Cottrell\\
+    \affaddr{The Browser}\\
+    \email{robert@thebrowser.com}}\\
+  \alignauthor{Gabriel Reder\\
+    \affaddr{Stanford University}\\
+    \email{gkreder@stanford.edu}}\\
+  \alignauthor{Jaan Altosaar\\
+    \affaddr{Princeton University}\\
+    \email{altosaar@princeton.edu}}\\
+}
+
+\maketitle
+\begin{strip}\centering
+\includegraphics[width=\textwidth]{fig/pipeline.pdf}
+\captionof{figure}{End-to-end pipeline for recommending writing to editors at The Browser with a controllable, explanation-aware visual interface. The \acrlong{rfs} recommendation model~\parencite{altosaar2020rankfromsets:} is trained on data consisting of positive examples from the editors' history of curated articles, and negative examples from news sources. After training and offline evaluation of the recommendation model, \acrlong{rfs} is deployed as a microservice on Amazon Web Services Lambda, with the visual interface hosted on Github Pages. Editors can control the recommender system using the visual interface, which can aid in their decision-making. The editors' interrogation of the recommendation model informs further data collection and training.
+\label{fig:pipeline}}
+\end{strip}
+
+\input{sec_abstract}
+
+
+% ACM Classfication
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10010405.10010497.10010498</concept_id>
+       <concept_desc>Applied computing~Document searching</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010257.10010282.10010292</concept_id>
+       <concept_desc>Computing methodologies~Learning from implicit feedback</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Applied computing~Document searching}
+\ccsdesc[500]{Computing methodologies~Learning from implicit feedback}
+
+% Author Keywords
+\keywords{content-based recommendation, open source, visual interface}
+
+% Print the classficiation codes
+\printccsdesc
+Please use the 2012 Classifiers and see this link to embed them in the text: \url{https://dl.acm.org/ccs/ccs_flat.cfm}
+
+
+\maketitle
+\input{sec_intro}
+\input{sec_method}
+\input{sec_interface}
+\input{sec_experiments}
+\input{sec_deployment}
+\input{sec_discussion}
+\section*{Acknowledgments}
+The authors are grateful to Christian Bjartli for help with data collection.
+% BALANCE COLUMNS
+\balance{}
+
+% REFERENCES FORMAT
+% References must be the same font size as other body text.
+\newcommand{\newblock}{}
+%\bibliographystyle{SIGCHI-Reference-Format}
+%\bibliography{bib}
+\printbibliography
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

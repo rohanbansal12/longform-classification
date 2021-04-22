@@ -1,0 +1,14 @@
+% !TEX root = recommending-interesting-writing.tex
+\section{Recommendation Model}
+\acrfull{rfs} is the recommendation model that powers the visual interface; the main part of the pipeline illustrated in \Cref{fig:pipeline}. \gls{rfs} scales to large numbers of articles, and can maximize the evaluation metric of recall~\parencite{altosaar2020rankfromsets:,altosaar2020probabilistic}. Recall, or the fraction of true positives returned by a recommendation model, is an appropriate evaluation metric for recommending interesting writing to editors at The Browser. A recommendation model such as \gls{rfs} can be readily backtested with recall as an evaluation metric, as historical data contains positive examples (articles selected by the editors) but rarely contains negative examples (articles seen but not selected by the editors). Further, as our goal is to build an explanation-aware visual interface that can also serve to control recommendations, and \gls{rfs} is fast, interpretable, and simple to integrate into a user interface as we describe later.
+
+\gls{rfs} is a recommendation model defined by a binary classifier. For a user $u$ and item $m$ with attributes $x_m$ (the set of unique words in an article), \gls{rfs} is described by the probability of $y_{um} = 1$ (user $u$ consuming item $m$):
+$$p(\yum = 1 \mid u, m) = \sigma\left( f \left (u, x_m\right) \right)\, ,$$
+where $\sigma$ is the sigmoid function. To parameterize the binary classifier in \gls{rfs}, we use an inner product architecture:
+\begin{equation}
+\label{eq:inner-product}
+  f\left(u, x_m\right) = \theta_u^\top\left(\frac{1}{|x_m|}\sum_{j\in x_m}
+  \beta_j\right)\, .
+\end{equation}
+In this architecture, the user embedding $\theta_u$ includes a dimension that is fixed to unity. Word embeddings $\beta_j$ (including a bias dimension for every word) and the publication embedding are fit with maximum likelihood estimation, and negative examples are sampled uniformly at random to balance positive examples~\parencite{altosaar2020probabilistic}.
+

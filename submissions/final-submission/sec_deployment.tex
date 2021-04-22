@@ -1,0 +1,3 @@
+% !TEX root = recommending-interesting-writing.tex
+\section{Deployment}
+The visual interface is deployed on Github Pages, with the backend, \gls{rfs}, deployed as a microservice on Amazon Web Services Lambda. \Cref{eq:inner-product-control} is cheap to compute, so the lambda function is a short python script that requires numpy as a dependency, compared to \acrshort{bert} which would require a hosted GPU solution. \gls{rfs} recommends recent articles from the editors' reading list of feeds. As a proof of concept, we include a tab for coronavirus-related articles that users can search through using the sliders and \Cref{eq:inner-product-control}.

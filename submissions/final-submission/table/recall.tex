@@ -1,0 +1,18 @@
+% !TEX root = ../recommending-interesting-writing.tex
+\begin{table}[tb]
+\centering
+\begin{tabular}{lSS}
+\toprule
+Recommendation Model & \multicolumn{1}{c}{Recall @ 1000 (\%)}
+\\
+\midrule
+\acrlong{rfs} &  \bfseries 53.1\\
+\acrshort{bert} & 46.6 \\
+\bottomrule
+\end{tabular}
+% BERT 466/1000
+% rankfromsets 531/1000
+% \vspace{1ex}
+\caption{\gls{rfs} outperforms \acrshort{bert} in an offline evaluation, on a task of predicting which articles editors at The Browser would feature based on words in the articles.}
+\label{tab:recall}
+\end{table}

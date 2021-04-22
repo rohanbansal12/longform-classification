@@ -79,6 +79,11 @@ if args.map_items:
     print(f"Filtered, Mapped Data saved to {mapped_data_path} directory")
     print("-------------------")
 
+# pin memory if using GPU for high efficiency
+if args.use_gpu:
+    pin_mem = True
+else:
+    pin_mem = False
 
 # pin memory if using GPU for high efficiency
 if args.use_gpu:
